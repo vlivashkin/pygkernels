@@ -1,0 +1,21 @@
+# Python compiled
+*.pyc
+
+# JetBrains
+.idea/
+*.iml
+
+# Jupyter notebook
+.ipynb_checkpoints/
+*.npy
+
+*.box
+*.gif
+*.tiff
+
+*.csv
+*.tsv
+*.zip
+*.txt
+
+*.obj
