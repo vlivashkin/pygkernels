@@ -5,14 +5,14 @@ chain_graph = np.array([
     [1, 0, 1, 0],
     [0, 1, 0, 1],
     [0, 0, 1, 0]
-])
+], dtype=np.float64)
 
 triangle_graph = np.array([
     [0, 1, 0, 0],
     [1, 0, 1, 1],
     [0, 1, 0, 1],
     [0, 1, 1, 0]
-])
+], dtype=np.float64)
 
 full_graph = np.array([
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -25,7 +25,7 @@ full_graph = np.array([
     [1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
-])
+], dtype=np.float64)
 
 tree_matrix = np.array([
     [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -38,7 +38,7 @@ tree_matrix = np.array([
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
     [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-])
+], dtype=np.float64)
 
 diploma_matrix = np.array([
     [0, 1, 1, 0, 0, 0],
@@ -47,7 +47,7 @@ diploma_matrix = np.array([
     [0, 0, 1, 0, 1, 1],
     [0, 0, 1, 1, 0, 1],
     [0, 0, 0, 1, 1, 0]
-])
+], dtype=np.float64)
 
 
 def equal_double(a, b):
@@ -65,13 +65,17 @@ def equal_double_non_strict(a, b):
     return abs(a - b) / mi < 0.013
 
 
-def equal_arrays_strict(a, b):
-    return equal_arrays(a, b, equal_double_strict)
-
-
 def equal_arrays(a, b, operator):
     for i in range(len(a)):
         for j in range(len(a[i])):
             if not operator(a[i, j], b[i, j]):
                 return False
     return True
+
+
+def equal_arrays_strict(a, b):
+    return equal_arrays(a, b, equal_double_strict)
+
+
+def equal_arrays_non_strict(a, b):
+    return equal_arrays(a, b, equal_double_non_strict)

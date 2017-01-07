@@ -1,6 +1,4 @@
-import statistics
-
-from scipy.linalg import expm, expm2, expm3
+from scipy.linalg import expm
 from sklearn.preprocessing import normalize
 
 from measure import distance
@@ -32,6 +30,7 @@ class Kernel:
     def get_all_K():
         return [pWalk_K(), Walk_K(), For_K(), logFor_K(), Comm_K(), logComm_K(),
                 Heat_K(), logHeat_K(), SCT_K(), SCCT_K(), RSP_K(), FE_K()]
+
 
 class pWalk_H(Kernel):
     def __init__(self):
@@ -124,8 +123,8 @@ class SCT_H(Kernel):
         H = 1/(1 + exp(-αL+/σ))
         """
         K_CT = np.linalg.pinv(getL(A))
-        sigma = statistics.stdev(K_CT)
-        return 1 / (1 + expm(-alpha * K_CT / sigma))
+        sigma = K_CT.std()
+        return 1. / (1. + expm(-alpha * K_CT / sigma))
 
 
 class SCCT_H(Kernel):
@@ -137,8 +136,8 @@ class SCCT_H(Kernel):
         H = 1/(1 + exp(-αL+/σ))
         """
         K_CCT = H_CCT(A)
-        sigma = statistics.stdev(K_CCT)
-        return 1 / (1 + expm(-alpha * K_CCT / sigma))
+        sigma = K_CCT.std()
+        return 1. / (1. + expm(-alpha * K_CCT / sigma))
 
 
 class SPCT_H(Kernel):

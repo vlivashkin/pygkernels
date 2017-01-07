@@ -1,4 +1,3 @@
-import scipy as sc
 from measure import kernel
 from measure import scale
 from measure.shortcuts import *
@@ -16,6 +15,10 @@ class Distance:
         D = HtoD(H)
         return np.power(D, self.power) if self.power != 1 else D
 
+    @staticmethod
+    def get_all():
+        return [pWalk(), Walk(), For(), logFor(), Comm(), logComm(),
+                Heat(), logHeat(), SCT(), SCCT()]
 
 class pWalk(Distance):
     def __init__(self):

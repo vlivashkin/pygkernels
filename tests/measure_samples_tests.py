@@ -7,7 +7,7 @@ from measure.shortcuts import *
 from tests import sample_graphs
 
 
-class TestStringMethods(unittest.TestCase):
+class MeasureSamplesTests(unittest.TestCase):
     def test_chain_SP(self):
         D = D_SP(sample_graphs.chain_graph)
         D = D / D[0, 1]
@@ -113,7 +113,7 @@ class TestStringMethods(unittest.TestCase):
             [0, 1, 0, 0],
             [0, 0, 1, 0],
             [0, 0, 0, 1]
-        ])
+        ], dtype=np.float64)
         self.assertTrue(sample_graphs.equal_arrays_strict(for_chain0, for_chain0_etalon))
 
         for_chain05 = For_H().getK(sample_graphs.chain_graph, 0.5)
@@ -122,7 +122,7 @@ class TestStringMethods(unittest.TestCase):
             [0.19642857, 0.58928571, 0.16071429, 0.05357143],
             [0.05357143, 0.16071429, 0.58928571, 0.19642857],
             [0.01785714, 0.05357143, 0.19642857, 0.73214286]
-        ])
+        ], dtype=np.float64)
         self.assertTrue(sample_graphs.equal_arrays_strict(for_chain05, for_chain05_etalon))
 
     def test_triangle_For_H(self):
@@ -132,7 +132,7 @@ class TestStringMethods(unittest.TestCase):
             [0.11111111, 0.66666667, 0.11111111, 0.11111111],
             [0.01851852, 0.11111111, 0.74768519, 0.12268519],
             [0.01851852, 0.11111111, 0.12268519, 0.74768519]
-        ])
+        ], dtype=np.float64)
         self.assertTrue(sample_graphs.equal_arrays_strict(for_chain02, for_chain02_etalon))
 
     if __name__ == '__main__':
