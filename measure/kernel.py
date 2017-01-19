@@ -124,7 +124,7 @@ class SCT_H(Kernel):
         """
         K_CT = np.linalg.pinv(getL(A))
         sigma = K_CT.std()
-        return 1. / (1. + expm(-alpha * K_CT / sigma))
+        return 1. / (1. + np.exp(-alpha * K_CT / sigma))
 
 
 class SCCT_H(Kernel):
@@ -137,7 +137,7 @@ class SCCT_H(Kernel):
         """
         K_CCT = H_CCT(A)
         sigma = K_CCT.std()
-        return 1. / (1. + expm(-alpha * K_CCT / sigma))
+        return 1. / (1. + np.exp(-alpha * K_CCT / sigma))
 
 
 class SPCT_H(Kernel):
