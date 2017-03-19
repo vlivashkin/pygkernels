@@ -22,9 +22,9 @@ class WorkflowTests(unittest.TestCase):
                     y_pred = ward.fit_predict(D)
                     ari = adjusted_rand_score(nodes, y_pred)
                     mean.append(ari)
-                mean = [m for m in mean if m is not None and m is not np.nan]
+                mean = [m for m in mean if m is not None and m == m]
                 score = np.array(mean).mean()
-                if score is not None and mean is not np.nan:
+                if score is not None and score == score:
                     measureparamdict[param] = score
             maxparam = max(measureparamdict.items(), key=operator.itemgetter(1))[0]
             print("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))

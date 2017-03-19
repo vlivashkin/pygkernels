@@ -63,8 +63,8 @@ def H_CCT(A: np.ndarray):
     """
     size = A.shape[0]
     I = np.eye(A.shape[0])
-    d = np.sum(A, axis=0).transpose()
-    D05 = np.diag(np.power(d, -0.5))
+    d = np.sum(A, axis=0).reshape((-1, 1))
+    D05 = np.diag(np.power(d, -0.5)[:, 0])
     H = np.eye(size) - np.ones((size, size)) / size
     volG = np.sum(A)
     M = D05.dot(A - d.dot(d.transpose()) / volG).dot(D05)

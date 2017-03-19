@@ -82,7 +82,10 @@ class Comm_H(Kernel):
         """
         H0 = exp(tA)
         """
-        return expm(t * A)
+        if t < 30:
+            return expm(t * A)
+        else:
+            return None
 
 
 class logComm_H(Kernel):
