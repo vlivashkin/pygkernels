@@ -13,23 +13,23 @@ class Kernel:
         self.parent_distance = parent_distance
 
     def getK(self, A: np.ndarray, param):
-        D = self.parent_distance.getD(A, param)
+        D = self.parent_distance().getD(A, param)
         return DtoK(D)
 
     @staticmethod
     def get_all_H():
         return [pWalk_H(), Walk_H(), For_H(), logFor_H(), Comm_H(), logComm_H(),
-                Heat_H(), logHeat_H(), SCT_H(), SCCT_H()]
+                Heat_H(), logHeat_H(), SCT_H(), SCCT_H(), SPCT_H()]
 
     @staticmethod
     def get_all_H_plus_RSP_FE():
         return [pWalk_H(), Walk_H(), For_H(), logFor_H(), Comm_H(), logComm_H(),
-                Heat_H(), logHeat_H(), SCT_H(), SCCT_H(), RSP_K(), FE_K()]
+                Heat_H(), logHeat_H(), SCT_H(), SCCT_H(), RSP_K(), FE_K(), SPCT_H()]
 
     @staticmethod
     def get_all_K():
         return [pWalk_K(), Walk_K(), For_K(), logFor_K(), Comm_K(), logComm_K(),
-                Heat_K(), logHeat_K(), SCT_K(), SCCT_K(), RSP_K(), FE_K()]
+                Heat_K(), logHeat_K(), SCT_K(), SCCT_K(), RSP_K(), FE_K(), SPCT_K()]
 
 
 class pWalk_H(Kernel):

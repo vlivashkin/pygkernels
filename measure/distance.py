@@ -88,7 +88,7 @@ class RSP(Distance):
         W = Pref * np.exp(-beta * C)
         Z = np.linalg.pinv(np.eye(size) - W)
         S = (Z.dot(C * W).dot(Z)) / Z
-        C_ = S - np.ones((size, 1)).dot(np.diag(S).transpose())
+        C_ = S - np.ones((size, 1)).dot(np.diag(S).reshape((-1, 1)).transpose())
         Δ_RSP = 0.5 * (C_ + C_.transpose())
         return Δ_RSP - np.diag(np.diag(Δ_RSP))
 

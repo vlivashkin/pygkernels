@@ -32,7 +32,7 @@ def DtoK(D: np.ndarray):
     K = -1 / 2 HΔH
     """
     size = D.shape[0]
-    H = (np.eye(size) - np.ones((size, size))) / size
+    H = np.eye(size) - (np.ones((size, size)) / size)
     return -0.5 * np.dot(H, D).dot(H)
 
 
