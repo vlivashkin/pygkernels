@@ -6,8 +6,11 @@ def normalize(dm: np.ndarray):
     return dm / dm.std() if dm.std() != 0 else dm
 
 
+def getD(A: np.ndarray):
+    return np.diag(np.sum(A, axis=0))
+
 def getL(A: np.ndarray):
-    return np.diag(np.sum(A, axis=0).transpose()) - A
+    return np.diag(np.sum(A, axis=0)) - A
 
 
 def H0toH(H0: np.ndarray):
@@ -69,13 +72,3 @@ def H_CCT(A: np.ndarray):
     volG = np.sum(A)
     M = D05.dot(A - d.dot(d.transpose()) / volG).dot(D05)
     return H.dot(D05).dot(M).dot(np.linalg.pinv(I - M)).dot(M).dot(D05).dot(H)
-
-
-def getPref(A: np.ndarray):
-    """
-    P^{ref} = D^{-1}*A
-    """
-    size = A.shape[0]
-    e = np.ones((size, 1))
-    D = np.diag(np.dot(A, e)[:, 0])
-    return np.linalg.pinv(D).dot(A)

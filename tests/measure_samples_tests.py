@@ -68,14 +68,12 @@ class MeasureSamplesTests(unittest.TestCase):
 
     def test_chain_Comm(self):
         D = Comm().getD(sample_graphs.chain_graph, 1.0)
+        D = np.sqrt(D)
         D = 0.964 * D / D[0, 1]
         self.assertTrue(sample_graphs.equal_double(D[0, 1], 0.964), "distances not equal: 0.964 != {}".format(D[0, 1]))
-        # 1.072
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.190), "distances not equal: 1.072 != {}".format(D[1, 2]))
-        # 1.492
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 2.308), "distances not equal: 1.492 != {}".format(D[0, 2]))
-        # 1.564
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 2.535), "distances not equal: 1.564 != {}".format(D[0, 3]))
+        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.072), "distances not equal: 1.072 != {}".format(D[1, 2]))
+        self.assertTrue(sample_graphs.equal_double(D[0, 2], 1.492), "distances not equal: 1.492 != {}".format(D[0, 2]))
+        self.assertTrue(sample_graphs.equal_double(D[0, 3], 1.564), "distances not equal: 1.564 != {}".format(D[0, 3]))
 
     def test_triangle_SPCT(self):
         D = SPCT().getD(sample_graphs.triangle_graph, 0)

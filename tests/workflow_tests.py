@@ -11,7 +11,7 @@ from measure.shortcuts import *
 
 class WorkflowTests(unittest.TestCase):
     def test_ward_clustering(self):
-        graphs, info = datasets.football
+        graphs, info = datasets.polbooks
         for measure in Kernel.get_all_H_plus_RSP_FE():
             measureparamdict = {}
             for param in [0.1]:

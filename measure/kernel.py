@@ -1,4 +1,4 @@
-from scipy.linalg import expm
+from scipy.linalg import expm, expm2, expm3
 from sklearn.preprocessing import normalize
 
 from measure import distance

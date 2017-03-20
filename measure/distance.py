@@ -4,7 +4,7 @@ from measure.shortcuts import *
 
 
 class Distance:
-    def __init__(self, name, scale, parent_kernel, power=1):
+    def __init__(self, name, scale, parent_kernel, power=1.):
         self.name = name
         self.scale = scale
         self.parent_kernel = parent_kernel
@@ -18,64 +18,66 @@ class Distance:
     @staticmethod
     def get_all():
         return [pWalk(), Walk(), For(), logFor(), Comm(), logComm(),
-                Heat(), logHeat(), SCT(), SCCT()]
+                Heat(), logHeat(), SCT(), SCCT(), RSP(), FE(), SPCT()]
+
 
 class pWalk(Distance):
     def __init__(self):
-        super().__init__('pWalk', scale.Rho, kernel.pWalk_H(), 1)
+        super().__init__('pWalk', scale.Rho, kernel.pWalk_H(), 1.)
 
 
 class Walk(Distance):
     def __init__(self):
-        super().__init__('Walk', scale.Rho, kernel.Walk_H(), 1)
+        super().__init__('Walk', scale.Rho, kernel.Walk_H(), 1.)
 
 
 class For(Distance):
     def __init__(self):
-        super().__init__('For', scale.Fraction, kernel.For_H(), 1)
+        super().__init__('For', scale.Fraction, kernel.For_H(), 1.)
 
 
 class logFor(Distance):
     def __init__(self):
-        super().__init__('logFor', scale.Fraction, kernel.logFor_H(), 1)
+        super().__init__('logFor', scale.Fraction, kernel.logFor_H(), 1.)
 
 
 class Comm(Distance):
     def __init__(self):
-        super().__init__('Comm', scale.Fraction, kernel.Comm_H(), 1)
+        super().__init__('Comm', scale.Fraction, kernel.Comm_H(), .5)
 
 
 class logComm(Distance):
     def __init__(self):
-        super().__init__('logComm', scale.Fraction, kernel.logComm_H(), 1)
+        super().__init__('logComm', scale.Fraction, kernel.logComm_H(), .5)
 
 
 class Heat(Distance):
     def __init__(self):
-        super().__init__('Heat', scale.Fraction, kernel.Heat_H(), 1)
+        super().__init__('Heat', scale.Fraction, kernel.Heat_H(), .5)
 
 
 class logHeat(Distance):
     def __init__(self):
-        super().__init__('logHeat', scale.Fraction, kernel.logHeat_H(), 1)
+        super().__init__('logHeat', scale.Fraction, kernel.logHeat_H(), .5)
 
 
 class SCT(Distance):
     def __init__(self):
-        super().__init__('SCT', scale.Fraction, kernel.SCT_H(), 1)
+        super().__init__('SCT', scale.Fraction, kernel.SCT_H(), 1.)
 
 
 class SCCT(Distance):
     def __init__(self):
-        super().__init__('SCCT', scale.Fraction, kernel.SCCT_H(), 1)
+        super().__init__('SCCT', scale.Fraction, kernel.SCCT_H(), 1.)
 
 
 class RSP(Distance):
     def __init__(self):
-        super().__init__('RSP', scale.FractionReversed, None, 1)
+        super().__init__('RSP', scale.FractionReversed, None, 1.)
 
     def getD(self, A: np.ndarray, beta):
         """
+        P^{ref} = D^{-1}*A, D = Diag(A*e)
         W = P^{ref} ◦ exp(-βC); ◦ is element-wise *
         Z = (I - W)^{-1}
         S = (Z(C ◦ W)Z)÷Z; ÷ is element-wise /
@@ -83,7 +85,7 @@ class RSP(Distance):
         Δ_RSP = (C_ + C_^T)/2
         """
         size = A.shape[0]
-        Pref = getPref(A)
+        Pref = np.linalg.pinv(getD(A)).dot(A)
         C = johnson(A, directed=False)
         W = Pref * np.exp(-beta * C)
         Z = np.linalg.pinv(np.eye(size) - W)
@@ -95,7 +97,7 @@ class RSP(Distance):
 
 class FE(Distance):
     def __init__(self):
-        super().__init__('FE', scale.FractionReversed, None, 1)
+        super().__init__('FE', scale.FractionReversed, None, 1.)
 
     def getD(self, A, beta):
         """
@@ -107,7 +109,7 @@ class FE(Distance):
         Δ_FE = (Φ + Φ^T)/2
         """
         size = A.shape[0]
-        Pref = getPref(A)
+        Pref = np.linalg.pinv(getD(A)).dot(A)
         C = johnson(A, directed=False)
         W = Pref * np.exp(-beta * C)
         Z = np.linalg.pinv(np.eye(size) - W)
@@ -120,9 +122,9 @@ class FE(Distance):
 
 class SPCT(Distance):
     def __init__(self):
-        super().__init__('SP-CT', scale.Linear, None, 1)
+        super().__init__('SP-CT', scale.Linear, None, 1.)
 
     def getD(self, A, lambda_):
         Ds = normalize(D_SP(A))
         Dr = normalize(HtoD(H_R(A)))
-        return (1 - lambda_) * Ds + lambda_ * Dr
+        return (1. - lambda_) * Ds + lambda_ * Dr
