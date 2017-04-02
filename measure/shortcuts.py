@@ -9,8 +9,9 @@ def normalize(dm: np.ndarray):
 def getD(A: np.ndarray):
     return np.diag(np.sum(A, axis=0))
 
+
 def getL(A: np.ndarray):
-    return np.diag(np.sum(A, axis=0)) - A
+    return getD(A) - A
 
 
 def H0toH(H0: np.ndarray):
@@ -65,7 +66,7 @@ def H_CCT(A: np.ndarray):
     K_CCT = HD^{-1/2}M(I - M)^{-1}MD^{-1/2}H
     """
     size = A.shape[0]
-    I = np.eye(A.shape[0])
+    I = np.eye(size)
     d = np.sum(A, axis=0).reshape((-1, 1))
     D05 = np.diag(np.power(d, -0.5)[:, 0])
     H = np.eye(size) - np.ones((size, size)) / size

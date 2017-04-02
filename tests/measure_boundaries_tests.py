@@ -29,7 +29,7 @@ class MeasureBoundariesTests(unittest.TestCase):
 
     def test_full_graph_SP_logFor_Walk_equality(self):
         parameter = 0.00001
-        D_SP = SPCT().getD(sample_graphs.chain_graph, 0)
+        D_SP = normalize(SPCT().getD(sample_graphs.chain_graph, 0))
         D_logFor = normalize(logFor().getD(sample_graphs.chain_graph, parameter))
         D_Walk = normalize(Walk().getD(sample_graphs.chain_graph, parameter))
         self.assertTrue(sample_graphs.equal_arrays_non_strict(D_SP, D_logFor))
