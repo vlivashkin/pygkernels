@@ -5,21 +5,21 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import adjusted_rand_score
 
 from graphs import datasets
-from measure.kernel import Kernel
+from measure.kernel import *
 from measure.shortcuts import *
+from ward import Ward
 
 
 class WorkflowTests(unittest.TestCase):
     def test_ward_clustering(self):
         graphs, info = datasets.polbooks
-        for measure in Kernel.get_all_H_plus_RSP_FE():
+        for measure in Kernel.get_all_H():
             measureparamdict = {}
-            for param in [0.1]:
+            for param in [0.5]:
                 mean = []
                 for edges, nodes in graphs:
                     D = measure.getK(edges, measure.scale().calc(edges, param))
-                    ward = AgglomerativeClustering(n_clusters=len(list(set(graphs[0][1]))))
-                    y_pred = ward.fit_predict(D)
+                    y_pred = Ward().predict(D, len(list(set(graphs[0][1]))))
                     ari = adjusted_rand_score(nodes, y_pred)
                     mean.append(ari)
                 mean = [m for m in mean if m is not None and m == m]

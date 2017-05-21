@@ -41,7 +41,8 @@ class pWalk_H(Kernel):
         H0 = (I - tA)^{-1}
         """
         size = A.shape[0]
-        return np.linalg.pinv(np.eye(size) - t * A)
+        K = np.linalg.pinv(np.eye(size) - t * A)
+        return K
 
 
 class Walk_H(Kernel):

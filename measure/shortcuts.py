@@ -37,7 +37,8 @@ def DtoK(D: np.ndarray):
     """
     size = D.shape[0]
     H = np.eye(size) - (np.ones((size, size)) / size)
-    return -0.5 * np.dot(H, D).dot(H)
+    K = -0.5 * np.dot(H, D).dot(H)
+    return K
 
 
 def D_SP(A: np.ndarray):
