@@ -9,9 +9,9 @@ class MeasureCommonTests(unittest.TestCase):
     def test_chain_all_distances_more_than_zero(self):
         start, end, n_params = 0.05, 0.5, 30
         for distance in Distance.get_all():
-            for param in np.linspace(start, end, n_params):
-                true_param = distance.scale.calc(sample_graphs.chain_graph, param)
-                D = distance.getD(sample_graphs.chain_graph, true_param)
+            distance = distance(sample_graphs.chain_graph)
+            for param in distance.scaler.scale(np.linspace(start, end, n_params)):
+                D = distance.getD(param)
                 for i in range(D.shape[0]):
                     for j in range(D.shape[1]):
                         self.assertTrue(D[i][j] >= 0,
@@ -20,9 +20,9 @@ class MeasureCommonTests(unittest.TestCase):
     def test_chain_all_distances_symmetry_matrix(self):
         start, end, n_params = 0.005, 0.5, 30
         for distance in Distance.get_all():
-            for param in np.linspace(start, end, n_params):
-                true_param = distance.scale.calc(sample_graphs.chain_graph, param)
-                D = distance.getD(sample_graphs.chain_graph, true_param)
+            distance = distance(sample_graphs.chain_graph)
+            for param in distance.scaler.scale(np.linspace(start, end, n_params)):
+                D = distance.getD(param)
                 for i in range(D.shape[0]):
                     for j in range(i + 1, D.shape[1]):
                         self.assertTrue(sample_graphs.equal_double_strict(D[i][j], D[j][i]),
@@ -31,9 +31,9 @@ class MeasureCommonTests(unittest.TestCase):
     def test_chain_all_distances_main_diagonal_zero(self):
         start, end, n_params = 0.0001, 0.5, 30
         for distance in Distance.get_all():
+            distance = distance(sample_graphs.chain_graph)
             for param in np.linspace(start, end, n_params):
-                true_param = distance.scale.calc(sample_graphs.chain_graph, param)
-                D = distance.getD(sample_graphs.chain_graph, true_param)
+                D = distance.getD(param)
                 for i in range(D.shape[0]):
                     self.assertTrue(D[i][i] == 0)
 

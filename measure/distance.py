@@ -1,81 +1,90 @@
 from measure import kernel
-from measure import scale
+from measure import scaler
 from measure.shortcuts import *
 
 
 class Distance:
-    def __init__(self, name, scale, parent_kernel=None, power=1.):
+    def __init__(self, name, scaler, A: np.ndarray, parent_kernel=None, power=1.):
         self.name = name
-        self.scale = scale
-        self.parent_kernel = parent_kernel
+        self.scaler = scaler(A)
+        self.A = A
+        self.parent_kernel = parent_kernel(A) if parent_kernel is not None else None
         self.power = power
 
-    def getD(self, A: np.ndarray, param):
-        H = self.parent_kernel.getK(A, param)
+    def getD(self, param):
+        H = self.parent_kernel.getK(param)
         D = HtoD(H)
         return np.power(D, self.power) if self.power != 1 else D
 
+    def grid_search(self, params=np.linspace(0, 1, 55)):
+        results = np.array((params.shape[0], ))
+        for idx, param in enumerate(self.scaler.scale(params)):
+            results[idx] = self.getD(param)
+        return results
+
     @staticmethod
     def get_all():
-        return [pWalk(), Walk(), For(), logFor(), Comm(), logComm(),
-                Heat(), logHeat(), SCT(), SCCT(), RSP(), FE(), SPCT()]
+        return [pWalk, Walk, For, logFor, Comm, logComm, Heat, logHeat, SCT, SCCT, RSP, FE, SPCT]
 
 
 class pWalk(Distance):
-    def __init__(self):
-        super().__init__('pWalk', scale.Rho, kernel.pWalk_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('pWalk', scaler.Rho, A, kernel.pWalk_H, .5)
 
 
 class Walk(Distance):
-    def __init__(self):
-        super().__init__('Walk', scale.Rho, kernel.Walk_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('Walk', scaler.Rho, A, kernel.Walk_H, .5)
 
 
 class For(Distance):
-    def __init__(self):
-        super().__init__('For', scale.Fraction, kernel.For_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('For', scaler.Fraction, A, kernel.For_H, .5)
 
 
 class logFor(Distance):
-    def __init__(self):
-        super().__init__('logFor', scale.Fraction, kernel.logFor_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('logFor', scaler.Fraction, A, kernel.logFor_H, .5)
 
 
 class Comm(Distance):
-    def __init__(self):
-        super().__init__('Comm', scale.Fraction, kernel.Comm_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('Comm', scaler.Fraction, A, kernel.Comm_H, .5)
 
 
 class logComm(Distance):
-    def __init__(self):
-        super().__init__('logComm', scale.Fraction, kernel.logComm_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('logComm', scaler.Fraction, A, kernel.logComm_H, .5)
 
 
 class Heat(Distance):
-    def __init__(self):
-        super().__init__('Heat', scale.Fraction, kernel.Heat_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('Heat', scaler.Fraction, A, kernel.Heat_H, .5)
 
 
 class logHeat(Distance):
-    def __init__(self):
-        super().__init__('logHeat', scale.Fraction, kernel.logHeat_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('logHeat', scaler.Fraction, A, kernel.logHeat_H, .5)
 
 
 class SCT(Distance):
-    def __init__(self):
-        super().__init__('SCT', scale.Fraction, kernel.SCT_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('SCT', scaler.Fraction, A, kernel.SCT_H, .5)
 
 
 class SCCT(Distance):
-    def __init__(self):
-        super().__init__('SCCT', scale.Fraction, kernel.SCCT_H(), .5)
+    def __init__(self, A: np.ndarray):
+        super().__init__('SCCT', scaler.Fraction, A, kernel.SCCT_H, .5)
 
 
 class RSP(Distance):
-    def __init__(self):
-        super().__init__('RSP', scale.FractionReversed)
+    def __init__(self, A: np.ndarray):
+        super().__init__('RSP', scaler.FractionReversed, A)
+        self.size = A.shape[0]
+        self.Pref = np.linalg.pinv(getD(A)).dot(A)
+        self.C = johnson(A, directed=False)
 
-    def getD(self, A: np.ndarray, beta):
+    def getD(self, beta):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
         W = P^{ref} ◦ exp(-βC); ◦ is element-wise *
@@ -84,22 +93,22 @@ class RSP(Distance):
         C_ = S - e(d_S)^T; d_S = diag(S)
         Δ_RSP = (C_ + C_^T)/2
         """
-        size = A.shape[0]
-        Pref = np.linalg.pinv(getD(A)).dot(A)
-        C = johnson(A, directed=False)
-        W = Pref * np.exp(-beta * C)
-        Z = np.linalg.pinv(np.eye(size) - W)
-        S = (Z.dot(C * W).dot(Z)) / Z
-        C_ = S - np.ones((size, 1)).dot(np.diag(S).reshape((-1, 1)).transpose())
+        W = self.Pref * np.exp(-beta * self.C)
+        Z = np.linalg.pinv(np.eye(self.size) - W)
+        S = (Z.dot(self.C * W).dot(Z)) / Z
+        C_ = S - np.ones((self.size, 1)).dot(np.diag(S).reshape((-1, 1)).transpose())
         Δ_RSP = 0.5 * (C_ + C_.transpose())
         return Δ_RSP - np.diag(np.diag(Δ_RSP))
 
 
 class FE(Distance):
-    def __init__(self):
-        super().__init__('FE', scale.FractionReversed)
+    def __init__(self, A: np.ndarray):
+        super().__init__('FE', scaler.FractionReversed, A)
+        self.size = A.shape[0]
+        self.Pref = np.linalg.pinv(getD(A)).dot(A)
+        self.C = johnson(A, directed=False)
 
-    def getD(self, A, beta):
+    def getD(self, beta):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
         W = P^{ref} (element-wise)* exp(-βC)
@@ -108,11 +117,8 @@ class FE(Distance):
         Φ = -1/β * log(Z^h)
         Δ_FE = (Φ + Φ^T)/2
         """
-        size = A.shape[0]
-        Pref = np.linalg.pinv(getD(A)).dot(A)
-        C = johnson(A, directed=False)
-        W = Pref * np.exp(-beta * C)
-        Z = np.linalg.pinv(np.eye(size) - W)
+        W = self.Pref * np.exp(-beta * self.C)
+        Z = np.linalg.pinv(np.eye(self.size) - W)
         Dh = np.diag(np.diag(Z))
         Zh = Z.dot(np.linalg.pinv(Dh))
         Φ = np.log(Zh) / -beta
@@ -121,10 +127,10 @@ class FE(Distance):
 
 
 class SPCT(Distance):
-    def __init__(self):
-        super().__init__('SP-CT', scale.Linear)
+    def __init__(self, A: np.ndarray):
+        super().__init__('SP-CT', scaler.Linear, A)
+        self.Ds = normalize(D_SP(A))
+        self.Dr = normalize(HtoD(H_R(A)))
 
-    def getD(self, A, lambda_):
-        Ds = normalize(D_SP(A))
-        Dr = normalize(HtoD(H_R(A)))
-        return (1. - lambda_) * Ds + lambda_ * Dr
+    def getD(self, lmbda):
+        return (1. - lmbda) * self.Ds + lmbda * self.Dr
