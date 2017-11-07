@@ -1,9 +1,9 @@
 # Python compiled
+__pycache__/
 *.pyc
 
 # JetBrains
 .idea/
-*.iml
 
 # Jupyter notebook
 .ipynb_checkpoints/
@@ -19,3 +19,5 @@
 *.txt
 
 *.obj
+
+.DS_Store

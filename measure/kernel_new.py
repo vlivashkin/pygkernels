@@ -74,7 +74,7 @@ class NormalizedHeat(KernelNew):  # !
         D = getD(A)
         L = D - A
         D_12 = np.linalg.inv(np.sqrt(D))
-        self.Ll = D_12 * L * D_12
+        self.Ll = D_12.dot(L).dot(D_12)
 
     def getK(self, t):
         K = KernelNew.mat_exp(-t * self.Ll, n=50)
@@ -102,7 +102,7 @@ class PersonalizedPageRank(KernelNew):
     def __init__(self, A: np.ndarray):
         super().__init__('NEW PersonalizedPageRank', scaler.Linear, A)
         D = getD(A)
-        self.P = np.linalg.inv(D) * A
+        self.P = np.linalg.inv(D).dot(A)
 
     def getK(self, alpha):
         K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - alpha * self.P)
@@ -129,7 +129,7 @@ class HeatPersonalizedPareRank(KernelNew):  # !
     def __init__(self, A: np.ndarray):
         super().__init__('NEW HeatPersonalizedPareRank', scaler.Fraction, A)
         self.D = getD(A)
-        self.P = np.linalg.inv(self.D) * A
+        self.P = np.linalg.inv(self.D).dot(A)
 
     def getK(self, t):
         K = KernelNew.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
