@@ -14,7 +14,7 @@ class KernelNew(Kernel):
             RegularizedLaplacian,
             PersonalizedPageRank,
             ModifiedPersonalizedPageRank,
-            HeatPersonalizedPareRank
+            HeatPersonalizedPageRank
         ]
 
     @staticmethod
@@ -125,7 +125,7 @@ class ModifiedPersonalizedPageRank(KernelNew):
         return np.log(K)
 
 
-class HeatPersonalizedPareRank(KernelNew):  # !
+class HeatPersonalizedPageRank(KernelNew):  # !
     def __init__(self, A: np.ndarray):
         super().__init__('NEW HeatPersonalizedPareRank', scaler.Fraction, A)
         self.D = getD(A)
