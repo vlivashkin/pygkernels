@@ -6,7 +6,7 @@ from measure.shortcuts import *
 
 
 class Kernel:
-    def __init__(self, name, scaler, A: np.ndarray, parent_distance=None):
+    def __init__(self, name, scaler, A: np.matrixlib.defmatrix.matrix, parent_distance=None):
         self.name = name
         self.scaler = scaler(A)
         self.A = A
@@ -37,7 +37,7 @@ class Kernel:
 
 
 class pWalk_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('pWalk H', scaler.Rho, A)
 
     def getK(self, t):
@@ -49,7 +49,7 @@ class pWalk_H(Kernel):
 
 
 class Walk_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Walk H', scaler.Rho, A)
         self.parent_distance = pWalk_H(self.A)
 
@@ -58,7 +58,7 @@ class Walk_H(Kernel):
 
 
 class For_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('For H', scaler.Fraction, A)
 
     def getK(self, t):
@@ -70,7 +70,7 @@ class For_H(Kernel):
 
 
 class logFor_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logFor H', scaler.Fraction, A)
         self.parent_distance = For_H(self.A)
 
@@ -79,7 +79,7 @@ class logFor_H(Kernel):
 
 
 class Comm_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Comm H', scaler.Fraction, A)
 
     def getK(self, t):
@@ -90,7 +90,7 @@ class Comm_H(Kernel):
 
 
 class logComm_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logComm H', scaler.Fraction, A)
         self.parent_distance = Comm_H(self.A)
 
@@ -99,7 +99,7 @@ class logComm_H(Kernel):
 
 
 class Heat_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Heat H', scaler.Fraction, A)
 
     def getK(self, t):
@@ -110,7 +110,7 @@ class Heat_H(Kernel):
 
 
 class logHeat_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logHeat H', scaler.Fraction, A)
         self.parent_distance = Heat_H(self.A)
 
@@ -119,7 +119,7 @@ class logHeat_H(Kernel):
 
 
 class SCT_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SCT H', scaler.Fraction, A)
         self.K_CT = np.linalg.pinv(getL(self.A))
         self.sigma = self.K_CT.std()
@@ -133,7 +133,7 @@ class SCT_H(Kernel):
 
 
 class SCCT_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SCCT H', scaler.Fraction, A)
         self.K_CCT = H_CCT(A)
         self.sigma = self.K_CCT.std()
@@ -147,7 +147,7 @@ class SCCT_H(Kernel):
 
 
 class SPCT_H(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SP-CT H', scaler.Linear, A)
         self.Hs = normalize(DtoK(D_SP(A)))
         self.Hc = normalize(H_R(A))
@@ -157,65 +157,65 @@ class SPCT_H(Kernel):
 
 
 class pWalk_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('pWalk K', scaler.Rho, A, distance.pWalk)
 
 
 class Walk_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Walk K', scaler.Rho, A, distance.Walk)
 
 
 class For_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('For K', scaler.Fraction, A, distance.For)
 
 
 class logFor_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logFor K', scaler.Fraction, A, distance.logFor)
 
 
 class Comm_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Comm K', scaler.Fraction, A, distance.Comm)
 
 
 class logComm_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logComm K', scaler.Fraction, A, distance.logComm)
 
 
 class Heat_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Heat K', scaler.Fraction, A, distance.Heat)
 
 
 class logHeat_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logHeat K', scaler.Fraction, A, distance.logHeat)
 
 
 class SCT_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SCT K', scaler.Fraction, A, distance.SCT)
 
 
 class SCCT_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SCCT K', scaler.Fraction, A, distance.SCCT)
 
 
 class RSP_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('RSP K', scaler.FractionReversed, A, distance.RSP)
 
 
 class FE_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('FE K', scaler.FractionReversed, A, distance.FE)
 
 
 class SPCT_K(Kernel):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SP-CT K', scaler.Linear, A, distance.SPCT)

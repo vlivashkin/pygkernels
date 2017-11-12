@@ -25,7 +25,7 @@ class Cluster:
 
 
 class Ward:
-    def predict(self, K: np.ndarray, clusters_count):
+    def predict(self, K: np.matrixlib.defmatrix.matrix, clusters_count):
         clusters = [Cluster([i], K.shape[0]) for i in range(K.shape[0])]
         for i in range(K.shape[0] - clusters_count):
             self.iteration(K, clusters)

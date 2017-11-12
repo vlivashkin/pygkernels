@@ -4,7 +4,7 @@ from measure.shortcuts import *
 
 
 class Distance:
-    def __init__(self, name, scaler, A: np.ndarray, parent_kernel=None, power=1.):
+    def __init__(self, name, scaler, A: np.matrixlib.defmatrix.matrix, parent_kernel=None, power=1.):
         self.name = name
         self.scaler = scaler(A)
         self.A = A
@@ -28,57 +28,57 @@ class Distance:
 
 
 class pWalk(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('pWalk', scaler.Rho, A, kernel.pWalk_H, .5)
 
 
 class Walk(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Walk', scaler.Rho, A, kernel.Walk_H, .5)
 
 
 class For(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('For', scaler.Fraction, A, kernel.For_H, .5)
 
 
 class logFor(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logFor', scaler.Fraction, A, kernel.logFor_H, .5)
 
 
 class Comm(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Comm', scaler.Fraction, A, kernel.Comm_H, .5)
 
 
 class logComm(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logComm', scaler.Fraction, A, kernel.logComm_H, .5)
 
 
 class Heat(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('Heat', scaler.Fraction, A, kernel.Heat_H, .5)
 
 
 class logHeat(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('logHeat', scaler.Fraction, A, kernel.logHeat_H, .5)
 
 
 class SCT(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SCT', scaler.Fraction, A, kernel.SCT_H, .5)
 
 
 class SCCT(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SCCT', scaler.Fraction, A, kernel.SCCT_H, .5)
 
 
 class RSP(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('RSP', scaler.FractionReversed, A)
         self.size = A.shape[0]
         self.Pref = np.linalg.pinv(getD(A)).dot(A)
@@ -102,7 +102,7 @@ class RSP(Distance):
 
 
 class FE(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('FE', scaler.FractionReversed, A)
         self.size = A.shape[0]
         self.Pref = np.linalg.pinv(getD(A)).dot(A)
@@ -127,7 +127,7 @@ class FE(Distance):
 
 
 class SPCT(Distance):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('SP-CT', scaler.Linear, A)
         self.Ds = normalize(D_SP(A))
         self.Dr = normalize(HtoD(H_R(A)))

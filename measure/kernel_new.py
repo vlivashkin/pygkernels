@@ -32,11 +32,11 @@ class KernelNew(Kernel):
 
 
 class Katz(KernelNew):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW Katz', scaler.Rho, A)
         self.rad = self._get_radius(self.A)
 
-    def _get_radius(self, M: np.ndarray):
+    def _get_radius(self, M: np.matrixlib.defmatrix.matrix):
         val, vec = np.linalg.eig(M)
         return np.max(np.abs(val))
 
@@ -46,7 +46,7 @@ class Katz(KernelNew):
 
 
 class Estrada(KernelNew):  # !
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW Estrada', scaler.Fraction, A)
 
     def getK(self, t):
@@ -55,7 +55,7 @@ class Estrada(KernelNew):  # !
 
 
 class Heat(KernelNew):  # !
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW Heat', scaler.Fraction, A)
         D = getD(A)
         self.L = D - A
@@ -69,7 +69,7 @@ class Heat(KernelNew):  # !
 
 
 class NormalizedHeat(KernelNew):  # !
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW NormalizedHeat', scaler.Fraction, A)
         D = getD(A)
         L = D - A
@@ -85,7 +85,7 @@ class NormalizedHeat(KernelNew):  # !
 
 
 class RegularizedLaplacian(KernelNew):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW RegularizedLaplacian', scaler.Fraction, A)
         D = getD(A)
         self.L = D - A
@@ -99,7 +99,7 @@ class RegularizedLaplacian(KernelNew):
 
 
 class PersonalizedPageRank(KernelNew):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW PersonalizedPageRank', scaler.Linear, A)
         D = getD(A)
         self.P = np.linalg.inv(D).dot(A)
@@ -113,7 +113,7 @@ class PersonalizedPageRank(KernelNew):
 
 
 class ModifiedPersonalizedPageRank(KernelNew):
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW ModifiedPersonalizedPageRank', scaler.Linear, A)
         self.D = getD(A)
 
@@ -126,7 +126,7 @@ class ModifiedPersonalizedPageRank(KernelNew):
 
 
 class HeatPersonalizedPageRank(KernelNew):  # !
-    def __init__(self, A: np.ndarray):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix):
         super().__init__('NEW HeatPersonalizedPareRank', scaler.Fraction, A)
         self.D = getD(A)
         self.P = np.linalg.inv(self.D).dot(A)

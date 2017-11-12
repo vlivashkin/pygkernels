@@ -13,7 +13,7 @@ __pycache__/
 *.gif
 *.tiff
 
-*.csv
+# *.csv
 *.tsv
 *.zip
 *.txt
