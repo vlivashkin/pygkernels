@@ -1,8 +1,8 @@
 import os
 
-from graphs.importer import ImportedGraphBuilder
+from graphs.dataset.importer import ImportedGraphBuilder
 
-ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets')
+ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'impl')
 
 
 def load_polbooks_or_football(name, nodes, edges):

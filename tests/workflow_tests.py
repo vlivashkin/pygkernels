@@ -1,19 +1,18 @@
 import operator
 import unittest
 
-from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import adjusted_rand_score
 
-from graphs import datasets
+from cluster.ward import Ward
+from graphs import dataset
 from measure.kernel import *
 from measure.kernel_new import KernelNew
 from measure.shortcuts import *
-from ward import Ward
 
 
 class WorkflowTests(unittest.TestCase):
     def test_ward_clustering(self):
-        graphs, info = datasets.polbooks
+        graphs, info = dataset.polbooks
         for measure in Kernel.get_all_H():
             measureparamdict = {}
             mean = []
@@ -21,7 +20,7 @@ class WorkflowTests(unittest.TestCase):
                 measure_o = measure(edges)
                 param = list(measure_o.scaler.scale([0.5]))[0]
                 D = measure_o.getK(param)
-                y_pred = Ward().predict(D, len(list(set(graphs[0][1]))))
+                y_pred = Ward(len(list(set(graphs[0][1])))).predict(D)
                 ari = adjusted_rand_score(nodes, y_pred)
                 mean.append(ari)
             mean = [m for m in mean if m is not None and m == m]
@@ -33,7 +32,7 @@ class WorkflowTests(unittest.TestCase):
 
 
     def test_ward_clustering_new_kernels(self):
-        graphs, info = datasets.polbooks
+        graphs, info = dataset.polbooks
         for measure in KernelNew.get_all_new():
             measureparamdict = {}
             mean = []
@@ -42,7 +41,7 @@ class WorkflowTests(unittest.TestCase):
                 param = list(measure_o.scaler.scale([0.5]))[0]
                 D = measure_o.getK(param)
                 if D is not None:
-                    y_pred = Ward().predict(D, len(list(set(graphs[0][1]))))
+                    y_pred = Ward(len(list(set(graphs[0][1])))).predict(D, )
                     ari = adjusted_rand_score(nodes, y_pred)
                     mean.append(ari)
                 else:

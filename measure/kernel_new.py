@@ -100,7 +100,7 @@ class RegularizedLaplacian(KernelNew):
 
 class PersonalizedPageRank(KernelNew):
     def __init__(self, A: np.matrixlib.defmatrix.matrix):
-        super().__init__('NEW PersonalizedPageRank', scaler.Linear, A)
+        super().__init__('NEW PersonalizedPageRank', scaler.Fraction, A)
         D = getD(A)
         self.P = np.linalg.inv(D).dot(A)
 
@@ -114,7 +114,7 @@ class PersonalizedPageRank(KernelNew):
 
 class ModifiedPersonalizedPageRank(KernelNew):
     def __init__(self, A: np.matrixlib.defmatrix.matrix):
-        super().__init__('NEW ModifiedPersonalizedPageRank', scaler.Linear, A)
+        super().__init__('NEW ModifiedPersonalizedPageRank', scaler.Fraction, A)
         self.D = getD(A)
 
     def getK(self, alpha):

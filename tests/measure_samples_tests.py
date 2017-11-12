@@ -1,137 +1,130 @@
 import unittest
 
-from measure.distance import Walk, logFor, For, pWalk, Comm, SPCT, FE
+from graphs import sample
+from measure.distance import *
 from measure.kernel import For_H
 from measure.scaler import AlphaToT
 from measure.shortcuts import *
-from tests import sample_graphs
+
+
+# https://arxiv.org/abs/1305.7514
+class Article1ComparisonTests(unittest.TestCase):
+    def __init__(self):
+        super().__init__()
+        self.graph = sample.chain_graph
+    
+    def _comparison(self, D, true_values, atol=0.03):
+        D *= true_values[0] / D[0, 1]
+        for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]], true_values):
+            self.assertTrue(np.isclose(d, t, atol=atol), "{} != {}, diff={}".format(d, t, np.abs(d - t)))
+
+    def test_chain_SP(self):
+        D = D_SP(self.graph)
+        self._comparison(D, [1.000, 1.000, 2.000, 3.000])
+
+    def test_chain_R(self):
+        D = HtoD(H_R(self.graph))
+        self._comparison(D, [1.000, 1.000, 2.000, 3.000])
+
+    def test_chain_Walk(self):
+        parameter = list(AlphaToT(self.graph).scale([1.0]))[0]
+        D = Walk(self.graph).getD(parameter)
+        self._comparison(D, [1.025, 0.950, 1.975, 3.000])
+
+    def test_chain_logFor(self):
+        D = logFor(self.graph).getD(2.0)
+        self._comparison(D, [0.959, 1.081, 2.040, 2.999])
+
+    def test_chain_For(self):
+        D = For(self.graph).getD(1.0)
+        self._comparison(D, [1.026, 0.947, 1.500, 1.895])
+
+    def test_chain_Comm(self):
+        D = Comm(self.graph).getD(1.0)
+        self._comparison(D, [0.964, 1.072, 1.492, 1.564])
+
+    def test_chain_pWalk(self):
+        parameter = list(AlphaToT(self.graph).scale([4.5]))[0]
+        D = pWalk(self.graph).getD(parameter)
+        self._comparison(D, [1.025, 0.950, 1.541, 1.466])
+
+        parameter = list(AlphaToT(self.graph).scale([1.0]))[0]
+        D = pWalk(self.graph).getD(parameter)
+        self._comparison(D, [0.988, 1.025, 1.379, 1.416])
+
+    if __name__ == '__main__':
+        unittest.main()
+
+
+# https://arxiv.org/abs/1212.1666
+class Article2Comparison(unittest.TestCase):
+    def __init__(self):
+        super().__init__()
+        self.graph = self.graph
+    
+    def _comparison(self, name, D, true_value, atol=0.02):
+        div = D[0, 1] / D[1, 2]
+        self.assertTrue(np.isclose(div, true_value, atol=atol),
+                        "{}: {} != {}, diff={}".format(name, div, true_value, div - true_value))
+
+    def test_boundaries_10(self):
+        D = SPCT(self.graph).getD(0)
+        self._comparison('SP', D, 1.0)
+        D = logFor(self.graph).getD(0.01)
+        self._comparison('logFor', D, 1.0)
+        D = RSP(self.graph).getD(20.0)
+        self._comparison('RSP', D, 1.0)
+        D = FE(self.graph).getD(30.0)
+        self._comparison('FE', D, 1.0)
+
+    def test_boundaries_15(self):
+        D = SPCT(self.graph).getD(1)
+        self._comparison('CT', D, 1.5)
+        D = logFor(self.graph).getD(500.0)
+        # self._comparison('logFor', D, 1.5)
+        D = RSP(self.graph).getD(0.0001)
+        self._comparison('RSP', D, 1.5)
+        D = FE(self.graph).getD(0.0001)
+        self._comparison('FE', D, 1.5)
+
+    if __name__ == '__main__':
+        unittest.main()
 
 
 class MeasureSamplesTests(unittest.TestCase):
-    def test_chain_SP(self):
-        D = D_SP(sample_graphs.chain_graph)
-        D = D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 1.000), "distances not equal: 1.000 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.000), "distances not equal: 1.000 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 2.000), "distances not equal: 2.000 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 3.000), "distances not equal: 3.000 != {}".format(D[0, 3]))
-
-    def test_chain_R(self):
-        D = HtoD(H_R(sample_graphs.chain_graph))
-        D = D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 1.000), "distances not equal: 1.000 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.000), "distances not equal: 1.000 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 2.000), "distances not equal: 2.000 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 3.000), "distances not equal: 3.000 != {}".format(D[0, 3]))
-
-    def test_chain_pWalk(self):
-        parameter = list(AlphaToT(sample_graphs.chain_graph).scale([4.5]))[0]
-        D = pWalk(sample_graphs.chain_graph).getD(parameter)
-        D = 1.025 * D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 1.025), "distances not equal: 1.025 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 0.950), "distances not equal: 0.950 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 1.541), "distances not equal: 1.541 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 1.466), "distances not equal: 1.466 != {}".format(D[0, 3]))
-
-        parameter = list(AlphaToT(sample_graphs.chain_graph).scale([1.0]))[0]
-        D = pWalk(sample_graphs.chain_graph).getD(parameter)
-        D = 0.988 * D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 0.988), "distances not equal: 0.988 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.025), "distances not equal: 1.025 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 1.379), "distances not equal: 1.379 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 1.416), "distances not equal: 1.416 != {}".format(D[0, 3]))
-
-    def test_chain_Walk(self):
-        parameter = list(AlphaToT(sample_graphs.chain_graph).scale([1.0]))[0]
-        D = Walk(sample_graphs.chain_graph).getD(parameter)
-        D = 1.025 * D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 1.025), "distances not equal: 1.025 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 0.950), "distances not equal: 0.950 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 1.975), "distances not equal: 1.975 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 3.000), "distances not equal: 3.000 != {}".format(D[0, 3]))
-
-    def test_chain_For(self):
-        D = For(sample_graphs.chain_graph).getD(1.0)
-        D = 1.026 * D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 1.026), "distances not equal: 1.026 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 0.947), "distances not equal: 0.947 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 1.500), "distances not equal: 1.500 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 1.895), "distances not equal: 1.895 != {}".format(D[0, 3]))
-
-    def test_chain_logFor(self):
-        D = logFor(sample_graphs.chain_graph).getD(2.0)
-        D = 0.959 * D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 0.959), "distances not equal: 0.959 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.081), "distances not equal: 1.081 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 2.040), "distances not equal: 2.040 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 2.999), "distances not equal: 2.999 != {}".format(D[0, 3]))
-
-    def test_chain_Comm(self):
-        D = Comm(sample_graphs.chain_graph).getD(1.0)
-        D = np.sqrt(D)
-        D = 0.964 * D / D[0, 1]
-        self.assertTrue(sample_graphs.equal_double(D[0, 1], 0.964), "distances not equal: 0.964 != {}".format(D[0, 1]))
-        self.assertTrue(sample_graphs.equal_double(D[1, 2], 1.072), "distances not equal: 1.072 != {}".format(D[1, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 2], 1.492), "distances not equal: 1.492 != {}".format(D[0, 2]))
-        self.assertTrue(sample_graphs.equal_double(D[0, 3], 1.564), "distances not equal: 1.564 != {}".format(D[0, 3]))
-
-    def test_triangle_SPCT(self):
-        D = SPCT(sample_graphs.triangle_graph).getD(0)
-        self.assertTrue(sample_graphs.equal_double(D[0, 1] / D[1, 2], 1.0),
-                        "SP distance attitude not equal 1.0: {}".format(D[0, 1] / D[1, 2]))
-        D = SPCT(sample_graphs.triangle_graph).getD(1)
-        self.assertTrue(sample_graphs.equal_double(D[0, 1] / D[1, 2], 1.5),
-                        "CT distance attitude not equal 1.5: {}".format(D[0, 1] / D[1, 2]))
-
-    def test_triangle_logFor(self):
-        D = logFor(sample_graphs.triangle_graph).getD(0.01)
-        self.assertTrue(sample_graphs.equal_double_non_strict(D[0, 1] / D[1, 2], 1.0),
-                        "Logarithmic Forest distance attitude not equal 1.0: {}".format(D[0, 1] / D[1, 2]))
-        D = logFor(sample_graphs.triangle_graph).getD(500.0)
-        self.assertTrue(sample_graphs.equal_double_non_strict(D[0, 1] / D[1, 2], 1.5),
-                        "Logarithmic Forest distance attitude not equal 1.5: {}".format(D[0, 1] / D[1, 2]))
-
-    def test_triangle_FE(self):
-        D = FE(sample_graphs.triangle_graph).getD(0.0001)
-        self.assertTrue(sample_graphs.equal_double_non_strict(D[0, 1] / D[1, 2], 1.5),
-                        "Free Energy distance attitude not equal 1.5: {}".format(D[0, 1] / D[1, 2]))
-        D = FE(sample_graphs.triangle_graph).getD(30.0)
-        self.assertTrue(sample_graphs.equal_double_non_strict(D[0, 1] / D[1, 2], 1.0),
-                        "Free Energy distance attitude not equal 1.0: {}".format(D[0, 1] / D[1, 2]))
-
     def test_tree_SPCT_equality(self):
-        SP = SPCT(sample_graphs.tree_matrix).getD(0)
-        CT = SPCT(sample_graphs.tree_matrix).getD(1)
-        self.assertTrue(sample_graphs.equal_arrays_strict(SP, CT))
+        SP = SPCT(sample.tree_matrix).getD(0)
+        CT = SPCT(sample.tree_matrix).getD(1)
+        self.assertTrue(np.allclose(SP, CT))
 
     def test_chain_For_H(self):
-        for_chain0 = For_H(sample_graphs.chain_graph).getK(0)
+        for_chain0 = For_H(sample.triangle_graph).getK(0)
         for_chain0_etalon = np.array([
             [1, 0, 0, 0],
             [0, 1, 0, 0],
             [0, 0, 1, 0],
             [0, 0, 0, 1]
         ], dtype=np.float64)
-        self.assertTrue(sample_graphs.equal_arrays_strict(for_chain0, for_chain0_etalon))
+        self.assertTrue(np.allclose(for_chain0, for_chain0_etalon))
 
-        for_chain05 = For_H(sample_graphs.chain_graph).getK(0.5)
+        for_chain05 = For_H(sample.triangle_graph).getK(0.5)
         for_chain05_etalon = np.array([
             [0.73214286, 0.19642857, 0.05357143, 0.01785714],
             [0.19642857, 0.58928571, 0.16071429, 0.05357143],
             [0.05357143, 0.16071429, 0.58928571, 0.19642857],
             [0.01785714, 0.05357143, 0.19642857, 0.73214286]
         ], dtype=np.float64)
-        self.assertTrue(sample_graphs.equal_arrays_strict(for_chain05, for_chain05_etalon))
+        self.assertTrue(np.allclose(for_chain05, for_chain05_etalon))
 
     def test_triangle_For_H(self):
-        for_chain02 = For_H(sample_graphs.triangle_graph).getK(0.2)
+        for_chain02 = For_H(sample.triangle_graph).getK(0.2)
         for_chain02_etalon = np.array([
             [0.85185185, 0.11111111, 0.01851852, 0.01851852],
             [0.11111111, 0.66666667, 0.11111111, 0.11111111],
             [0.01851852, 0.11111111, 0.74768519, 0.12268519],
             [0.01851852, 0.11111111, 0.12268519, 0.74768519]
         ], dtype=np.float64)
-        self.assertTrue(sample_graphs.equal_arrays_strict(for_chain02, for_chain02_etalon))
+        self.assertTrue(np.allclose(for_chain02, for_chain02_etalon))
 
     if __name__ == '__main__':
         unittest.main()
