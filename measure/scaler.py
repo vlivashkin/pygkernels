@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Scaler:
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix = None):
         self.A = A
 
     def scale(self, ts):
@@ -15,7 +15,7 @@ class Linear(Scaler):  # SP-CT
 
 
 class AlphaToT(Scaler):  # α > 0 -> 0 < t < α^{-1}
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix = None):
         super().__init__(A)
         cfm = np.linalg.eigvals(self.A)
         self.rho = np.max(cfm)
@@ -26,7 +26,7 @@ class AlphaToT(Scaler):  # α > 0 -> 0 < t < α^{-1}
 
 
 class Rho(Scaler):  # pWalk, Walk
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A: np.matrixlib.defmatrix.matrix = None):
         super().__init__(A)
         cfm = np.linalg.eigvals(self.A)
         self.rho = np.max(cfm)

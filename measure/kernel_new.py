@@ -5,6 +5,7 @@ from measure import scaler
 from measure.kernel import Kernel, getD
 
 
+# Avrachenkov: Kernels on Graphs as Proximity Measures
 class KernelNew(Kernel):
     @staticmethod
     def get_all_new():

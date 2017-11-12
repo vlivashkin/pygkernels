@@ -41,3 +41,8 @@ news_3cl_3 = load_newsgroup_graph('news_3cl_3', 'newsgroup/news_3cl_3_classeo.cs
 news_5cl_1 = load_newsgroup_graph('news_5cl_1', 'newsgroup/news_5cl_1_classeo.csv', 'newsgroup/news_5cl_1_Docr.csv')
 news_5cl_2 = load_newsgroup_graph('news_5cl_2', 'newsgroup/news_5cl_2_classeo.csv', 'newsgroup/news_5cl_2_Docr.csv')
 news_5cl_3 = load_newsgroup_graph('news_5cl_3', 'newsgroup/news_5cl_3_classeo.csv', 'newsgroup/news_5cl_3_Docr.csv')
+news = [
+    news_2cl_1, news_2cl_2, news_2cl_3,
+    news_3cl_1, news_3cl_2, news_3cl_3,
+    # news_5cl_1, news_5cl_2, news_5cl_3
+]

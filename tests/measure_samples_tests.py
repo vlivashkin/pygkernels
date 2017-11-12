@@ -7,13 +7,14 @@ from measure.scaler import AlphaToT
 from measure.shortcuts import *
 
 
+# Chebotarev: Studying new classes of graph metrics
 # https://arxiv.org/abs/1305.7514
 class Article1ComparisonTests(unittest.TestCase):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.graph = sample.chain_graph
-    
-    def _comparison(self, D, true_values, atol=0.03):
+
+    def _comparison(self, D, true_values, atol=0.04):
         D *= true_values[0] / D[0, 1]
         for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]], true_values):
             self.assertTrue(np.isclose(d, t, atol=atol), "{} != {}, diff={}".format(d, t, np.abs(d - t)))
@@ -56,12 +57,13 @@ class Article1ComparisonTests(unittest.TestCase):
         unittest.main()
 
 
+# Kivimäki: Developments in the theory of randomized shortest paths with a comparison of graph node distances
 # https://arxiv.org/abs/1212.1666
 class Article2Comparison(unittest.TestCase):
     def __init__(self):
         super().__init__()
         self.graph = self.graph
-    
+
     def _comparison(self, name, D, true_value, atol=0.02):
         div = D[0, 1] / D[1, 2]
         self.assertTrue(np.isclose(div, true_value, atol=atol),

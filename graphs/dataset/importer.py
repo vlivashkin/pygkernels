@@ -66,6 +66,7 @@ class ImportedGraphBuilder:
         if self.name is None or self.nodes is None or self.edges is None:
             raise NotImplementedError()
         info = {
+            'name': self.name,
             'count': 1,
             'n': len(self.nodes),
             'k': len(list(set(self.nodes))),
