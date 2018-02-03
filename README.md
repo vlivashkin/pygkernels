@@ -1,5 +1,7 @@
 # py_graphs
 
+Framework for clustering graphs using various measures.
+
 Publications
 ------------
 
