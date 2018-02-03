@@ -34,9 +34,9 @@ class ShortcutsTests(unittest.TestCase):
         ])
 
     def test_get_D(self):
-        D = shortcuts.getD(self.A)
+        D = shortcuts.get_D(self.A)
         self.assertTrue(np.array_equal(D, self.D))
 
     def test_get_L(self):
-        L = shortcuts.getL(self.A)
+        L = shortcuts.get_L(self.A)
         self.assertTrue(np.array_equal(L, self.L))

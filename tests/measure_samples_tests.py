@@ -15,7 +15,10 @@ class Article1ComparisonTests(unittest.TestCase):
         self.graph = sample.chain_graph
 
     def _comparison(self, D, true_values, atol=0.04):
-        D *= true_values[0] / D[0, 1]
+        print("{}\t{}\t{}\t{}".format(*true_values))
+        print("{}\t{}\t{}\t{}".format(D[0, 1], D[1, 2], D[0, 2], D[0, 3]))
+        D *= 3. / (D[0, 1] + D[1, 2] + D[2, 3])
+        print("{}\t{}\t{}\t{}".format(D[0, 1], D[1, 2], D[0, 2], D[0, 3]))
         for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]][:len(true_values)], true_values):
             self.assertTrue(np.isclose(d, t, atol=atol), "{} != {}, diff={}".format(d, t, np.abs(d - t)))
 
@@ -24,24 +27,24 @@ class Article1ComparisonTests(unittest.TestCase):
         self._comparison(D, [1.000, 1.000, 2.000, 3.000])
 
     def test_chain_R(self):
-        D = HtoD(H_R(self.graph))
+        D = H_to_D(H_R(self.graph))
         self._comparison(D, [1.000, 1.000, 2.000, 3.000])
 
     def test_chain_Walk(self):
         parameter = list(AlphaToT(self.graph).scale([1.0]))[0]
         D = Walk(self.graph).getD(parameter)
-        self._comparison(D, [1.025, 0.950, 1.975])
+        self._comparison(D, [1.025, 0.950, 1.975, 3.000])
 
     def test_chain_logFor(self):
         D = logFor(self.graph).getD(2.0)
-        self._comparison(D, [0.959, 1.081, 2.040])
+        self._comparison(D, [0.959, 1.081, 2.040, 3.000])
 
     def test_chain_For(self):
         D = For(self.graph).getD(1.0)
         self._comparison(D, [1.026, 0.947, 1.500, 1.895])
 
     def test_chain_SqResistance(self):
-        D = np.sqrt(HtoD(H_R(self.graph)))
+        D = np.sqrt(H_to_D(H_R(self.graph)))
         self._comparison(D, [1.000, 1.000, 1.414, 1.732])
 
     def test_chain_Comm(self):
@@ -49,11 +52,11 @@ class Article1ComparisonTests(unittest.TestCase):
         self._comparison(D, [0.964, 1.072, 1.492, 1.564])
 
     def test_chain_pWalk(self):
-        parameter = AlphaToT(self.graph).scale([4.5]).__next__
+        parameter = AlphaToT(self.graph).scale([4.5]).__next__()
         D = pWalk(self.graph).getD(parameter)
         self._comparison(D, [1.025, 0.950, 1.541, 1.466])
 
-        parameter = AlphaToT(self.graph).scale([1.0]).__next__
+        parameter = AlphaToT(self.graph).scale([1.0]).__next__()
         D = pWalk(self.graph).getD(parameter)
         self._comparison(D, [0.988, 1.025, 1.379, 1.416])
 

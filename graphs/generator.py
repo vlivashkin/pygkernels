@@ -17,6 +17,7 @@ class StochasticBlockModelGraphGenerator:
 
     def generate_graphs(self, count, n, k, p_in, p_out):
         info = {
+            'name': 'count:{}, n:{}, k:{}, p_in:{}, p_out:{}'.format(count, n, k, p_in, p_out),
             'count': count,
             'n': n,
             'k': k,

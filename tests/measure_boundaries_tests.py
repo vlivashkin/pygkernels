@@ -8,7 +8,7 @@ from graphs import sample
 class MeasureBoundariesTests(unittest.TestCase):
     def test_SPCT_order(self):
         SP = normalize(D_SP(sample.diploma_matrix))
-        CT = normalize(HtoD(H_R(sample.diploma_matrix)))
+        CT = normalize(H_to_D(H_R(sample.diploma_matrix)))
         SPCT_SP = normalize(SPCT(sample.diploma_matrix).getD(0))
         SPCT_CT = normalize(SPCT(sample.diploma_matrix).getD(1))
         self.assertTrue(np.allclose(SP, SPCT_SP))

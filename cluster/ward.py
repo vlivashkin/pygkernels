@@ -30,7 +30,7 @@ class Ward(ClusterMixin, BaseEstimator):
     def __init__(self, n_clusters):
         self.n_clusters = n_clusters
 
-    def predict(self, K: np.matrixlib.defmatrix.matrix):
+    def predict(self, K):
         clusters = [Cluster([i], K.shape[0]) for i in range(K.shape[0])]
         for i in range(K.shape[0] - self.n_clusters):
             self._iteration(K, clusters)

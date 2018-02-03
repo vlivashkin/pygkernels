@@ -2,26 +2,33 @@ import numpy as np
 from scipy.sparse.csgraph import johnson
 
 
-def normalize(dm: np.matrixlib.defmatrix.matrix):
+def normalize(dm):
     return dm / dm.std() if dm.std() != 0 else dm
 
 
-def getD(A: np.matrixlib.defmatrix.matrix):
+def get_D(A):
     return np.diag(np.sum(A, axis=0))
 
 
-def getL(A: np.matrixlib.defmatrix.matrix):
-    return getD(A) - A
+def get_D_1(A):
+    """
+    D_1 = D^{-1}
+    """
+    return np.diag(1. / np.sum(A, axis=0))
 
 
-def H0toH(H0: np.matrixlib.defmatrix.matrix):
+def get_L(A):
+    return get_D(A) - A
+
+
+def H0_to_H(H0):
     """
     H = element - wise log(H0)
     """
     return np.log(H0)
 
 
-def HtoD(H: np.matrixlib.defmatrix.matrix):
+def H_to_D(H):
     """
     D = (h * 1^T + 1 * h^T - H - H ^ T) / 2
     """
@@ -31,7 +38,7 @@ def HtoD(H: np.matrixlib.defmatrix.matrix):
     return 0.5 * ((h.dot(i.transpose()) + i.dot(h.transpose())) - H - H.transpose())
 
 
-def DtoK(D: np.matrixlib.defmatrix.matrix):
+def D_to_K(D):
     """
     K = -1 / 2 HΔH
     """
@@ -41,24 +48,24 @@ def DtoK(D: np.matrixlib.defmatrix.matrix):
     return K
 
 
-def D_SP(A: np.matrixlib.defmatrix.matrix):
+def D_SP(A):
     """
     Johnson's Algorithm
     """
     return johnson(A, directed=False)
 
 
-def H_R(A: np.matrixlib.defmatrix.matrix):
+def H_R(A):
     """
     H = (L + J)^{-1}
     """
     size = A.shape[0]
-    L = getL(A)
+    L = get_L(A)
     J = np.ones((size, size)) / size
     return np.linalg.pinv(L + J)
 
 
-def H_CCT(A: np.matrixlib.defmatrix.matrix):
+def H_CCT(A):
     """
     H = I - E / n
     M = D^{-1/2}(A - dd^T/vol(G))D^{-1/2},

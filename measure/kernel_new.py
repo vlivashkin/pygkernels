@@ -2,7 +2,7 @@ import numpy as np
 import numpy.matlib
 
 from measure import scaler
-from measure.kernel import Kernel, getD
+from measure.kernel import Kernel, get_D
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures
@@ -33,11 +33,12 @@ class KernelNew(Kernel):
 
 
 class Katz(KernelNew):
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW Katz', scaler.Rho, A)
         self.rad = self._get_radius(self.A)
 
-    def _get_radius(self, M: np.matrixlib.defmatrix.matrix):
+    @staticmethod
+    def _get_radius(M):
         val, vec = np.linalg.eig(M)
         return np.max(np.abs(val))
 
@@ -47,7 +48,7 @@ class Katz(KernelNew):
 
 
 class Estrada(KernelNew):  # !
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW Estrada', scaler.Fraction, A)
 
     def getK(self, t):
@@ -56,9 +57,9 @@ class Estrada(KernelNew):  # !
 
 
 class Heat(KernelNew):  # !
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW Heat', scaler.Fraction, A)
-        D = getD(A)
+        D = get_D(A)
         self.L = D - A
 
     def getK(self, t):
@@ -70,9 +71,9 @@ class Heat(KernelNew):  # !
 
 
 class NormalizedHeat(KernelNew):  # !
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW NormalizedHeat', scaler.Fraction, A)
-        D = getD(A)
+        D = get_D(A)
         L = D - A
         D_12 = np.linalg.inv(np.sqrt(D))
         self.Ll = D_12.dot(L).dot(D_12)
@@ -86,9 +87,9 @@ class NormalizedHeat(KernelNew):  # !
 
 
 class RegularizedLaplacian(KernelNew):
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW RegularizedLaplacian', scaler.Fraction, A)
-        D = getD(A)
+        D = get_D(A)
         self.L = D - A
 
     def getK(self, beta):
@@ -100,9 +101,9 @@ class RegularizedLaplacian(KernelNew):
 
 
 class PersonalizedPageRank(KernelNew):
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW PersonalizedPageRank', scaler.Fraction, A)
-        D = getD(A)
+        D = get_D(A)
         self.P = np.linalg.inv(D).dot(A)
 
     def getK(self, alpha):
@@ -114,9 +115,9 @@ class PersonalizedPageRank(KernelNew):
 
 
 class ModifiedPersonalizedPageRank(KernelNew):
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW ModifiedPersonalizedPageRank', scaler.Fraction, A)
-        self.D = getD(A)
+        self.D = get_D(A)
 
     def getK(self, alpha):
         K = np.linalg.inv(self.D - alpha * self.A)
@@ -127,9 +128,9 @@ class ModifiedPersonalizedPageRank(KernelNew):
 
 
 class HeatPersonalizedPageRank(KernelNew):  # !
-    def __init__(self, A: np.matrixlib.defmatrix.matrix):
+    def __init__(self, A):
         super().__init__('NEW HeatPersonalizedPareRank', scaler.Fraction, A)
-        self.D = getD(A)
+        self.D = get_D(A)
         self.P = np.linalg.inv(self.D).dot(A)
 
     def getK(self, t):
