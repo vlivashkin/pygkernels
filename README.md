@@ -3,22 +3,21 @@
 Framework for clustering graphs using various distances/proximity measures.
 
 List of distances/proximity measures:
-* Shortest Path
-* Commute Time
+* Shortest Path and Commute Time (and linear combination)
 * plain Walk (Von Neumann diffusion kernel)
-* Forest(Regularized Laplacian kernel)
+* Forest (Regularized Laplacian kernel)
 * Communicability (Exponential diffusion kernel)
 * Heat kernel (Laplacian exponential diffusion kernel)
-* Walk (logarithmic), logarithmic Forest, logarithmic Communicability, logarithmic Heat
+* logarithmic versions of Walk, Forest, Communicability, Heat
 * Sigmoid Commute Time
 * Sigmoid Corrected Commute Time
 * Randomized Shortest Path
 * Free Energy
-* NormalizedHeat
-* RegularizedLaplacian
-* PersonalizedPageRank
-* ModifiedPersonalizedPageRank
-* HeatPersonalizedPageRank
+* Normalized Heat
+* Regularized Laplacian
+* Personalized PageRank
+* Modified Personalized PageRank
+* Heat Personalized PageRank
 
 List of clustering algoritms:
 * Kernel k-means
