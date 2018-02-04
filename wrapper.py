@@ -46,7 +46,7 @@ class ParallelByGraphs:
     def calc_for_graph(self, measure_name, graph_idx, param):
         mg, y_true = self.measure_graphs[measure_name][graph_idx]
         try:
-            K = mg.getK(param)
+            K = mg.get_K(param)
             y_pred = self.clf.fit_predict(K)
             return self.score_function(y_true, y_pred)
         except (ValueError, LinAlgError, FloatingPointError):

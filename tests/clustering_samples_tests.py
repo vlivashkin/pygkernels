@@ -28,20 +28,20 @@ class Article1Tests(unittest.TestCase):
         for graphs, info in news:
             A, labels_true = graphs[0]
             measure = measure_class(A)
-            K = measure.getK(best_param)
+            K = measure.get_K(best_param)
             labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=8).fit_predict(K)
             nmi = normalized_mutual_info_score(labels_true, labels_pred)
             self.assertTrue(np.isclose(nmi * 100, self.etalon[info['name']][idx], atol=10.),
-                            "{}, {}: {} != {}, diff:{}".format(info['name'], measure.name, nmi * 100,
-                                                               self.etalon[info['name']][idx],
-                                                               np.abs(nmi * 100 - self.etalon[info['name']][idx])))
+                            "{}, {}: {:0.3f} != {:0.3f}, diff:{:0.3f}".format(
+                                info['name'], measure.name, nmi * 100, self.etalon[info['name']][idx],
+                                np.abs(nmi * 100 - self.etalon[info['name']][idx])))
             print('{} success'.format(info['name']))
 
     def test_RSP(self):
-        self._newsgroup_results(RSP_K, 0.02, 0)  # 8.6
+        self._newsgroup_results(RSP, 0.02, 0)  # 8.6
 
     def test_FE(self):
-        self._newsgroup_results(FE_K, 0.07, 1)  # 13.5
+        self._newsgroup_results(FE, 0.07, 1)  # 13.5
 
     def test_logFor(self):
         self._newsgroup_results(logFor_H, 0.95, 2)  # 0.26
@@ -72,42 +72,43 @@ class Article2Tests(unittest.TestCase):
             'news_5cl_2': (0.6177, 0.6401, 0.5977, 0.6243, 0.6154, 0.5970),
             'news_5cl_3': (0.6269, 0.6065, 0.5729, 0.5750, 0.5712, 0.4801),
             'polblogs': (0.5525, 0.5813, 0.5811, 0.5815, 0.5757, 0.5605),
-            'zachary': (1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000)
+            # 'zachary': (1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000)
         }
 
     def _dataset_results(self, measure_class, best_param, idx):
         for graphs, info in [  # football,
-                             news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
-                             # polblogs,
-                             zachary]:
+            news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
+            # polblogs,
+            # zachary
+        ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
-            K = measure.getK(best_param)
+            K = measure.get_K(best_param)
             labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=8).fit_predict(K)
             nmi = normalized_mutual_info_score(labels_true, labels_pred)
             self.assertTrue(np.isclose(nmi, self.etalon[info['name']][idx], atol=0.1),
-                            "{}, {}: {} != {}, diff:{}".format(info['name'], measure.name, nmi,
-                                                               self.etalon[info['name']][idx],
-                                                               np.abs(nmi - self.etalon[info['name']][idx])))
+                            "{}, {}: Test {:0.3f} != True {:0.3f}, diff:{:0.3f}".format(
+                                info['name'], measure.name, nmi, self.etalon[info['name']][idx],
+                                np.abs(nmi - self.etalon[info['name']][idx])))
             print('{} success'.format(info['name']))
 
     def test_CCT(self):
         self._dataset_results(SCCT_H, 26, 0)
 
     def test_FE(self):
-        self._dataset_results(FE_K, 0.1, 1)
+        self._dataset_results(FE, 0.1, 1)
 
     def test_logFor(self):
         self._dataset_results(logFor_H, 1, 2)
 
     def test_RSP(self):
-        self._dataset_results(RSP_K, 0.03, 3)
+        self._dataset_results(RSP, 0.03, 3)
 
     def test_SCT(self):
         self._dataset_results(SCT_H, 22, 4)
 
     def test_SP(self):
-        self._dataset_results(SPCT_H, 0, 5)
+        self._dataset_results(SP_K, 0, 5)
 
     if __name__ == '__main__':
         unittest.main()

@@ -12,14 +12,14 @@ class Kernel:
         self.A = A
         self.parent_distance = parent_distance(A) if parent_distance is not None else None
 
-    def getK(self, param):
-        D = self.parent_distance.getD(param)
+    def get_K(self, param):
+        D = self.parent_distance.get_D(param)
         return D_to_K(D)
 
     def grid_search(self, params=np.linspace(0, 1, 55)):
         results = np.array((params.shape[0], ))
         for idx, param in enumerate(self.scaler.scale(params)):
-            results[idx] = self.getK(param)
+            results[idx] = self.get_K(param)
         return results
 
     @staticmethod
@@ -39,7 +39,7 @@ class pWalk_H(Kernel):
     def __init__(self, A):
         super().__init__('pWalk H', scaler.Rho, A)
 
-    def getK(self, t):
+    def get_K(self, t):
         """
         H0 = (I - tA)^{-1}
         """
@@ -52,15 +52,15 @@ class Walk_H(Kernel):
         super().__init__('Walk H', scaler.Rho, A)
         self.parent_distance = pWalk_H(self.A)
 
-    def getK(self, t):
-        return H0_to_H(self.parent_distance.getK(t))
+    def get_K(self, t):
+        return H0_to_H(self.parent_distance.get_K(t))
 
 
 class For_H(Kernel):
     def __init__(self, A):
         super().__init__('For H', scaler.Fraction, A)
 
-    def getK(self, t):
+    def get_K(self, t):
         """
         H0 = (I + tL)^{-1}
         """
@@ -73,15 +73,15 @@ class logFor_H(Kernel):
         super().__init__('logFor H', scaler.Fraction, A)
         self.parent_distance = For_H(self.A)
 
-    def getK(self, t):
-        return H0_to_H(self.parent_distance.getK(t))
+    def get_K(self, t):
+        return H0_to_H(self.parent_distance.get_K(t))
 
 
 class Comm_H(Kernel):
     def __init__(self, A):
         super().__init__('Comm H', scaler.Fraction, A)
 
-    def getK(self, t):
+    def get_K(self, t):
         """
         H0 = exp(tA)
         """
@@ -93,15 +93,15 @@ class logComm_H(Kernel):
         super().__init__('logComm H', scaler.Fraction, A)
         self.parent_distance = Comm_H(self.A)
 
-    def getK(self, t):
-        return H0_to_H(self.parent_distance.getK(t))
+    def get_K(self, t):
+        return H0_to_H(self.parent_distance.get_K(t))
 
 
 class Heat_H(Kernel):
     def __init__(self, A):
         super().__init__('Heat H', scaler.Fraction, A)
 
-    def getK(self, t):
+    def get_K(self, t):
         """
         H0 = exp(-tL)
         """
@@ -113,8 +113,8 @@ class logHeat_H(Kernel):
         super().__init__('logHeat H', scaler.Fraction, A)
         self.parent_distance = Heat_H(self.A)
 
-    def getK(self, t):
-        return H0_to_H(self.parent_distance.getK(t))
+    def get_K(self, t):
+        return H0_to_H(self.parent_distance.get_K(t))
 
 
 class SCT_H(Kernel):
@@ -124,7 +124,7 @@ class SCT_H(Kernel):
         self.sigma = self.K_CT.std()
         self.Kds = self.K_CT / self.sigma
 
-    def getK(self, alpha):
+    def get_K(self, alpha):
         """
         H = 1/(1 + exp(-αL+/σ))
         """
@@ -138,12 +138,20 @@ class SCCT_H(Kernel):
         self.sigma = self.K_CCT.std()
         self.Kds = self.K_CCT / self.sigma
 
-    def getK(self, alpha):
+    def get_K(self, alpha):
         """
         H = 1/(1 + exp(-αL+/σ))
         """
         return 1. / (1. + np.exp(-alpha * self.Kds))
 
+
+class CT_H(Kernel):
+    def __init__(self, A):
+        super().__init__('CT H', scaler.Linear, A)
+        self.CT = H_R(A)
+
+    def get_K(self, param):
+        return self.CT
 
 class SPCT_H(Kernel):
     def __init__(self, A):
@@ -151,7 +159,7 @@ class SPCT_H(Kernel):
         self.Hs = normalize(D_to_K(D_SP(A)))
         self.Hc = normalize(H_R(A))
 
-    def getK(self, lmbda):
+    def get_K(self, lmbda):
         return (1 - lmbda) * self.Hs + lmbda * self.Hc
 
 
@@ -215,14 +223,14 @@ class FE(Kernel):
         super().__init__('FE', scaler.FractionReversed, A, distance.FE)
 
 
-class another_RSP(Kernel):
+class RSP2(Kernel):
     def __init__(self, A):
-        super().__init__('another RSP', scaler.FractionReversed, A, distance.another_RSP)
+        super().__init__('RSP 2', scaler.FractionReversed, A, distance.RSP2)
 
 
-class another_FE(Kernel):
+class FE2(Kernel):
     def __init__(self, A):
-        super().__init__('another FE', scaler.FractionReversed, A, distance.another_FE)
+        super().__init__('FE 2', scaler.FractionReversed, A, distance.FE2)
 
 
 class old_RSP(Kernel):
@@ -233,6 +241,15 @@ class old_RSP(Kernel):
 class old_FE(Kernel):
     def __init__(self, A):
         super().__init__('old FE', scaler.FractionReversed, A, distance.old_FE)
+
+
+class SP_K(Kernel):
+    def __init__(self, A):
+        super().__init__('SP K', scaler.Linear, A)
+        self.SP = D_to_K(D_SP(A))
+
+    def get_K(self, param):
+        return self.SP
 
 
 class SPCT_K(Kernel):

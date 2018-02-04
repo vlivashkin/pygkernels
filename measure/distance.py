@@ -11,15 +11,15 @@ class Distance:
         self.parent_kernel = parent_kernel(A) if parent_kernel is not None else None
         self.power = power
 
-    def getD(self, param):
-        H = self.parent_kernel.getK(param)
+    def get_D(self, param):
+        H = self.parent_kernel.get_K(param)
         D = H_to_D(H)
         return np.power(D, self.power) if self.power != 1 else D
 
     def grid_search(self, params=np.linspace(0, 1, 55)):
         results = np.array((params.shape[0],))
         for idx, param in enumerate(self.scaler.scale(params)):
-            results[idx] = self.getD(param)
+            results[idx] = self.get_D(param)
         return results
 
     @staticmethod
@@ -78,7 +78,7 @@ class SCCT(Distance):
 
 
 class RSP_like(Distance):
-    def __init__(self, name, A):
+    def __init__(self, name, A, C=None):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
         """
@@ -91,9 +91,13 @@ class RSP_like(Distance):
         # self.C = johnson(A, directed=False)
         eps = 0.00000001
         max = np.finfo('d').max
-        self.C = A.copy()
-        self.C[A >= eps] = 1.0 / A[A >= eps]
-        self.C[A < eps] = max
+
+        if C is None:
+            self.C = A.copy()
+            self.C[A >= eps] = 1.0 / A[A >= eps]
+            self.C[A < eps] = max
+        else:
+            self.C = C
 
     def WZ(self, beta):
         W = self.Pref * np.exp(-beta * self.C)
@@ -105,7 +109,7 @@ class RSP(RSP_like):
     def __init__(self, A):
         super().__init__('RSP', A)
 
-    def getD(self, beta):
+    def get_D(self, beta):
         """
         W = P^{ref} ◦ exp(-βC); ◦ is element-wise *
         Z = (I - W)^{-1}
@@ -125,7 +129,7 @@ class FE(RSP_like):
     def __init__(self, A):
         super().__init__('FE', A)
 
-    def getD(self, beta):
+    def get_D(self, beta):
         """
         W = P^{ref} (element-wise)* exp(-βC)
         Z = (I - W)^{-1}
@@ -157,7 +161,7 @@ class old_FE(FE):
 
 
 # From https://github.com/jmmcd/GPDistance
-class another_RSP_like(Distance):
+class RSP2_like(Distance):
     def __init__(self, name, A):
         super().__init__(name, scaler.FractionReversed, A)
 
@@ -198,11 +202,11 @@ class another_RSP_like(Distance):
         return W, Z
 
 
-class another_RSP(another_RSP_like):
+class RSP2(RSP2_like):
     def __init__(self, A):
-        super().__init__('another RSP', A)
+        super().__init__('RSP 2', A)
 
-    def getD(self, beta):
+    def get_D(self, beta):
         W, Z = self.WZ(beta)
 
         # Computation of Z*(C.*W)*Z avoiding zero-division errors:
@@ -233,11 +237,11 @@ class another_RSP(another_RSP_like):
         return D_RSP
 
 
-class another_FE(another_RSP_like):
+class FE2(RSP2_like):
     def __init__(self, A):
-        super().__init__('another FE', A)
+        super().__init__('FE 2', A)
 
-    def getD(self, beta):
+    def get_D(self, beta):
         W, Z = self.WZ(beta)
 
         # Free energies and symmetrization:
@@ -263,5 +267,5 @@ class SPCT(Distance):
         self.Ds = normalize(D_SP(A))
         self.Dr = normalize(H_to_D(H_R(A)))
 
-    def getD(self, lmbda):
+    def get_D(self, lmbda):
         return (1. - lmbda) * self.Ds + lmbda * self.Dr

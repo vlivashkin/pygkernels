@@ -12,9 +12,9 @@ class EstimatorsTests(unittest.TestCase):
     def test_all_estimators(self):
         K = sample.diploma_matrix
 
-        y_pred_kmeans = KernelKMeans(n_clusters=2, max_iter=100, random_state=0).predict(K)
-        y_pred_ward = Ward(n_clusters=2).predict(K)
-        y_pred_spectral = SpectralClustering(n_clusters=2).predict(K)
+        y_pred_kmeans = KernelKMeans(n_clusters=2, max_iter=100, random_state=0).fit_predict(K)
+        y_pred_ward = Ward(n_clusters=2).fit_predict(K)
+        y_pred_spectral = SpectralClustering(n_clusters=2).fit_predict(K)
         print('KMeans:', y_pred_kmeans)
         print('Ward:', y_pred_ward)
         print('Spectral Clustering:', y_pred_spectral)
