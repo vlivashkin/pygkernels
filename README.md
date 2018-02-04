@@ -1,6 +1,40 @@
 # py_graphs
 
-Framework for clustering graphs using various measures.
+Framework for clustering graphs using various distances/proximity measures.
+
+List of distances/proximity measures:
+* Shortest Path
+* Commute Time
+* plain Walk (Von Neumann diffusion kernel)
+* Forest(Regularized Laplacian kernel)
+* Communicability (Exponential diffusion kernel)
+* Heat kernel (Laplacian exponential diffusion kernel)
+* Walk (logarithmic), logarithmic Forest, logarithmic Communicability, logarithmic Heat
+* Sigmoid Commute Time
+* Sigmoid Corrected Commute Time
+* Randomized Shortest Path
+* Free Energy
+* NormalizedHeat
+* RegularizedLaplacian
+* PersonalizedPageRank
+* ModifiedPersonalizedPageRank
+* HeatPersonalizedPageRank
+
+List of clustering algoritms:
+* Kernel k-means
+* Spectral clustering
+* Ward
+
+List of graph generators:
+* Stochastic Block Model
+
+List of graph samples:
+* Football
+* Polbooks
+* Polblogs
+* Zachary
+* Newsgroup
+
 
 Publications
 ------------
