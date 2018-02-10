@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse.csgraph import johnson
+from scipy.sparse.csgraph import shortest_path
 
 
 def normalize(dm):
@@ -49,10 +49,7 @@ def D_to_K(D):
 
 
 def D_SP(A):
-    """
-    Johnson's Algorithm
-    """
-    return johnson(A, directed=False)
+    return shortest_path(A, directed=False)
 
 
 def H_R(A):

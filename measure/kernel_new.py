@@ -2,10 +2,13 @@ import numpy as np
 import numpy.matlib
 
 from measure import scaler
-from measure.kernel import Kernel, get_D
+from measure.kernel import Kernel
+from measure.shortcuts import get_D, get_L
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures
+# Implementation from Dmytro Rubanov
+
 class KernelNew(Kernel):
     @staticmethod
     def get_all_new():
@@ -44,7 +47,7 @@ class Katz(KernelNew):
 
     def get_K(self, t):
         K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - t * self.A)
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class Estrada(KernelNew):  # !
@@ -53,21 +56,20 @@ class Estrada(KernelNew):  # !
 
     def get_K(self, t):
         K = KernelNew.mat_exp(t * self.A)
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class Heat(KernelNew):  # !
     def __init__(self, A):
         super().__init__('NEW Heat', scaler.Fraction, A)
-        D = get_D(A)
-        self.L = D - A
+        self.L = np.matlib.array(get_L(A))
 
     def get_K(self, t):
         K = KernelNew.mat_exp(- t * self.L, n=50)
         if np.any(K < 0):
-            print(t, "K < 0")
+            # print(t, "K < 0")
             return None
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class NormalizedHeat(KernelNew):  # !
@@ -81,9 +83,9 @@ class NormalizedHeat(KernelNew):  # !
     def get_K(self, t):
         K = KernelNew.mat_exp(-t * self.Ll, n=50)
         if np.any(K < 0):
-            print(t, "K < 0")
+            # print(t, "K < 0")
             return None
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class RegularizedLaplacian(KernelNew):
@@ -95,9 +97,9 @@ class RegularizedLaplacian(KernelNew):
     def get_K(self, beta):
         K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) + beta * self.L)
         if np.any(K < 0):
-            print(beta, "K < 0")
+            # print(beta, "K < 0")
             return None
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class PersonalizedPageRank(KernelNew):
@@ -109,9 +111,9 @@ class PersonalizedPageRank(KernelNew):
     def get_K(self, alpha):
         K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - alpha * self.P)
         if np.any(K < 0):
-            print(alpha, "K < 0")
+            # print(alpha, "K < 0")
             return None
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class ModifiedPersonalizedPageRank(KernelNew):
@@ -122,9 +124,9 @@ class ModifiedPersonalizedPageRank(KernelNew):
     def get_K(self, alpha):
         K = np.linalg.inv(self.D - alpha * self.A)
         if np.any(K < 0):
-            print(alpha, "K < 0")
+            # print(alpha, "K < 0")
             return None
-        return np.log(K)
+        return np.array(np.log(K))
 
 
 class HeatPersonalizedPageRank(KernelNew):  # !
@@ -136,6 +138,6 @@ class HeatPersonalizedPageRank(KernelNew):  # !
     def get_K(self, t):
         K = KernelNew.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
         if np.any(K < 0):
-            print(t, "K < 0")
+            # print(t, "K < 0")
             return None
-        return np.log(K)
+        return np.array(np.log(K))

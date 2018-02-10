@@ -7,6 +7,10 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
     def __init__(self, n_clusters):
         self.n_clusters = n_clusters
 
+    def fit(self, K, y=None, sample_weight=None):
+        self.labels_ = self.predict(K)
+        return self
+
     def predict(self, K):
         X = self._max_ort(K)
         X = self._sign_flip(X)
