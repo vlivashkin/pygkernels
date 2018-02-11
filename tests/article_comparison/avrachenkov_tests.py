@@ -1,7 +1,6 @@
 import unittest
 from collections import defaultdict
 
-from sklearn.metrics import normalized_mutual_info_score
 from tqdm import tqdm
 
 from cluster import KernelKMeans
@@ -10,11 +9,11 @@ from graphs.generator import StochasticBlockModelGraphGenerator
 from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H, Heat_H
 from measure.kernel_new import *
 from measure.shortcuts import *
+from scorer import max_accuracy
 
 
 # Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
 # https://hal.inria.fr/hal-01647915/document
-from scorer import rand_index, max_accuracy
 
 
 class BalancedModel(unittest.TestCase):
