@@ -29,22 +29,22 @@ class Distance:
 
 class pWalk(Distance):
     def __init__(self, A):
-        super().__init__('pWalk', scaler.Rho, A, kernel.pWalk_H, .5)
+        super().__init__('pWalk', scaler.Rho, A, kernel.pWalk_H, 1.)
 
 
 class Walk(Distance):
     def __init__(self, A):
-        super().__init__('Walk', scaler.Rho, A, kernel.Walk_H, .5)
+        super().__init__('Walk', scaler.Rho, A, kernel.Walk_H, 1.)
 
 
 class For(Distance):
     def __init__(self, A):
-        super().__init__('For', scaler.Fraction, A, kernel.For_H, .5)
+        super().__init__('For', scaler.Fraction, A, kernel.For_H, 1.)
 
 
 class logFor(Distance):
     def __init__(self, A):
-        super().__init__('logFor', scaler.Fraction, A, kernel.logFor_H, .5)
+        super().__init__('logFor', scaler.Fraction, A, kernel.logFor_H, 1.)
 
 
 class Comm(Distance):
@@ -59,22 +59,22 @@ class logComm(Distance):
 
 class Heat(Distance):
     def __init__(self, A):
-        super().__init__('Heat', scaler.Fraction, A, kernel.Heat_H, .5)
+        super().__init__('Heat', scaler.Fraction, A, kernel.Heat_H, 1.)
 
 
 class logHeat(Distance):
     def __init__(self, A):
-        super().__init__('logHeat', scaler.Fraction, A, kernel.logHeat_H, .5)
+        super().__init__('logHeat', scaler.Fraction, A, kernel.logHeat_H, 1.)
 
 
 class SCT(Distance):
     def __init__(self, A):
-        super().__init__('SCT', scaler.Fraction, A, kernel.SCT_H, .5)
+        super().__init__('SCT', scaler.Fraction, A, kernel.SCT_H, 1.)
 
 
 class SCCT(Distance):
     def __init__(self, A):
-        super().__init__('SCCT', scaler.Fraction, A, kernel.SCCT_H, .5)
+        super().__init__('SCCT', scaler.Fraction, A, kernel.SCCT_H, 1.)
 
 
 class RSP_like(Distance):
@@ -150,14 +150,14 @@ class old_RSP(RSP):
     def __init__(self, A):
         super().__init__(A)
         self.name = 'old RSP'
-        self.C = johnson(A, directed=False)
+        self.C = shortest_path(A, directed=False)
 
 
 class old_FE(FE):
     def __init__(self, A):
         super().__init__(A)
         self.name = 'old FE'
-        self.C = johnson(A, directed=False)
+        self.C = shortest_path(A, directed=False)
 
 
 # From https://github.com/jmmcd/GPDistance

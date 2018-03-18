@@ -1,8 +1,6 @@
 import unittest
 from collections import defaultdict
 
-from tqdm import tqdm
-
 from cluster import KernelKMeans
 from graphs import sample
 from graphs.generator import StochasticBlockModelGraphGenerator
@@ -25,7 +23,7 @@ class BalancedModel(unittest.TestCase):
     def _compare(self, measure, y_need):
         results = defaultdict(lambda: [])
         count, passes = 0, 0
-        for (A, y_true) in tqdm(self.graphs, desc=measure.__name__):
+        for A, y_true in self.graphs:
             mg = measure(A)
             for param in mg.scaler.scale(np.linspace(0, 1, 50)):
                 try:

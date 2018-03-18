@@ -5,9 +5,8 @@ from sklearn.metrics import normalized_mutual_info_score
 from cluster import KernelKMeans
 from graphs import sample
 from graphs.dataset import *
-from measure.distance import *
-from measure.kernel import *
 from measure.shortcuts import *
+from measure import kernel, distance
 
 
 # Kivimäki: Developments in the theory of randomized shortest paths with a article_comparison of graph node distances
@@ -24,31 +23,43 @@ class Figure2ComparisonTests(unittest.TestCase):
         self.assertTrue(np.isclose(div, true_value, atol=atol),
                         "{}: {:0.3f} != {:0.3f}, diff={:0.3f}".format(name, div, true_value, div - true_value))
 
-    def test_boundaries_left(self):
-        D = SPCT(self.graph).get_D(1)
+    def test_boundaries_left_CT(self):
+        D = distance.SPCT(self.graph).get_D(1)
         self._comparison('CT', D, 1.5)
-        D = logFor(self.graph).get_D(500.0)
+
+    def test_boundaries_left_logFor(self):
+        D = distance.logFor(self.graph).get_D(500.0)
         self._comparison('logFor', D, 1.5)
-        D = RSP(self.graph).get_D(0.0001)
+
+    def test_boundaries_left_RSP(self):
+        D = distance.RSP(self.graph).get_D(0.0001)
         self._comparison('RSP', D, 1.5)
-        D = FE(self.graph).get_D(0.0001)
+
+    def test_boundaries_left_FE(self):
+        D = distance.FE(self.graph).get_D(0.0001)
         self._comparison('FE', D, 1.5)
 
-    def test_boundaries_right(self):
-        D = SPCT(self.graph).get_D(0)
+    def test_boundaries_right_SP(self):
+        D = distance.SPCT(self.graph).get_D(0)
         self._comparison('SP', D, 1.0)
-        D = logFor(self.graph).get_D(0.01)
+
+    def test_boundaries_right_logFor(self):
+        D = distance.logFor(self.graph).get_D(0.01)
         self._comparison('logFor', D, 1.0)
-        D = RSP(self.graph).get_D(20.0)
+
+    def test_boundaries_right_RSP(self):
+        D = distance.RSP(self.graph).get_D(20.0)
         self._comparison('RSP', D, 1.0)
-        D = FE(self.graph).get_D(20.0)
+
+    def test_boundaries_right_FE(self):
+        D = distance.FE(self.graph).get_D(20.0)
         self._comparison('FE', D, 1.0)
 
     if __name__ == '__main__':
         unittest.main()
 
 
-# Table 2 with optimal values from table 1
+# Table 2 with optimal values from Table 1
 class Table2Tests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -78,19 +89,19 @@ class Table2Tests(unittest.TestCase):
             print('{} success'.format(info['name']))
 
     def test_RSP(self):
-        self._newsgroup_results(RSP, 0.02, 0)  # 8.6
+        self._newsgroup_results(kernel.RSP, 0.02, 0)  # 8.6
 
     def test_FE(self):
-        self._newsgroup_results(FE, 0.07, 1)  # 13.5
+        self._newsgroup_results(kernel.FE, 0.07, 1)  # 13.5
 
     def test_logFor(self):
-        self._newsgroup_results(logFor_H, 0.95, 2)  # 0.26
+        self._newsgroup_results(kernel.logFor_H, 0.95, 2)  # 0.26
 
     def test_SPCT(self):
-        self._newsgroup_results(SPCT_H, 1, 3)  # 0.51
+        self._newsgroup_results(kernel.SPCT_H, 1, 3)  # 0.51
 
     def test_SCT(self):
-        self._newsgroup_results(SCT_H, 26, 4)  # 1.92
+        self._newsgroup_results(kernel.SCT_H, 26, 4)  # 1.92
 
     if __name__ == '__main__':
         unittest.main()

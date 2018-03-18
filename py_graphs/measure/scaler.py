@@ -21,7 +21,7 @@ class AlphaToT(Scaler):  # α > 0 -> 0 < t < α^{-1}
     def __init__(self, A=None):
         super().__init__(A)
         cfm = np.linalg.eigvals(self.A)
-        self.rho = np.max(cfm)
+        self.rho = np.max(np.abs(cfm))
 
     def scale_one(self, alpha):
         return 1 / (1 / alpha + self.rho)
