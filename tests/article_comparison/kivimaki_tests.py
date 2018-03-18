@@ -82,7 +82,7 @@ class Table2Tests(unittest.TestCase):
             K = measure.get_K(best_param)
             labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=8).fit_predict(K)
             nmi = normalized_mutual_info_score(labels_true, labels_pred)
-            self.assertTrue(np.isclose(nmi * 100, self.etalon[info['name']][idx], atol=10.),
+            self.assertTrue(np.isclose(nmi * 100, self.etalon[info['name']][idx], atol=6.),
                             "{}, {}: {:0.3f} != {:0.3f}, diff:{:0.3f}".format(
                                 info['name'], measure.name, nmi * 100, self.etalon[info['name']][idx],
                                 np.abs(nmi * 100 - self.etalon[info['name']][idx])))

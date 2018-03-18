@@ -31,156 +31,38 @@
 \section{Chebotarev: Studying new classes of graph metrics}
 Ссылка: \url{https://arxiv.org/abs/1305.7514}
 
-Здесь нам интересен Fig. 1. На графе "цепочка" можно прогнать такие же метрики при тех же параметрах. В обозначениях ниже я имею в виду, что вершины графа названы слева направо цифрами от 0 до 3. Важно:
-\begin{itemize}
-  \item это расстояния, не близости
-  \item расстояния здесь нормированы на то, чтобы сумма $D[0, 1] + D[1, 2] + D[2, 3] = 3$
-\end{itemize}
+Здесь нам интересен Fig. 1. На графе "цепочка" можно прогнать такие же метрики при тех же параметрах. В обозначениях ниже я имею в виду, что вершины графа названы слева направо цифрами от 0 до 3. Расстояния здесь нормированы на то, чтобы сумма $D[0, 1] + D[1, 2] + D[2, 3] = 3$.
 Достаточно будет сравнивать расстояния $D[0, 1], D[1, 2], D[0, 2], D[0, 3]$.
 Будем считать, что расстояния не соответствуют друг другу, если хотя бы одна соответствующая пара расстояний различается на 0.04 в абсолютной величине.
-True --- результат из статьи, Test --- посчитанные результаты, Diff --- абсолютная разница
-Итак, вот результаты:
 
-\begin{table}[H]
-  \caption{Результаты воспроизведения результатов из Fig. 1}
-  \begin{center}
-    \begin{tabular}{rc|cccc|c}
-                         &      & $D[0, 1]$ & $D[1, 2]$ & $D[0, 2]$ & $D[0, 3]$ & Passed \\
-                         \hline
-Shortest path,     & True & 1,000       & 1,000       & 2,000       & 3,000       &        \\
-Resistance distance  & Test & 1,000       & 1,000       & 2,000       & 3,000       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-Walk, $\alpha=1$ & True & 1,025       & 0,950       & 1,975       & 3,000       &        \\
-                         & Test & 1,013       & 0,975       & 1,406       & 1,732       &        \\
-                         & Diff & 0,012       & 0,025       & 0,569       & 1,268       & FALSE  \\
-                         \hline
-log Forest, $\alpha=2$ & True & 0,959       & 1,081       & 2,040       & 3,000       &        \\
-                         & Test & 0,980       & 1,040       & 1,429       & 1,733       &        \\
-                         & Diff & 0,021       & 0,041       & 0,611       & 1,267       & FALSE  \\
-                         \hline
-Forest, $\alpha=1$ & True & 1,026       & 0,947       & 1,500       & 1,895       &        \\
-                         & Test & 1,013       & 0,973       & 1,225       & 1,377       &        \\
-                         & Diff & 0,013       & 0,026       & 0,275       & 0,518       & FALSE  \\
-                         \hline
-Square-rooted resistance & True & 1,000       & 1,000       & 1,414       & 1,732       &        \\
-                         & Test & 1,000       & 1,000       & 1,414       & 1,732       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-Communicability & True & 0,964       & 1,072       & 1,492       & 1,564       &        \\
-(не указан параметр!) & Test & 0,964       & 1,072       & 1,492       & 1,564       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-plain Walk $\alpha=4.5$    & True & 1,025       & 0,950       & 1,541       & 1,466       &        \\
-                         & Test & 1,013       & 0,975       & 1,242       & 1,211       &        \\
-                         & Diff & 0,012       & 0,025       & 0,299       & 0,255       & FALSE  \\
-                         \hline
-plain Walk, $\alpha=1$       & True & 0,988       & 1,025       & 1,379       & 1,416       &        \\
-                         & Test & 0,994       & 1,012       & 1,174       & 1,190       &        \\
-                         & Diff & 0,006       & 0,013       & 0,205       & 0,226       & FALSE  \\  
-    \end{tabular}
-  \end{center}
-  \label{cha1:fig1natural}
-\end{table}
+При сравнении выяснилось следующее:
+\begin{itemize}
+  \item В моем коде из всех ядер, перед тем, как превращать их в расстояния, брался корень. Кажется, мы обсуждали, что это нужно для Communicability, но в итоге это было включено везде. В этом причина, почему тесты не проходили
+  \item Для Communicability это все-таки нужно, в этом случае все результаты совпадают
+\end{itemize}
 
-Итоги более коротко: результаты совпали для Shortest path, Resistance, Square-rooted resistance, Communicability, и не совпали для Walk, plain Walk, Forest, log Forest.
+Также я воспроизвел результаты из Table 1 в Chebotarev: The Walk Distances in Graphs (ссылка: \url{https://arxiv.org/abs/1103.2059}).
+Все это теперь автотесты моего кода, больше таких ошибок допустить не получится.
 
-Давайте рассмотрим процесс получения матрицы расстояний на примере log Forest:
-\begin{enumerate}
-  \item Считаем $H0 = (I + tL)^{-1}$. $t$ --- параметр метрики, в данном случае передается напрямую.
-  \item Поэлементно логарифмируем $H = \text{element-wise} \log(H0)$
-  \item Превращаем ядро в матрицу расстояний с помощью $D = (h * 1^T + 1 * h^T - H - H ^ T) / 2$, $h$ --- диагональ $H$.
-\end{enumerate}
-
-Исследуя разные гипотезы и перепроверяя все что только можно, я наткнулся на следующий интересный факт: ответы начинают совпадать, если конечную матрицу расстояний возвести в квадрат. Причем не для всех метрик, а только для тех, результаты для которых не совпадали раньше. Это странно. В чем здесь может быть дело?
-
-С корректировками таблица выглядит так:
-
-\begin{table}[H]
-  \caption{Результаты после возведения некоторых расстояний в квадрат}
-  \begin{center}
-    \begin{tabular}{rc|cccc|c}
-                         &      & $D[0, 1]$ & $D[1, 2]$ & $D[0, 2]$ & $D[0, 3]$ & Passed \\
-                         \hline
-Shortest path,     & True & 1,000       & 1,000       & 2,000       & 3,000       &        \\
-Resistance distance  & Test & 1,000       & 1,000       & 2,000       & 3,000       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-Walk, $\alpha=1$ & True & 1,025       & 0,950       & 1,975       & 3,000       &        \\
-                         & Test & 1,025       & 0,950       & 1,975       & 3,000       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-log Forest, $\alpha=2$ & True & 0,959       & 1,081       & 2,040       & 3,000       &        \\
-                         & Test & 0,959       & 1,081       & 2,041       & 3,000       &        \\
-                         & Diff & 0,000       & 0,000       & 0,001       & 0,000       & TRUE  \\
-                         \hline
-Forest, $\alpha=1$ & True & 1,026       & 0,947       & 1,500       & 1,895       &        \\
-                         & Test & 1,026       & 0,947       & 1,500       & 1,895       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE  \\
-                         \hline
-Square-rooted resistance & True & 1,000       & 1,000       & 1,414       & 1,732       &        \\
-                         & Test & 1,000       & 1,000       & 1,414       & 1,732       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-Communicability & True & 0,964       & 1,072       & 1,492       & 1,564       &        \\
-(не указан параметр!) & Test & 0,964       & 1,072       & 1,492       & 1,564       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\
-                         \hline
-plain Walk, $\alpha=4.5$    & True & 1,025       & 0,950       & 1,541       & 1,466       &        \\
-                         & Test & 1,025       & 0,950       & 1,541       & 1,466       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE  \\
-                         \hline
-plain Walk, $\alpha=1$       & True & 0,988       & 1,025       & 1,379       & 1,416       &        \\
-                         & Test & 0,988       & 1,025       & 1,379       & 1,416       &        \\
-                         & Diff & 0,000       & 0,000       & 0,000       & 0,000       & TRUE   \\ 
-    \end{tabular}
-  \end{center}
-  \label{cha1:fig1cheated}
-\end{table}
-
-Что, помимо вопроса насчет квадрата расстояния, можно вынести из этой истории?
-Все меры из этой статьи реализованы верно, функция преобразования параметра $\alpha \rightarrow t$ реализована верно. Также верно реализованы функции-переходы $H0 \rightarrow H$ и $H \rightarrow D$.
-
-\section{Chebotarev: The Walk Distances in Graphs}
-Ссылка: \url{https://arxiv.org/abs/1103.2059}
-
-Думая о том, почему не совпадают результаты в предыдущей статье, я нашел также и вот эту статью. В ней есть Table 1, в которой те же метрики при тех же параметрах, но используются отношения расстояний. Воспроизвел также и эти результаты. Проблема здесь точно такая же: часть мер нужно возводить в квадрат, чтобы получился такой же ответ. Результаты в таблице \ref{che2:table1cheated}.
-
-\begin{table}[H]
-  \caption{Результаты после возведения некоторых расстояний в квадрат}
-  \begin{center}
-    \begin{tabular}{rc|ccc|c}
-                     &      & $\frac{D[0, 1]}{D[1, 2]}$ & $\frac{D[0, 1] + D[1, 2]}{D[0, 2]}$ & $\frac{D[0, 3]}{D[0, 2]}$ & Passed \\
-                     \hline
-Shortest path,        & True & 1.000                   & 1.000                                     & 1.500                   &        \\
-Resistance distance & Test & 1.000                   & 1.000                                     & 1.500                   &        \\
-                     & Diff & 0.000                   & 0.000                                     & 0.000                   & TRUE   \\
-                     \hline
-Walk, $\alpha=1$ & True & 1.080                   & 1.000                                     & 1.520                   &        \\
-                     & Test & 1.080                   & 1.000                                     & 1.519                   &        \\
-                     & Diff & 0.000                   & 0.000                                     & 0.001                   & TRUE   \\
-                     \hline
-Log forest, $\alpha=2$ & True & 0.890                   & 1.000                                     & 1.470                   &        \\
-                     & Test & 0.887                   & 1.000                                     & 1.470                   &        \\
-                     & Diff & 0.003                   & 0.000                                     & 0.000                   & TRUE   \\
-                     \hline
-Forest, $\alpha=1$ & True & 1.080                   & 1.320                                     & 1.260                   &        \\
-                     & Test & 1.083                   & 1.316                                     & 1.263                   &        \\
-                     & Diff & 0.003                   & 0.004                                     & 0.003                   & TRUE   \\
-                     \hline
-Plain walk, $\alpha=4.5$ & True & 1.080                   & 1.280                                     & 0.950                   &        \\
-                     & Test & 1.079                   & 1.281                                     & 0.951                   &        \\
-                     & Diff & 0.001                   & 0.001                                     & 0.001                   & TRUE   \\
-                     \hline
-Plain walk, $\alpha=1$ & True & 0.960                   & 1.460                                     & 1.030                   &        \\
-                     & Test & 0.964                   & 1.459                                     & 1.027                   &        \\
-                     & Diff & 0.004                   & 0.001                                     & 0.003                   & TRUE  
-    \end{tabular}
-  \end{center}
-  \label{che2:table1cheated}
-\end{table}
-
-Скорее всего, это одни и те же данные, но я подумал, что если здесь есть ошибка, то она могла быть исправлена для одной стати и не исправлена для другой.
+Итак, здесь мы проверили:
+\begin{itemize}
+  \item Кернелы
+  \begin{itemize}
+    \item Shortest path
+    \item Resistance
+    \item plain Walk
+    \item Walk
+    \item Forest
+    \item logForest
+    \item Communicability
+  \end{itemize}
+  \item Преобразования
+  \begin{itemize}
+    \item $\alpha \rightarrow t$
+    \item $H0 \rightarrow H$
+    \item $H \rightarrow D$
+   \end{itemize}
+\end{itemize}
 
 
 \section{Kivimaki: Developments in the theory of randomized shortest paths with a article comparison of graph node distances}
@@ -189,9 +71,70 @@ Plain walk, $\alpha=1$ & True & 0.960                   & 1.460                 
 Здесь мы можем использовать два источника: это Figure 2, а также Table 2 с оптимальными значениями из Table 1.
 
 \subsection{Figure 2}
-Здесь исследуется поведение метрик RSP, FE, pRes, logFor, SP-CT при изменении их параметров в заданном интервале для графа "треугольник с хвостом". Можно исследовать только крайние точки: слева отношение "\delta_{12}/\delta_{23}" равно 1.5, справа --- 1.0.
+Здесь исследуется поведение метрик RSP, FE, pRes, logFor, SP-CT при изменении их параметров в заданном интервале для графа "треугольник с хвостом". Можно исследовать только крайние точки: слева отношение $\Delta_{12}/\Delta_{23}$ равно 1.5, справа --- 1.0.
+После того, как я убрал взятие корня для logFor, все результаты сошлись
+
+\subsection{Table 2 с оптимальными значениями из Table 1}
+Здесь проверяется качество кластеризации методом kMeans графов из датасета Newsgroups. Кернелы: RSP, FE, logFor, SP-CT, SCT. Результаты получаются похожими для всех метрик, кроме SP-CT. Результат очень плох: в статье ожидается качество порядка 70-80 NMI*100, по факту что SP, что CT дают 0.2-3 NMI*100.
 
 
+Итак, теперь у нас есть следующее покрытие тестами:
+\begin{itemize}
+  \item Кернелы
+  \begin{itemize}
+    \item Shortest path: Kivimaki Fig. 2
+    \item Resistance: Kivimaki Fig. 2
+    \item SP-CT combination: Kivimaki Table 2 !!!!ошибка
+    \item logForest: Chebotarev, Kivimaki Fig. 2, Kivimaki Table 2
+    \item SCT: Kivimaki Table 2
+    \item RSP: Kivimaki Fig. 2, Kivimaki Table 2
+    \item FE: Kivimaki Fig. 2, Kivimaki Table 2
+  \end{itemize}
+  \item Преобразования
+  \begin{itemize}
+    \item $H0 \rightarrow H$: Kivimaki Fig. 2, Kivimaki Table 2 
+    \item $H \rightarrow D$: Kivimaki Fig. 2
+    \item $D \rightarrow K$: Kivimaki Table 2
+   \end{itemize}
+   \item Датасеты
+   \begin{itemize}
+     \item Newsgroups: Kivimaki Table 2
+   \end{itemize}
+\end{itemize}
+
+\section{Общий результат}
+Здесь я постараюсь записать в единый список всё, что мы используем в коде и наличие тестов.
+\begin{itemize}
+  \item Кернелы
+  \begin{itemize}
+    \item Shortest path: Chebotarev, Kivimaki Fig. 2
+    \item Resistance: Chebotarev, Kivimaki Fig. 2
+    \item SP-CT combination: Kivimaki Table 2 !!!!ошибка
+    \item plain Walk: Chebotarev
+    \item Walk: Chebotarev
+    \item Forest: Chebotarev
+    \item logForest: Chebotarev, Kivimaki Fig. 2, Kivimaki Table 2
+    \item Communicability: Chebotarev
+    \item logCommunicability
+    \item Heat:
+    \item logHeat:
+    \item SCT: Kivimaki Table 2
+    \item SCCT:
+    \item RSP: Kivimaki Fig. 2, Kivimaki Table 2
+    \item FE: Kivimaki Fig. 2, Kivimaki Table 2
+  \end{itemize}
+  \item Преобразования
+  \begin{itemize}
+    \item $\alpha \rightarrow t$: Chebotarev
+    \item $H0 \rightarrow H$: Chebotarev, Kivimaki Fig. 2, Kivimaki Table 2 
+    \item $H \rightarrow D$: Chebotarev, Kivimaki Fig. 2
+    \item $D \rightarrow K$: Kivimaki Table 2
+   \end{itemize}
+   \item Датасеты
+   \begin{itemize}
+     \item Newsgroups: Kivimaki Table 2
+   \end{itemize}
+\end{itemize}
 
 \end{document}
 
