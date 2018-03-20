@@ -264,8 +264,8 @@ class FE2(RSP2_like):
 class SPCT(Distance):
     def __init__(self, A):
         super().__init__('SP-CT', scaler.Linear, A)
-        self.Ds = normalize(D_SP(A))
-        self.Dr = normalize(H_to_D(H_R(A)))
+        self.D_SP = normalize(D_SP(A))
+        self.D_CT = normalize(H_to_D(H_R(A)))
 
     def get_D(self, lmbda):
-        return (1. - lmbda) * self.Ds + lmbda * self.Dr
+        return lmbda * self.D_SP + (1. - lmbda) * self.D_CT

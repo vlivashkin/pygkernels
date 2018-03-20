@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.3.18)  18 MAR 2018 19:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.3.18)  20 MAR 2018 12:19
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1022,9 +1022,22 @@ Package babel Info: Redefining russian shorthand "|
 Package babel Info: Redefining russian shorthand "~
 (babel)             in language  on input line 77.
 Package babel Info: Redefining russian shorthand "|
+(babel)             in language  on input line 80.
+Package babel Info: Redefining russian shorthand "~
+(babel)             in language  on input line 80.
+Package babel Info: Redefining russian shorthand "|
 (babel)             in language  on input line 105.
 Package babel Info: Redefining russian shorthand "~
 (babel)             in language  on input line 105.
+Package babel Info: Redefining russian shorthand "|
+(babel)             in language  on input line 135.
+Package babel Info: Redefining russian shorthand "~
+(babel)             in language  on input line 135.
+Package babel Info: Redefining russian shorthand "|
+(babel)             in language  on input line 135.
+Package babel Info: Redefining russian shorthand "~
+(babel)             in language  on input line 135.
+ [2]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 139.
 Package babel Info: Redefining russian shorthand "|
 (babel)             in language  on input line 139.
@@ -1034,23 +1047,31 @@ Package babel Info: Redefining russian shorthand "|
 (babel)             in language  on input line 139.
 Package babel Info: Redefining russian shorthand "~
 (babel)             in language  on input line 139.
- [2]
+ [3]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 139.
- (./comparison.aux)
+
+(./comparison.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 139.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 139.
-Package rerunfilecheck Info: File `comparison.out' has not changed.
-(rerunfilecheck)             Checksum: 01EFD5B68301858552C22D36C8FC5769;1715.
+
+
+Package rerunfilecheck Warning: File `comparison.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `comparison.out':
+(rerunfilecheck)             Before: 01EFD5B68301858552C22D36C8FC5769;1715
+(rerunfilecheck)             After:  1D69A489C1E5CEF979BD0451A6A9F4F4;1804.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 139.
  ) 
 Here is how much of TeX's memory you used:
- 12481 strings out of 492982
- 174230 string characters out of 6132527
+ 12483 strings out of 492982
+ 174250 string characters out of 6132527
  262227 words of memory out of 5000000
  15917 multiletter control sequences out of 15000+600000
  15958 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,6n,38p,711b,350s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,6n,38p,711b,467s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t2a.enc
 }</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
@@ -1063,10 +1084,10 @@ texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/te
 xlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texl
 ive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb></usr/local/texliv
 e/2017/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on comparison.pdf (2 pages, 160442 bytes).
+Output written on comparison.pdf (3 pages, 161182 bytes).
 PDF statistics:
- 93 PDF objects out of 1000 (max. 8388607)
- 77 compressed objects within 1 object stream
- 9 named destinations out of 1000 (max. 500000)
+ 98 PDF objects out of 1000 (max. 8388607)
+ 81 compressed objects within 1 object stream
+ 11 named destinations out of 1000 (max. 500000)
  49 words of extra memory for PDF output out of 10000 (max. 10000000)
 

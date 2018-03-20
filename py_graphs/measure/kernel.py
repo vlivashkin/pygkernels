@@ -153,14 +153,15 @@ class CT_H(Kernel):
     def get_K(self, param):
         return self.CT
 
+
 class SPCT_H(Kernel):
     def __init__(self, A):
         super().__init__('SP-CT H', scaler.Linear, A)
-        self.Hs = normalize(D_to_K(D_SP(A)))
-        self.Hc = normalize(H_R(A))
+        self.H_SP = normalize(D_to_K(D_SP(A)))
+        self.H_CT = normalize(H_R(A))
 
     def get_K(self, lmbda):
-        return (1 - lmbda) * self.Hs + lmbda * self.Hc
+        return lmbda * self.H_SP + (1. - lmbda) * self.H_CT
 
 
 class pWalk_K(Kernel):

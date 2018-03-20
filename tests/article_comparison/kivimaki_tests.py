@@ -89,19 +89,19 @@ class Table2Tests(unittest.TestCase):
             print('{} success'.format(info['name']))
 
     def test_RSP(self):
-        self._newsgroup_results(kernel.RSP, 0.02, 0)  # 8.6
+        self._newsgroup_results(kernel.RSP, 0.02, 0)
 
     def test_FE(self):
-        self._newsgroup_results(kernel.FE, 0.07, 1)  # 13.5
+        self._newsgroup_results(kernel.FE, 0.07, 1)
 
     def test_logFor(self):
-        self._newsgroup_results(kernel.logFor_H, 0.95, 2)  # 0.26
+        self._newsgroup_results(kernel.logFor_H, 0.95, 2)
 
     def test_SPCT(self):
-        self._newsgroup_results(kernel.SPCT_H, 1, 3)  # 0.51
+        self._newsgroup_results(kernel.SPCT_K, 1, 3)
 
     def test_SCT(self):
-        self._newsgroup_results(kernel.SCT_H, 26, 4)  # 1.92
+        self._newsgroup_results(kernel.SCT_H, 26, 4)
 
     if __name__ == '__main__':
         unittest.main()
