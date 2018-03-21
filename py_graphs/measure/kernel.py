@@ -1,8 +1,8 @@
 from scipy.linalg import expm
 from sklearn.preprocessing import normalize
 
-from measure import distance, scaler
-from measure.shortcuts import *
+from . import distance, scaler
+from .shortcuts import *
 
 
 class Kernel:
@@ -28,11 +28,11 @@ class Kernel:
 
     @staticmethod
     def get_all_H_plus_RSP_FE():
-        return Kernel.get_all_H() + [RSP, FE]
+        return Kernel.get_all_H() + [RSP_K, FE_K]
 
     @staticmethod
     def get_all_K():
-        return [pWalk_K, Walk_K, For_K, logFor_K, Comm_K, logComm_K, Heat_K, logHeat_K, SCT_K, SCCT_K, RSP, FE, SPCT_K]
+        return [pWalk_K, Walk_K, For_K, logFor_K, Comm_K, logComm_K, Heat_K, logHeat_K, SCT_K, SCCT_K, RSP_K, FE_K, SPCT_K]
 
 
 class pWalk_H(Kernel):
@@ -214,32 +214,32 @@ class SCCT_K(Kernel):
         super().__init__('SCCT K', scaler.Fraction, A, distance.SCCT)
 
 
-class RSP(Kernel):
+class RSP_K(Kernel):
     def __init__(self, A):
         super().__init__('RSP', scaler.FractionReversed, A, distance.RSP)
 
 
-class FE(Kernel):
+class FE_K(Kernel):
     def __init__(self, A):
         super().__init__('FE', scaler.FractionReversed, A, distance.FE)
 
 
-class RSP2(Kernel):
+class RSP2_K(Kernel):
     def __init__(self, A):
         super().__init__('RSP 2', scaler.FractionReversed, A, distance.RSP2)
 
 
-class FE2(Kernel):
+class FE2_K(Kernel):
     def __init__(self, A):
         super().__init__('FE 2', scaler.FractionReversed, A, distance.FE2)
 
 
-class old_RSP(Kernel):
+class old_RSP_K(Kernel):
     def __init__(self, A):
         super().__init__('old RSP', scaler.FractionReversed, A, distance.old_RSP)
 
 
-class old_FE(Kernel):
+class old_FE_K(Kernel):
     def __init__(self, A):
         super().__init__('old FE', scaler.FractionReversed, A, distance.old_FE)
 
@@ -247,7 +247,7 @@ class old_FE(Kernel):
 class SP_K(Kernel):
     def __init__(self, A):
         super().__init__('SP K', scaler.Linear, A)
-        self.SP = D_to_K(D_SP(A))
+        self.SP = D_SP(A)
 
     def get_K(self, param):
         return self.SP

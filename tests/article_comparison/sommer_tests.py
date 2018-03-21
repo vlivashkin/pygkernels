@@ -29,15 +29,15 @@ class Table3Tests(unittest.TestCase):
         }
 
     def _dataset_results(self, measure_class, best_param, idx):
-        for graphs, info in [football, news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
-            # polblogs, zachary
-        ]:
+        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
+                             zachary, football  #, polblogs
+                             ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
             labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=42).fit_predict(K)
             nmi = normalized_mutual_info_score(labels_true, labels_pred)
-            self.assertTrue(np.isclose(nmi, self.etalon[info['name']][idx], atol=0.1),
+            self.assertTrue(np.isclose(nmi, self.etalon[info['name']][idx], atol=0.08),
                             "{}, {}: Test {:0.4f} != True {:0.4f}, diff:{:0.4f}".format(
                                 info['name'], measure.name, nmi, self.etalon[info['name']][idx],
                                 np.abs(nmi - self.etalon[info['name']][idx])))
@@ -47,13 +47,13 @@ class Table3Tests(unittest.TestCase):
         self._dataset_results(SCCT_H, 26, 0)
 
     def test_FE(self):
-        self._dataset_results(FE, 0.1, 1)
+        self._dataset_results(FE_K, 0.1, 1)
 
     def test_logFor(self):
         self._dataset_results(logFor_H, 1, 2)
 
     def test_RSP(self):
-        self._dataset_results(RSP, 0.03, 3)
+        self._dataset_results(RSP_K, 0.03, 3)
 
     def test_SCT(self):
         self._dataset_results(SCT_H, 22, 4)

@@ -75,39 +75,6 @@ class MeasureCommonTests(unittest.TestCase):
                 for i in range(D.shape[0]):
                     self.assertTrue(D[i][i] == 0)
 
-    if __name__ == '__main__':
-        unittest.main()
-
-
-class MeasureBoundariesTests(unittest.TestCase):
-    def test_SPCT_order(self):
-        SP = normalize(D_SP(sample.diploma_matrix))
-        CT = normalize(H_to_D(H_R(sample.diploma_matrix)))
-        SPCT_SP = normalize(SPCT(sample.diploma_matrix).get_D(0))
-        SPCT_CT = normalize(SPCT(sample.diploma_matrix).get_D(1))
-        self.assertTrue(np.allclose(SP, SPCT_SP))
-        self.assertTrue(np.allclose(CT, SPCT_CT))
-
-    def test_tree_SPCT_inequality(self):
-        SP = SPCT(sample.diploma_matrix).get_D(0)
-        CT = SPCT(sample.diploma_matrix).get_D(1)
-        self.assertFalse(np.allclose(SP, CT))
-
-    def test_chain_SPCT_equality(self):
-        SP = SPCT(sample.chain_graph).get_D(0)
-        CT = SPCT(sample.chain_graph).get_D(1)
-        self.assertTrue(np.allclose(SP, CT))
-
-    def test_big_chain_SPCT_equality(self):
-        SP = SPCT(sample.big_chain).get_D(0)
-        CT = SPCT(sample.big_chain).get_D(1)
-        self.assertTrue(np.allclose(SP, CT))
-
-    def test_full_graph_SPCT_equality(self):
-        SP = SPCT(sample.full_graph).get_D(0)
-        CT = SPCT(sample.full_graph).get_D(1)
-        self.assertTrue(np.allclose(SP, CT))
-
     def test_full_graph_SP_logFor_Walk_equality(self):
         parameter = 0.00001
         DSP = normalize(D_SP(sample.chain_graph))
@@ -122,11 +89,6 @@ class MeasureBoundariesTests(unittest.TestCase):
 
 
 class MeasureSamplesTests(unittest.TestCase):
-    def test_tree_SPCT_equality(self):
-        SP = SPCT(sample.tree_matrix).get_D(0)
-        CT = SPCT(sample.tree_matrix).get_D(1)
-        self.assertTrue(np.allclose(SP, CT))
-
     def test_chain_For_H(self):
         for_chain0 = For_H(sample.triangle_graph).get_K(0)
         for_chain0_etalon = np.array([

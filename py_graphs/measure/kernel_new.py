@@ -1,9 +1,9 @@
 import numpy as np
 import numpy.matlib
 
-from measure import scaler
-from measure.kernel import Kernel
-from measure.shortcuts import get_D, get_L
+from . import scaler
+from .kernel import Kernel
+from .shortcuts import get_D, get_L
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures

@@ -41,10 +41,12 @@ def H_to_D(H):
 def D_to_K(D):
     """
     K = -1 / 2 HΔH
+    H = I - E/n
     """
     size = D.shape[0]
-    H = np.eye(size) - (np.ones((size, size)) / size)
-    K = -0.5 * np.dot(H, D).dot(H)
+    I, E = np.eye(size), np.ones((size, size))
+    H = I - (E / size)
+    K = -0.5 * H.dot(D).dot(H)
     return K
 
 

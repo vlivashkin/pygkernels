@@ -1,6 +1,6 @@
 import os
 
-from graphs.dataset.importer import ImportedGraphBuilder
+from .importer import ImportedGraphBuilder
 
 ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'impl')
 
