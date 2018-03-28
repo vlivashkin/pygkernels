@@ -1,7 +1,28 @@
+import functools
+import warnings
+
 import numpy as np
 from scipy.sparse.csgraph import shortest_path
 
 
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
+        return func(*args, **kwargs)
+
+    return new_func
+
+
+@deprecated
 def normalize(dm):
     return dm / dm.std() if dm.std() != 0 else dm
 
@@ -19,6 +40,20 @@ def get_D_1(A):
 
 def get_L(A):
     return get_D(A) - A
+
+
+def sp_distance(A):
+    return shortest_path(A, directed=False)
+
+
+def resistance_kernel(A):
+    """
+    H = (L + J)^{-1}
+    """
+    size = A.shape[0]
+    L = get_L(A)
+    J = np.ones((size, size)) / size
+    return np.linalg.pinv(L + J)
 
 
 def H0_to_H(H0):
@@ -48,20 +83,6 @@ def D_to_K(D):
     H = I - (E / size)
     K = -0.5 * H.dot(D).dot(H)
     return K
-
-
-def D_SP(A):
-    return shortest_path(A, directed=False)
-
-
-def H_R(A):
-    """
-    H = (L + J)^{-1}
-    """
-    size = A.shape[0]
-    L = get_L(A)
-    J = np.ones((size, size)) / size
-    return np.linalg.pinv(L + J)
 
 
 def H_CCT(A):

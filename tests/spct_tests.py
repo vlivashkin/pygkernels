@@ -22,7 +22,7 @@ class spctTests(unittest.TestCase):
 
     def test_SPCT_order(self):
         A = sample.diploma_matrix
-        SP, CT = D_SP(A), 2. * H_to_D(H_R(A))
+        SP, CT = sp_distance(A), 2. * H_to_D(resistance_kernel(A))
         self.assertTrue(np.allclose(SP, self.get_SP(A)))
         self.assertTrue(np.allclose(CT, self.get_CT(A)))
 
@@ -61,27 +61,27 @@ class spctTests(unittest.TestCase):
             return normalized_mutual_info_score(y_true, y_test)
 
         # without normalization
-        K = D_to_K(D_SP(A))
+        K = D_to_K(sp_distance(A))
         quality1 = test_quality(K)
         print('without normalization', '\t', quality1)
 
         # normalization of distance
-        K = D_to_K(normalize(D_SP(A)))
+        K = D_to_K(normalize(sp_distance(A)))
         quality2 = test_quality(K)
         print('normalization of distance', '\t', quality2)
 
         # normalization of kernel
-        K = D_to_K(normalize(D_SP(A)))
+        K = D_to_K(normalize(sp_distance(A)))
         quality3 = test_quality(K)
         print('normalization of kernel', '\t', quality3)
 
         # both
-        K = normalize(D_to_K(normalize(D_SP(A))))
+        K = normalize(D_to_K(normalize(sp_distance(A))))
         quality4 = test_quality(K)
         print('both', '\t', quality4)
 
         # distance
-        K = D_SP(A)
+        K = sp_distance(A)
         quality4 = test_quality(K)
         print('distance', '\t', quality4)
 

@@ -77,7 +77,7 @@ class MeasureCommonTests(unittest.TestCase):
 
     def test_full_graph_SP_logFor_Walk_equality(self):
         parameter = 0.00001
-        DSP = normalize(D_SP(sample.chain_graph))
+        DSP = normalize(sp_distance(sample.chain_graph))
         DlogFor = normalize(logFor(sample.chain_graph).get_D(parameter))
         DWalk = normalize(Walk(sample.chain_graph).get_D(parameter))
         self.assertTrue(np.allclose(DSP, DlogFor))

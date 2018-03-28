@@ -59,7 +59,7 @@ class Table3Tests(unittest.TestCase):
         self._dataset_results(SCT_H, 22, 4)
 
     def test_SP(self):
-        self._dataset_results(SP_K, 0, 5)
+        self._dataset_results(SPCT_H, 1, 5)
 
     if __name__ == '__main__':
         unittest.main()

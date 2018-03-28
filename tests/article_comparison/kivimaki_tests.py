@@ -24,7 +24,7 @@ class Figure2ComparisonTests(unittest.TestCase):
                         "{}: {:0.3f} != {:0.3f}, diff={:0.3f}".format(name, div, true_value, div - true_value))
 
     def test_boundaries_left_CT(self):
-        D = distance.SPCT(self.graph).get_D(1)
+        D = distance.SPCT(self.graph).get_D(0)
         self._comparison('CT', D, 1.5)
 
     def test_boundaries_left_logFor(self):
@@ -40,7 +40,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         self._comparison('FE', D, 1.5)
 
     def test_boundaries_right_SP(self):
-        D = distance.SPCT(self.graph).get_D(0)
+        D = distance.SPCT(self.graph).get_D(1)
         self._comparison('SP', D, 1.0)
 
     def test_boundaries_right_logFor(self):
@@ -98,7 +98,7 @@ class Table2Tests(unittest.TestCase):
         self._newsgroup_results(kernel.logFor_H, 0.95, 2)
 
     def test_SPCT(self):
-        self._newsgroup_results(kernel.SPCT_K, 1, 3)
+        self._newsgroup_results(kernel.SPCT_K, 0, 3)
 
     def test_SCT(self):
         self._newsgroup_results(kernel.SCT_H, 26, 4)

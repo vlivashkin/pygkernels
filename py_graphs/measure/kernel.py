@@ -1,5 +1,4 @@
 from scipy.linalg import expm
-from sklearn.preprocessing import normalize
 
 from . import distance, scaler
 from .shortcuts import *
@@ -145,23 +144,21 @@ class SCCT_H(Kernel):
         return 1. / (1. + np.exp(-alpha * self.Kds))
 
 
-class CT_H(Kernel):
-    def __init__(self, A):
-        super().__init__('CT H', scaler.Linear, A)
-        self.CT = H_R(A)
-
-    def get_K(self, param):
-        return self.CT
-
-
 class SPCT_H(Kernel):
     def __init__(self, A):
         super().__init__('SP-CT H', scaler.Linear, A)
-        self.H_SP = normalize(D_to_K(D_SP(A)))
-        self.H_CT = normalize(H_R(A))
+        self.H_SP = D_to_K(sp_distance(A))
+        self.H_CT = 2 * resistance_kernel(A)
 
     def get_K(self, lmbda):
+        # when lambda = 0 this is CT, when lambda = 1 this is SP
         return lmbda * self.H_SP + (1. - lmbda) * self.H_CT
+
+    def get_SP(self):
+        return self.get_K(1)
+
+    def get_CT(self):
+        return self.get_K(0)
 
 
 class pWalk_K(Kernel):
@@ -234,25 +231,24 @@ class FE2_K(Kernel):
         super().__init__('FE 2', scaler.FractionReversed, A, distance.FE2)
 
 
+@deprecated
 class old_RSP_K(Kernel):
     def __init__(self, A):
         super().__init__('old RSP', scaler.FractionReversed, A, distance.old_RSP)
 
 
+@deprecated
 class old_FE_K(Kernel):
     def __init__(self, A):
         super().__init__('old FE', scaler.FractionReversed, A, distance.old_FE)
 
 
-class SP_K(Kernel):
-    def __init__(self, A):
-        super().__init__('SP K', scaler.Linear, A)
-        self.SP = D_SP(A)
-
-    def get_K(self, param):
-        return self.SP
-
-
 class SPCT_K(Kernel):
     def __init__(self, A):
         super().__init__('SP-CT K', scaler.Linear, A, distance.SPCT)
+
+    def get_SP(self):
+        return self.get_K(1)
+
+    def get_CT(self):
+        return self.get_K(0)

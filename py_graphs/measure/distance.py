@@ -264,8 +264,8 @@ class FE2(RSP2_like):
 class SPCT(Distance):
     def __init__(self, A):
         super().__init__('SP-CT', scaler.Linear, A)
-        self.D_SP = D_SP(A)
-        self.D_CT = 2. * H_to_D(H_R(A))
+        self.D_SP = sp_distance(A)
+        self.D_CT = 2. * H_to_D(resistance_kernel(A))
 
     def get_D(self, lmbda):
         # when lambda = 0 this is CT, when lambda = 1 this is SP

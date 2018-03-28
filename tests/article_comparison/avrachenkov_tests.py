@@ -1,68 +1,64 @@
 import unittest
-from collections import defaultdict
 
-from cluster import KernelKMeans
 from graphs import sample
-from graphs.generator import StochasticBlockModelGraphGenerator
-from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H, Heat_H
+from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H
 from measure.kernel_new import *
 from measure.shortcuts import *
-from scorer import max_accuracy
 
 
 # Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
 # https://hal.inria.fr/hal-01647915/document
 
 
-class BalancedModel(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        generator = StochasticBlockModelGraphGenerator()
-        self.graphs, _ = generator.generate_graphs(100, 200, 2, 0.1, 0.02)
-
-    def _compare(self, measure, y_need):
-        results = defaultdict(lambda: [])
-        count, passes = 0, 0
-        for A, y_true in self.graphs:
-            mg = measure(A)
-            for param in mg.scaler.scale(np.linspace(0, 1, 50)):
-                try:
-                    count += 1
-                    K = mg.get_K(param)
-                    y_pred = KernelKMeans(2).fit_predict(K)
-                    results[param].append(max_accuracy(y_true, y_pred))
-                    passes += 1
-                except:
-                    pass
-        print('Passes: {}/{}'.format(passes, count))
-        y_final = 1. - np.max([np.average(x) for x in results.values()])
-        print('Min error: {:0.3f}'.format(y_final))
-        self.assertTrue(np.isclose(y_final, y_need, atol=0.002),
-                        "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(y_final, y_need, np.abs(y_final - y_need)))
-
-    def test_katz(self):
-        self._compare(Katz, 0.0072)
-
-    def test_communicability(self):
-        self._compare(Estrada, 0.0084)
-
-    def test_heat(self):
-        self._compare(Heat_H, 0.0064)
-
-    def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.0066)
-
-    def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, 0.0072)
-
-    def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, 0.0073)
-
-    def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, 0.0072)
-
-    def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, 0.0074)
+# class BalancedModel(unittest.TestCase):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         generator = StochasticBlockModelGraphGenerator()
+#         self.graphs, _ = generator.generate_graphs(100, 200, 2, 0.1, 0.02)
+#
+#     def _compare(self, measure, y_need):
+#         results = defaultdict(lambda: [])
+#         count, passes = 0, 0
+#         for A, y_true in self.graphs:
+#             mg = measure(A)
+#             for param in mg.scaler.scale(np.linspace(0, 1, 50)):
+#                 try:
+#                     count += 1
+#                     K = mg.get_K(param)
+#                     y_pred = KernelKMeans(2).fit_predict(K)
+#                     results[param].append(max_accuracy(y_true, y_pred))
+#                     passes += 1
+#                 except:
+#                     pass
+#         print('Passes: {}/{}'.format(passes, count))
+#         y_final = 1. - np.max([np.average(x) for x in results.values()])
+#         print('Min error: {:0.3f}'.format(y_final))
+#         self.assertTrue(np.isclose(y_final, y_need, atol=0.002),
+#                         "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(y_final, y_need, np.abs(y_final - y_need)))
+#
+#     def test_katz(self):
+#         self._compare(Katz, 0.0072)
+#
+#     def test_communicability(self):
+#         self._compare(Estrada, 0.0084)
+#
+#     def test_heat(self):
+#         self._compare(Heat_H, 0.0064)
+#
+#     def test_normalizedHeat(self):
+#         self._compare(NormalizedHeat, 0.0066)
+#
+#     def test_regularizedLaplacian(self):
+#         self._compare(RegularizedLaplacian, 0.0072)
+#
+#     def test_personalizedPageRank(self):
+#         self._compare(PersonalizedPageRank, 0.0073)
+#
+#     def test_modifiedPageRank(self):
+#         self._compare(ModifiedPersonalizedPageRank, 0.0072)
+#
+#     def test_heatPageRank(self):
+#         self._compare(HeatPersonalizedPageRank, 0.0074)
 
 
 class NewMeasuresEqualutyTests(unittest.TestCase):

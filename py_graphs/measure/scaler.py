@@ -37,7 +37,7 @@ class Rho(Scaler):  # pWalk, Walk
         return t / self.rho
 
 
-class Fraction(Scaler):  # Forest, logForest, Comm, logComm, Heat, logHeat, SCT, SCCT
+class Fraction(Scaler):  # Forest, logForest, Comm, logComm, Heat, logHeat, SCT, SCCT, ...
     def scale_one(self, t):
         return 0.5 * t / (1.0 - t)
 
