@@ -46,6 +46,7 @@ def sp_distance(A):
     return shortest_path(A, directed=False)
 
 
+@deprecated
 def resistance_kernel(A):
     """
     H = (L + J)^{-1}
@@ -54,6 +55,25 @@ def resistance_kernel(A):
     L = get_L(A)
     J = np.ones((size, size)) / size
     return np.linalg.pinv(L + J)
+
+
+def commute_distance(A):
+    """Original code copyright (C) Ulrike Von Luxburg, Python
+        implementation by James McDermott."""
+
+    size = A.shape[0]
+    L = get_L(A)
+
+    Linv = np.linalg.inv(L + np.ones(L.shape) / size) - np.ones(L.shape) / size
+
+    Linv_diag = np.diag(Linv).reshape((size, 1))
+    Rexact = Linv_diag * np.ones((1, size)) + np.ones((size, 1)) * Linv_diag.T - 2 * Linv
+
+    # convert from a resistance distance to a commute time distance
+    vol = np.sum(A)
+    Rexact *= vol
+
+    return Rexact
 
 
 def H0_to_H(H0):

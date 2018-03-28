@@ -48,44 +48,52 @@ class spctTests(unittest.TestCase):
 
     def test_weighted_graph_SP(self):
         A = sample.weighted
-        SP = sample.weighted_sp
-        self.assertTrue(np.allclose(self.get_SP(A), SP))
+        true_SP = sample.weighted_sp
+        self.assertTrue(np.allclose(self.get_SP(A), true_SP))
 
-    def test_compare_clustering_quality(self):
-        graphs, info = dataset.news_2cl_1
-        A, y_true = graphs[0]
+    def test_compare_CT_and_Resistance(self):
+        A = sample.diploma_matrix
+        D_CT = commute_distance(A)
+        D_R = H_to_D(resistance_kernel(A))
+        D_CT /= np.average(D_CT)
+        D_R /= np.average(D_R)
+        self.assertTrue(np.allclose(D_CT, D_R))
 
-        def test_quality(K):
-            kmeans = KernelKMeans(n_clusters=info['k'])
-            y_test = kmeans.fit_predict(K)
-            return normalized_mutual_info_score(y_true, y_test)
-
-        # without normalization
-        K = D_to_K(sp_distance(A))
-        quality1 = test_quality(K)
-        print('without normalization', '\t', quality1)
-
-        # normalization of distance
-        K = D_to_K(normalize(sp_distance(A)))
-        quality2 = test_quality(K)
-        print('normalization of distance', '\t', quality2)
-
-        # normalization of kernel
-        K = D_to_K(normalize(sp_distance(A)))
-        quality3 = test_quality(K)
-        print('normalization of kernel', '\t', quality3)
-
-        # both
-        K = normalize(D_to_K(normalize(sp_distance(A))))
-        quality4 = test_quality(K)
-        print('both', '\t', quality4)
-
-        # distance
-        K = sp_distance(A)
-        quality4 = test_quality(K)
-        print('distance', '\t', quality4)
-
-        # another measure (FE)
-        K = D_to_K(FE(A).get_D(0.01))
-        quality5 = test_quality(K)
-        print('another measure (FE)', '\t', quality5)
+    # def test_compare_clustering_quality(self):
+    #     graphs, info = dataset.news_2cl_1
+    #     A, y_true = graphs[0]
+    #
+    #     def test_quality(K):
+    #         kmeans = KernelKMeans(n_clusters=info['k'])
+    #         y_test = kmeans.fit_predict(K)
+    #         return normalized_mutual_info_score(y_true, y_test)
+    #
+    #     # without normalization
+    #     K = D_to_K(sp_distance(A))
+    #     quality1 = test_quality(K)
+    #     print('without normalization', '\t', quality1)
+    #
+    #     # normalization of distance
+    #     K = D_to_K(normalize(sp_distance(A)))
+    #     quality2 = test_quality(K)
+    #     print('normalization of distance', '\t', quality2)
+    #
+    #     # normalization of kernel
+    #     K = D_to_K(normalize(sp_distance(A)))
+    #     quality3 = test_quality(K)
+    #     print('normalization of kernel', '\t', quality3)
+    #
+    #     # both
+    #     K = normalize(D_to_K(normalize(sp_distance(A))))
+    #     quality4 = test_quality(K)
+    #     print('both', '\t', quality4)
+    #
+    #     # distance
+    #     K = sp_distance(A)
+    #     quality4 = test_quality(K)
+    #     print('distance', '\t', quality4)
+    #
+    #     # another measure (FE)
+    #     K = D_to_K(FE(A).get_D(0.01))
+    #     quality5 = test_quality(K)
+    #     print('another measure (FE)', '\t', quality5)
