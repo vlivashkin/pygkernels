@@ -76,12 +76,12 @@ class MeasureCommonTests(unittest.TestCase):
                     self.assertTrue(D[i][i] == 0)
 
     def test_full_graph_SP_logFor_Walk_equality(self):
-        parameter = 0.00001
-        DSP = normalize(sp_distance(sample.chain_graph))
-        DlogFor = normalize(logFor(sample.chain_graph).get_D(parameter))
-        DWalk = normalize(Walk(sample.chain_graph).get_D(parameter))
-        self.assertTrue(np.allclose(DSP, DlogFor))
-        self.assertTrue(np.allclose(DWalk, DSP))
+        param = 0.00001
+        DSP = sp_distance(sample.chain_graph)
+        DlogFor = logFor(sample.chain_graph).get_D(param)
+        DWalk = Walk(sample.chain_graph).get_D(param)
+        self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
+        self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))
 
     if __name__ == '__main__':

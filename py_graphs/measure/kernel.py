@@ -223,12 +223,12 @@ class FE_K(Kernel):
 
 class RSP2_K(Kernel):
     def __init__(self, A):
-        super().__init__('RSP 2', scaler.FractionReversed, A, distance.RSP2)
+        super().__init__('RSP 2', scaler.FractionReversed, A, distance.GPD_RSP)
 
 
 class FE2_K(Kernel):
     def __init__(self, A):
-        super().__init__('FE 2', scaler.FractionReversed, A, distance.FE2)
+        super().__init__('FE 2', scaler.FractionReversed, A, distance.GPD_FE)
 
 
 @deprecated

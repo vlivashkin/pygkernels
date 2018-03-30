@@ -161,7 +161,7 @@ class old_FE(FE):
 
 
 # From https://github.com/jmmcd/GPDistance
-class RSP2_like(Distance):
+class GPD_RSP_like(Distance):
     def __init__(self, name, A):
         super().__init__(name, scaler.FractionReversed, A)
 
@@ -202,7 +202,7 @@ class RSP2_like(Distance):
         return W, Z
 
 
-class RSP2(RSP2_like):
+class GPD_RSP(GPD_RSP_like):
     def __init__(self, A):
         super().__init__('RSP 2', A)
 
@@ -237,7 +237,7 @@ class RSP2(RSP2_like):
         return D_RSP
 
 
-class FE2(RSP2_like):
+class GPD_FE(GPD_RSP_like):
     def __init__(self, A):
         super().__init__('FE 2', A)
 

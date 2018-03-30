@@ -51,14 +51,6 @@ class spctTests(unittest.TestCase):
         true_SP = sample.weighted_sp
         self.assertTrue(np.allclose(self.get_SP(A), true_SP))
 
-    def test_compare_CT_and_Resistance(self):
-        A = sample.diploma_matrix
-        D_CT = commute_distance(A)
-        D_R = H_to_D(resistance_kernel(A))
-        D_CT /= np.average(D_CT)
-        D_R /= np.average(D_R)
-        self.assertTrue(np.allclose(D_CT, D_R))
-
     # def test_compare_clustering_quality(self):
     #     graphs, info = dataset.news_2cl_1
     #     A, y_true = graphs[0]
