@@ -119,5 +119,5 @@ news_5cl_3 = load_newsgroup_graph('news_5cl_3', 'newsgroup/news_5cl_3_classeo.cs
 news = [
     news_2cl_1, news_2cl_2, news_2cl_3,
     news_3cl_1, news_3cl_2, news_3cl_3,
-    # news_5cl_1, news_5cl_2, news_5cl_3
+    news_5cl_1, news_5cl_2, news_5cl_3
 ]

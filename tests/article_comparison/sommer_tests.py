@@ -32,7 +32,7 @@ class Table3Tests(unittest.TestCase):
     def _dataset_results(self, measure_class, best_param, idx):
         results = []
         for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
-                             zachary, football  #, polblogs
+                             news_5cl_1, news_5cl_2, news_5cl_3, zachary, football  #, polblogs
                              ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
