@@ -46,9 +46,6 @@ class NewMeasuresEqualutyTests(unittest.TestCase):
             self.assertTrue(np.allclose(forest.get_K(param).ravel(), reg_laplacian.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
 
-    if __name__ == '__main__':
-        unittest.main()
-
 
 class Competition(unittest.TestCase):
     def __init__(self, atol, *args, **kwargs):
@@ -82,11 +79,23 @@ class Competition(unittest.TestCase):
 
     def _use_best_param(self, measure, param):
         results = []
+        count, passes = 0, 0
         for A, y_true in self.graphs:
-            K = measure(A).get_K(param)
-            y_pred = KernelKMeans(2).fit_predict(K)
-            results.append(max_accuracy(y_true, y_pred))
-        return np.average(results)
+            try:
+                count += 1
+                K = measure(A).get_K(param)
+                y_pred = KernelKMeans(2).fit_predict(K)
+                results.append(max_accuracy(y_true, y_pred))
+                passes += 1
+            except:
+                pass
+        quality = np.average(results)
+
+        # logging results for report
+        print('{}; Passes: {}/{}; Using param {:0.4f}, error: {:0.4f}'.format(
+            measure.name, passes, count, param, 1 - quality))
+
+        return quality
 
     def _compare(self, measure, error_true, param=None):
         if param is not None:
@@ -118,7 +127,7 @@ class BalancedModel(Competition):
         self._compare(Heat, 0.0064, 0.0326)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.0066, 0.3448)
+        self._compare(NormalizedHeat, 0.0066)
 
     def test_regularizedLaplacian(self):
         self._compare(RegularizedLaplacian, 0.0072, 0.0326)
@@ -139,13 +148,13 @@ class UnbalancedModel(Competition):
         self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(100)  # 1000 graphs in paper
 
     def test_katz(self):
-        self._compare(Katz, 0.012)
+        self._compare(Katz, 0.012, 0.0068)
 
     def test_communicability(self):
         self._compare(Estrada, 0.011)
 
     def test_heat(self):
-        self._compare(Heat, 0.026)
+        self._compare(Heat, 0.026, 0.0104)
 
     def test_normalizedHeat(self):
         self._compare(NormalizedHeat, 0.009)

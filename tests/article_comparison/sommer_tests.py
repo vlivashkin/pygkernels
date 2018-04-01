@@ -78,6 +78,3 @@ class Table3Tests(unittest.TestCase):
 
     def test_SP(self):
         self._dataset_results(SPCT_H, 1, 5)
-
-    if __name__ == '__main__':
-        unittest.main()

@@ -60,9 +60,6 @@ class Figure2ComparisonTests(unittest.TestCase):
         D = distance.FE(self.graph).get_D(20.0)
         self._comparison('FE 20.0', D, 1.0)
 
-    if __name__ == '__main__':
-        unittest.main()
-
 
 # Table 2 with optimal values from Table 1
 class Table2Tests(unittest.TestCase):
@@ -124,6 +121,3 @@ class Table2Tests(unittest.TestCase):
 
     def test_SCT(self):
         self._newsgroup_results(kernel.SCT_H, 26, 4)
-
-    if __name__ == '__main__':
-        unittest.main()

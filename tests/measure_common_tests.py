@@ -83,6 +83,3 @@ class MeasureCommonTests(unittest.TestCase):
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
         self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))
-
-    if __name__ == '__main__':
-        unittest.main()

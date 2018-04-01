@@ -67,9 +67,6 @@ class Figure1ComparisonTests(unittest.TestCase):
         D = pWalk(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.988, 1.025, 1.379, 1.416])
 
-    if __name__ == '__main__':
-        unittest.main()
-
 
 # Chebotarev: The Walk Distances in Graphs
 # https://arxiv.org/abs/1103.2059
@@ -123,6 +120,3 @@ class Table1ComparisonTests(unittest.TestCase):
         parameter = AlphaToT(self.graph).scale(1.0)
         D = pWalk(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.96, 1.46, 1.03])
-
-    if __name__ == '__main__':
-        unittest.main()

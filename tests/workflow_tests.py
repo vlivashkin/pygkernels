@@ -27,9 +27,6 @@ class EstimatorsTests(unittest.TestCase):
         print('Ward:', y_pred_ward)
         print('Spectral Clustering:', y_pred_spectral)
 
-    if __name__ == '__main__':
-        unittest.main()
-
 
 class WorkflowTests(unittest.TestCase):
     def test_ward_clustering(self):
