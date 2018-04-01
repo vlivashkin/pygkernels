@@ -73,11 +73,11 @@ class Competition(unittest.TestCase):
         diff = np.abs(y_final - y_need)
 
         # logging results for report
-        print('{}\nPasses: {}/{}\nMin error: {:0.3f}, true={}, diff={}'.format(
+        print('{}\nPasses: {}/{}\nMin error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(
             mg.name, passes, count, y_final, y_need, diff))
 
         self.assertTrue(np.isclose(y_final, y_need, atol=0.004),  # error in paper: 0.002
-                        "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(y_final, y_need, diff))
+                        "Test {:0.4f} != True {:0.4f}, diff={:0.4f}".format(y_final, y_need, diff))
 
 
 class BalancedModel(Competition):
