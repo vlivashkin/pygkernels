@@ -51,11 +51,13 @@ class NewMeasuresEqualutyTests(unittest.TestCase):
 
 
 class Competition(unittest.TestCase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, atol, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.atol = atol
         self.graphs = None
 
-    def _compare(self, measure, y_need):
+    def _search_best_param(self, measure):
         results = defaultdict(lambda: [])
         count, passes = 0, 0
         for A, y_true in self.graphs:
@@ -69,51 +71,72 @@ class Competition(unittest.TestCase):
                     passes += 1
                 except:
                     pass
-        y_final = 1. - np.max([np.average(x) for x in results.values()])
-        diff = np.abs(y_final - y_need)
+        pairs = [(key, np.average(value)) for key, value in results.items()]
+        best_param, best_quality = pairs[np.argmax([x[1] for x in pairs])]
 
         # logging results for report
-        print('{}\nPasses: {}/{}\nMin error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(
-            mg.name, passes, count, y_final, y_need, diff))
+        print('{}; Passes: {}/{}; Min error: {:0.4f}, Best param: {:0.4f}'.format(
+            measure.name, passes, count, 1 - best_quality, best_param))
 
-        self.assertTrue(np.isclose(y_final, y_need, atol=0.004),  # error in paper: 0.002
-                        "Test {:0.4f} != True {:0.4f}, diff={:0.4f}".format(y_final, y_need, diff))
+        return best_param, best_quality
+
+    def _use_best_param(self, measure, param):
+        results = []
+        for A, y_true in self.graphs:
+            K = measure(A).get_K(param)
+            y_pred = KernelKMeans(2).fit_predict(K)
+            results.append(max_accuracy(y_true, y_pred))
+        return np.average(results)
+
+    def _compare(self, measure, error_true, param=None):
+        if param is not None:
+            best_quality = self._use_best_param(measure, param)
+        else:
+            _, best_quality = self._search_best_param(measure)
+        error_test = 1. - best_quality
+        diff = np.abs(error_test - error_true)
+
+        # logging results for report
+        print('{}; Min error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(measure.name, error_test, error_true, diff))
+
+        self.assertTrue(np.isclose(error_test, error_true, atol=self.atol),
+                        "Test {:0.4f} != True {:0.4f}, diff={:0.4f}".format(error_test, error_true, diff))
 
 
 class BalancedModel(Competition):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(0.004, *args, **kwargs)  # error bars in paper: 0.002
         self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02).generate_graphs(100)
 
     def test_katz(self):
-        self._compare(Katz, 0.0072)
+        self._compare(Katz, 0.0072, 0.0017)
 
     def test_communicability(self):
-        self._compare(Estrada, 0.0084)
+        self._compare(Estrada, 0.0084, 0.0833)
 
     def test_heat(self):
-        self._compare(Heat, 0.0064)
+        self._compare(Heat, 0.0064, 0.0326)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.0066)
+        self._compare(NormalizedHeat, 0.0066, 0.3448)
 
     def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, 0.0072)
+        self._compare(RegularizedLaplacian, 0.0072, 0.0326)
 
     def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, 0.0073)
+        self._compare(PersonalizedPageRank, 0.0073, 0.0104)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, 0.0072)
+        self._compare(ModifiedPersonalizedPageRank, 0.0072, 0.0568)
 
     def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, 0.0074)
+        self._compare(HeatPersonalizedPageRank, 0.0074, 0.1621)
 
 
 class UnbalancedModel(Competition):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(1000)
+        super().__init__(0.012, *args, **kwargs)  # error bars in paper: 0.006
+        self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(100)  # 1000 graphs in paper
 
     def test_katz(self):
         self._compare(Katz, 0.012)

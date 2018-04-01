@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.matlib
 
+from . import kernel
 from . import scaler
 from .kernel import Kernel
 from .shortcuts import get_D, get_L
@@ -10,20 +11,7 @@ from .shortcuts import get_D, get_L
 # Implementation from Dmytro Rubanov
 
 class KernelNew(Kernel):
-    @staticmethod
-    def get_all_new():
-        return [
-            Katz, Estrada, Heat,
-            NormalizedHeat,
-            RegularizedLaplacian,
-            PersonalizedPageRank,
-            ModifiedPersonalizedPageRank,
-            HeatPersonalizedPageRank
-        ]
-
-    @staticmethod
-    def get_ALL():
-        return Kernel.get_all_H_plus_RSP_FE() + KernelNew.get_all_new()
+    name, default_scaler = None, None
 
     @staticmethod
     def mat_exp(M, n=15):
@@ -36,8 +24,10 @@ class KernelNew(Kernel):
 
 
 class Katz(KernelNew):
+    name, default_scaler = 'NEW Katz', scaler.Rho
+
     def __init__(self, A):
-        super().__init__('NEW Katz', scaler.Rho, A)
+        super().__init__(A)
         self.rad = self._get_radius(self.A)
 
     @staticmethod
@@ -51,8 +41,7 @@ class Katz(KernelNew):
 
 
 class Estrada(KernelNew):
-    def __init__(self, A):
-        super().__init__('NEW Estrada', scaler.Fraction, A)
+    name, default_scaler = 'NEW Estrada', scaler.Fraction
 
     def get_K(self, t):
         K = KernelNew.mat_exp(t * self.A)
@@ -60,8 +49,10 @@ class Estrada(KernelNew):
 
 
 class Heat(KernelNew):  # this is logHeat, actually
+    name, default_scaler = 'NEW Heat', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('NEW Heat', scaler.Fraction, A)
+        super().__init__(A)
         self.L = np.matlib.array(get_L(A))
 
     def get_K(self, t):
@@ -73,8 +64,10 @@ class Heat(KernelNew):  # this is logHeat, actually
 
 
 class NormalizedHeat(KernelNew):
+    name, default_scaler = 'NEW NormalizedHeat', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('NEW NormalizedHeat', scaler.Fraction, A)
+        super().__init__(A)
         D = get_D(A)
         L = D - A
         D_12 = np.linalg.inv(np.sqrt(D))
@@ -89,8 +82,10 @@ class NormalizedHeat(KernelNew):
 
 
 class RegularizedLaplacian(KernelNew):
+    name, default_scaler = 'NEW RegularizedLaplacian', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('NEW RegularizedLaplacian', scaler.Fraction, A)
+        super().__init__(A)
         D = get_D(A)
         self.L = D - A
 
@@ -103,8 +98,10 @@ class RegularizedLaplacian(KernelNew):
 
 
 class PersonalizedPageRank(KernelNew):
+    name, default_scaler = 'NEW PersonalizedPageRank', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('NEW PersonalizedPageRank', scaler.Fraction, A)
+        super().__init__(A)
         D = get_D(A)
         self.P = np.linalg.inv(D).dot(A)
 
@@ -117,8 +114,10 @@ class PersonalizedPageRank(KernelNew):
 
 
 class ModifiedPersonalizedPageRank(KernelNew):
+    name, default_scaler = 'NEW ModifiedPersonalizedPageRank', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('NEW ModifiedPersonalizedPageRank', scaler.Fraction, A)
+        super().__init__(A)
         self.D = get_D(A)
 
     def get_K(self, alpha):
@@ -130,8 +129,10 @@ class ModifiedPersonalizedPageRank(KernelNew):
 
 
 class HeatPersonalizedPageRank(KernelNew):
+    name, default_scaler = 'NEW HeatPersonalizedPageRank', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('NEW HeatPersonalizedPageRank', scaler.Fraction, A)
+        super().__init__(A)
         self.D = get_D(A)
         self.P = np.linalg.inv(self.D).dot(A)
 
@@ -141,3 +142,15 @@ class HeatPersonalizedPageRank(KernelNew):
             # print(t, "K < 0")
             return None
         return np.array(np.log(K))
+
+
+NEW_kernels = [
+    Katz, Estrada, Heat,
+    NormalizedHeat,
+    RegularizedLaplacian,
+    PersonalizedPageRank,
+    ModifiedPersonalizedPageRank,
+    HeatPersonalizedPageRank
+]
+
+ALL_kernels = kernel.H_kernels_plus_RSP_FE + NEW_kernels

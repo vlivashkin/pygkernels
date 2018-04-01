@@ -4,9 +4,10 @@ from .shortcuts import *
 
 
 class Distance:
-    def __init__(self, name, scaler, A, parent_kernel=None, power=1.):
-        self.name = name
-        self.scaler = scaler(A)
+    name, default_scaler = None, None
+
+    def __init__(self, A, parent_kernel=None, power=1.):
+        self.scaler = self.default_scaler(A)
         self.A = A
         self.parent_kernel = parent_kernel(A) if parent_kernel is not None else None
         self.power = power
@@ -28,61 +29,82 @@ class Distance:
 
 
 class pWalk(Distance):
+    name, default_scaler = 'pWalk', scaler.Rho
+
     def __init__(self, A):
-        super().__init__('pWalk', scaler.Rho, A, kernel.pWalk_H, 1.)
+        super().__init__(A, kernel.pWalk_H)
 
 
 class Walk(Distance):
+    name, default_scaler = 'Walk', scaler.Rho
+
     def __init__(self, A):
-        super().__init__('Walk', scaler.Rho, A, kernel.Walk_H, 1.)
+        super().__init__(A, kernel.Walk_H)
 
 
 class For(Distance):
+    name, default_scaler = 'For', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('For', scaler.Fraction, A, kernel.For_H, 1.)
+        super().__init__(A, kernel.For_H)
 
 
 class logFor(Distance):
+    name, default_scaler = 'logFor', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('logFor', scaler.Fraction, A, kernel.logFor_H, 1.)
+        super().__init__(A, kernel.logFor_H)
 
 
 class Comm(Distance):
+    name, default_scaler = 'Comm', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('Comm', scaler.Fraction, A, kernel.Comm_H, .5)
+        super().__init__(A, kernel.Comm_H, .5)
 
 
 class logComm(Distance):
+    name, default_scaler = 'logComm', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('logComm', scaler.Fraction, A, kernel.logComm_H, .5)
+        super().__init__(A, kernel.logComm_H, .5)
 
 
 class Heat(Distance):
+    name, default_scaler = 'Heat', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('Heat', scaler.Fraction, A, kernel.Heat_H, 1.)
+        super().__init__(A, kernel.Heat_H)
 
 
 class logHeat(Distance):
+    name, default_scaler = 'logHeat', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('logHeat', scaler.Fraction, A, kernel.logHeat_H, 1.)
+        super().__init__(A, kernel.logHeat_H)
 
 
 class SCT(Distance):
+    name, default_scaler = 'SCT', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('SCT', scaler.Fraction, A, kernel.SCT_H, 1.)
+        super().__init__(A, kernel.SCT_H)
 
 
 class SCCT(Distance):
+    name, default_scaler = 'SCCT', scaler.Fraction
+
     def __init__(self, A):
-        super().__init__('SCCT', scaler.Fraction, A, kernel.SCCT_H, 1.)
+        super().__init__(A, kernel.SCCT_H)
 
 
 class RSP_vanilla_like(Distance):
-    def __init__(self, name, A, C=None):
+    def __init__(self, A, C=None):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
         """
-        super().__init__(name, scaler.FractionReversed, A)
+        super().__init__(A)
+
         self.size = A.shape[0]
         self.e = np.ones((self.size, 1))
         self.I = np.eye(self.size)
@@ -106,8 +128,7 @@ class RSP_vanilla_like(Distance):
 
 
 class RSP_vanilla(RSP_vanilla_like):
-    def __init__(self, A):
-        super().__init__('RSP vanilla', A)
+    name, default_scaler = 'RSP vanilla', scaler.FractionReversed
 
     def get_D(self, beta):
         """
@@ -126,8 +147,7 @@ class RSP_vanilla(RSP_vanilla_like):
 
 
 class FE_vanilla(RSP_vanilla_like):
-    def __init__(self, A):
-        super().__init__('FE vanilla', A)
+    name, default_scaler = 'FE vanilla', scaler.FractionReversed
 
     def get_D(self, beta):
         """
@@ -148,8 +168,8 @@ class FE_vanilla(RSP_vanilla_like):
 
 # From https://github.com/jmmcd/GPDistance
 class RSP_like(Distance):
-    def __init__(self, name, A):
-        super().__init__(name, scaler.FractionReversed, A)
+    def __init__(self, A):
+        super().__init__(A)
 
         max = np.finfo('d').max
         eps = 0.00000001
@@ -189,8 +209,7 @@ class RSP_like(Distance):
 
 
 class RSP(RSP_like):
-    def __init__(self, A):
-        super().__init__('RSP', A)
+    name, default_scaler = 'RSP', scaler.FractionReversed
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -224,8 +243,7 @@ class RSP(RSP_like):
 
 
 class FE(RSP_like):
-    def __init__(self, A):
-        super().__init__('FE', A)
+    name, default_scaler = 'FE', scaler.FractionReversed
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -248,8 +266,11 @@ class FE(RSP_like):
 
 
 class SPCT(Distance):
+    name, default_scaler = 'SP-CT', scaler.Linear
+
     def __init__(self, A):
-        super().__init__('SP-CT', scaler.Linear, A)
+        super().__init__(A)
+
         self.D_SP = sp_distance(A)
         self.D_CT = 2. * H_to_D(resistance_kernel(A))
 
