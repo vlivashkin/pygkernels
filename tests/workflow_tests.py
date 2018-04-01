@@ -7,8 +7,7 @@ from cluster import KernelKMeans, SpectralClustering
 from cluster.ward import Ward
 from graphs import dataset
 from graphs import sample
-from measure.kernel import *
-from measure.kernel_new import KernelNew
+from measure import kernel, kernel_new
 from measure.shortcuts import *
 
 
@@ -31,7 +30,7 @@ class EstimatorsTests(unittest.TestCase):
 class WorkflowTests(unittest.TestCase):
     def test_ward_clustering(self):
         graphs, info = dataset.polbooks
-        for measure in Kernel.get_all_H():
+        for measure in kernel.H_kernels_plus_RSP_FE:
             measureparamdict = {}
             mean = []
             for edges, nodes in graphs:
@@ -46,11 +45,11 @@ class WorkflowTests(unittest.TestCase):
             if score is not None and score == score:
                 measureparamdict[0.5] = score
             maxparam = max(measureparamdict.items(), key=operator.itemgetter(1))[0]
-            print("{}\t{}\t{}".format(measure_o.name, maxparam, measureparamdict[maxparam]))
+            print("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))
 
     def test_ward_clustering_new_kernels(self):
         graphs, info = dataset.polbooks
-        for measure in KernelNew.get_all_new():
+        for measure in kernel_new.NEW_kernels:
             measureparamdict = {}
             mean = []
             for edges, nodes in graphs:
@@ -68,4 +67,4 @@ class WorkflowTests(unittest.TestCase):
             if score is not None and score == score:
                 measureparamdict[0.5] = score
             maxparam = max(measureparamdict.items(), key=operator.itemgetter(1))[0]
-            print("{}\t{}\t{}".format(measure_o.name, maxparam, measureparamdict[maxparam]))
+            print("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))
