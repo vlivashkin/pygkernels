@@ -50,11 +50,10 @@ class NewMeasuresEqualutyTests(unittest.TestCase):
         unittest.main()
 
 
-class BalancedModel(unittest.TestCase):
+class Competition(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        generator = StochasticBlockModel()
-        self.graphs, _ = generator.generate_graphs(100, 200, 2, 0.1, 0.02)
+        self.graphs = None
 
     def _compare(self, measure, y_need):
         results = defaultdict(lambda: [])
@@ -70,11 +69,21 @@ class BalancedModel(unittest.TestCase):
                     passes += 1
                 except:
                     pass
-        print('Passes: {}/{}'.format(passes, count))
         y_final = 1. - np.max([np.average(x) for x in results.values()])
-        print('Min error: {:0.3f}'.format(y_final))
+        diff = np.abs(y_final - y_need)
+
+        # logging results for report
+        print('{}\nPasses: {}/{}\nMin error: {:0.3f}, true={}, diff={}'.format(
+            mg.name, passes, count, y_final, y_need, diff))
+
         self.assertTrue(np.isclose(y_final, y_need, atol=0.004),  # error in paper: 0.002
-                        "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(y_final, y_need, np.abs(y_final - y_need)))
+                        "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(y_final, y_need, diff))
+
+
+class BalancedModel(Competition):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02).generate_graphs(100)
 
     def test_katz(self):
         self._compare(Katz, 0.0072)
@@ -101,5 +110,31 @@ class BalancedModel(unittest.TestCase):
         self._compare(HeatPersonalizedPageRank, 0.0074)
 
 
-class UnbalancedModel(unittest.TestCase):
-    pass
+class UnbalancedModel(Competition):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(1000)
+
+    def test_katz(self):
+        self._compare(Katz, 0.012)
+
+    def test_communicability(self):
+        self._compare(Estrada, 0.011)
+
+    def test_heat(self):
+        self._compare(Heat, 0.026)
+
+    def test_normalizedHeat(self):
+        self._compare(NormalizedHeat, 0.009)
+
+    def test_regularizedLaplacian(self):
+        self._compare(RegularizedLaplacian, 0.0026)
+
+    def test_personalizedPageRank(self):
+        self._compare(PersonalizedPageRank, 0.0021)
+
+    def test_modifiedPageRank(self):
+        self._compare(ModifiedPersonalizedPageRank, 0.0022)
+
+    def test_heatPageRank(self):
+        self._compare(HeatPersonalizedPageRank, 0.0021)
