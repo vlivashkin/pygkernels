@@ -46,7 +46,6 @@ def sp_distance(A):
     return shortest_path(A, directed=False)
 
 
-@deprecated
 def resistance_kernel(A):
     """
     H = (L + J)^{-1}

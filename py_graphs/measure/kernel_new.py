@@ -42,7 +42,7 @@ class Katz(KernelNew):
 
     @staticmethod
     def _get_radius(M):
-        val, vec = np.linalg.eig(M)
+        val, _ = np.linalg.eig(M)
         return np.max(np.abs(val))
 
     def get_K(self, t):
@@ -50,7 +50,7 @@ class Katz(KernelNew):
         return np.array(np.log(K))
 
 
-class Estrada(KernelNew):  # !
+class Estrada(KernelNew):
     def __init__(self, A):
         super().__init__('NEW Estrada', scaler.Fraction, A)
 
@@ -59,7 +59,7 @@ class Estrada(KernelNew):  # !
         return np.array(np.log(K))
 
 
-class Heat(KernelNew):  # !
+class Heat(KernelNew):  # this is logHeat, actually
     def __init__(self, A):
         super().__init__('NEW Heat', scaler.Fraction, A)
         self.L = np.matlib.array(get_L(A))
@@ -72,7 +72,7 @@ class Heat(KernelNew):  # !
         return np.array(np.log(K))
 
 
-class NormalizedHeat(KernelNew):  # !
+class NormalizedHeat(KernelNew):
     def __init__(self, A):
         super().__init__('NEW NormalizedHeat', scaler.Fraction, A)
         D = get_D(A)
@@ -129,9 +129,9 @@ class ModifiedPersonalizedPageRank(KernelNew):
         return np.array(np.log(K))
 
 
-class HeatPersonalizedPageRank(KernelNew):  # !
+class HeatPersonalizedPageRank(KernelNew):
     def __init__(self, A):
-        super().__init__('NEW HeatPersonalizedPareRank', scaler.Fraction, A)
+        super().__init__('NEW HeatPersonalizedPageRank', scaler.Fraction, A)
         self.D = get_D(A)
         self.P = np.linalg.inv(self.D).dot(A)
 

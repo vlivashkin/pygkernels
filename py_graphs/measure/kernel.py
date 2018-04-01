@@ -213,22 +213,22 @@ class SCCT_K(Kernel):
 
 class RSP_vanilla_K(Kernel):
     def __init__(self, A):
-        super().__init__('RSP', scaler.FractionReversed, A, distance.RSP_vanilla)
+        super().__init__('RSP vanilla K', scaler.FractionReversed, A, distance.RSP_vanilla)
 
 
 class FE_vanilla_K(Kernel):
     def __init__(self, A):
-        super().__init__('FE', scaler.FractionReversed, A, distance.FE_vanilla)
+        super().__init__('FE vanilla K', scaler.FractionReversed, A, distance.FE_vanilla)
 
 
 class RSP_K(Kernel):
     def __init__(self, A):
-        super().__init__('RSP 2', scaler.FractionReversed, A, distance.RSP)
+        super().__init__('RSP K', scaler.FractionReversed, A, distance.RSP)
 
 
 class FE_K(Kernel):
     def __init__(self, A):
-        super().__init__('FE 2', scaler.FractionReversed, A, distance.FE)
+        super().__init__('FE K', scaler.FractionReversed, A, distance.FE)
 
 
 class SPCT_K(Kernel):

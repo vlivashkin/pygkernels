@@ -13,7 +13,7 @@ class Scaler:
         return t
 
 
-class Linear(Scaler):  # SP-CT
+class Linear(Scaler):  # no transformation, for SP-CT
     pass
 
 
@@ -31,7 +31,7 @@ class Rho(Scaler):  # pWalk, Walk
     def __init__(self, A=None):
         super().__init__(A)
         cfm = np.linalg.eigvals(self.A)
-        self.rho = np.max(cfm)
+        self.rho = np.max(np.abs(cfm))
 
     def scale(self, t):
         return t / self.rho

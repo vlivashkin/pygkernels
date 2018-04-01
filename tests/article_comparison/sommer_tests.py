@@ -8,6 +8,7 @@ from measure.kernel import *
 
 
 # Sommer: Comparison of Graph Node Distances on Clustering Tasks
+# no known link to paper
 
 # Table 3 with optimal parameters from Table 2
 class Table3Tests(unittest.TestCase):
@@ -29,6 +30,7 @@ class Table3Tests(unittest.TestCase):
         }
 
     def _dataset_results(self, measure_class, best_param, idx):
+        results = []
         for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
                              zachary, football  #, polblogs
                              ]:
@@ -36,12 +38,28 @@ class Table3Tests(unittest.TestCase):
             measure = measure_class(A)
             K = measure.get_K(best_param)
             labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=42).fit_predict(K)
-            nmi = normalized_mutual_info_score(labels_true, labels_pred)
-            self.assertTrue(np.isclose(nmi, self.etalon[info['name']][idx], atol=0.08),
-                            "{}, {}: Test {:0.4f} != True {:0.4f}, diff:{:0.4f}".format(
-                                info['name'], measure.name, nmi, self.etalon[info['name']][idx],
-                                np.abs(nmi - self.etalon[info['name']][idx])))
-            print('{} success'.format(info['name']))
+            test_nmi = normalized_mutual_info_score(labels_true, labels_pred)
+
+            true_nmi = self.etalon[info['name']][idx]
+            diff = np.abs(test_nmi - true_nmi)
+
+            # logging results for report
+            print('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
+            print('{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
+
+            results.append({
+                'measure_name': measure.name,
+                'graph_name': info['name'],
+                'test_nmi': test_nmi,
+                'true_nmi': true_nmi,
+                'diff': diff
+            })
+
+        for result in results:
+            self.assertTrue(np.isclose(result['test_nmi'], result['true_nmi'], atol=.08),
+                            "{}, {}: {:0.4f} != {:0.4f}, diff:{:0.4f}".format(
+                                result['graph_name'], result['measure_name'], result['test_nmi'],
+                                result['true_nmi'], result['diff']))
 
     def test_CCT(self):
         self._dataset_results(SCCT_H, 26, 0)

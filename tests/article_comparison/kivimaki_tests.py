@@ -5,8 +5,8 @@ from sklearn.metrics import normalized_mutual_info_score
 from cluster import KernelKMeans
 from graphs import sample
 from graphs.dataset import *
-from measure.shortcuts import *
 from measure import kernel, distance
+from measure.shortcuts import *
 
 
 # Kivimäki: Developments in the theory of randomized shortest paths with a article_comparison of graph node distances
@@ -20,6 +20,11 @@ class Figure2ComparisonTests(unittest.TestCase):
 
     def _comparison(self, name, D, true_value, atol=0.02):
         div = D[0, 1] / D[1, 2]
+
+        # logging results for report
+        print('\t\tD_12/D_23 test\tD_12/D_23 true\tdiff')
+        print('{}\t{:0.4f}\t{:0.4f}\t{:0.4f}'.format(name, div, true_value, np.abs(div - true_value)))
+
         self.assertTrue(np.isclose(div, true_value, atol=atol),
                         "{}: {:0.3f} != {:0.3f}, diff={:0.3f}".format(name, div, true_value, div - true_value))
 
@@ -29,15 +34,15 @@ class Figure2ComparisonTests(unittest.TestCase):
 
     def test_boundaries_left_logFor(self):
         D = distance.logFor(self.graph).get_D(500.0)
-        self._comparison('logFor', D, 1.5)
+        self._comparison('logFor 500.0', D, 1.5)
 
     def test_boundaries_left_RSP(self):
         D = distance.RSP(self.graph).get_D(0.0001)
-        self._comparison('RSP', D, 1.5)
+        self._comparison('RSP 0.0001', D, 1.5)
 
     def test_boundaries_left_FE(self):
         D = distance.FE(self.graph).get_D(0.0001)
-        self._comparison('FE', D, 1.5)
+        self._comparison('FE 0.0001', D, 1.5)
 
     def test_boundaries_right_SP(self):
         D = distance.SPCT(self.graph).get_D(1)
@@ -45,15 +50,15 @@ class Figure2ComparisonTests(unittest.TestCase):
 
     def test_boundaries_right_logFor(self):
         D = distance.logFor(self.graph).get_D(0.01)
-        self._comparison('logFor', D, 1.0)
+        self._comparison('logFor 0.01', D, 1.0)
 
     def test_boundaries_right_RSP(self):
         D = distance.RSP(self.graph).get_D(20.0)
-        self._comparison('RSP', D, 1.0)
+        self._comparison('RSP 20.0', D, 1.0)
 
     def test_boundaries_right_FE(self):
         D = distance.FE(self.graph).get_D(20.0)
-        self._comparison('FE', D, 1.0)
+        self._comparison('FE 20.0', D, 1.0)
 
     if __name__ == '__main__':
         unittest.main()
@@ -76,17 +81,34 @@ class Table2Tests(unittest.TestCase):
         }
 
     def _newsgroup_results(self, measure_class, best_param, idx):
+        results = []
         for graphs, info in news:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
             labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=8).fit_predict(K)
-            nmi = normalized_mutual_info_score(labels_true, labels_pred)
-            self.assertTrue(np.isclose(nmi * 100, self.etalon[info['name']][idx], atol=6.),
+            test_nmi = 100 * normalized_mutual_info_score(labels_true, labels_pred)
+
+            true_nmi = self.etalon[info['name']][idx]
+            diff = np.abs(test_nmi - true_nmi)
+
+            # logging results for report
+            print('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
+            print('{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
+
+            results.append({
+                'measure_name': measure.name,
+                'graph_name': info['name'],
+                'test_nmi': test_nmi,
+                'true_nmi': true_nmi,
+                'diff': diff
+            })
+
+        for result in results:
+            self.assertTrue(np.isclose(result['test_nmi'], result['true_nmi'], atol=6.),
                             "{}, {}: {:0.3f} != {:0.3f}, diff:{:0.3f}".format(
-                                info['name'], measure.name, nmi * 100, self.etalon[info['name']][idx],
-                                np.abs(nmi * 100 - self.etalon[info['name']][idx])))
-            print('{} success'.format(info['name']))
+                                result['graph_name'], result['measure_name'], result['test_nmi'],
+                                result['true_nmi'], result['diff']))
 
     def test_RSP(self):
         self._newsgroup_results(kernel.RSP_K, 0.02, 0)

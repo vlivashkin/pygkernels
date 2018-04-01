@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class StochasticBlockModelGraphGenerator:
+class StochasticBlockModel:
     def generate_graph(self, n, k, p_in, p_out):
         cluster_size = n // k
         edges = np.zeros((cluster_size * k, cluster_size * k))
