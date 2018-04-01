@@ -40,7 +40,9 @@ class spctTests(unittest.TestCase):
 
     def test_full_graph_SPCT_equality(self):
         A = sample.full_graph
-        self.assertTrue(np.allclose(self.get_SP(A), self.get_CT(A)))
+        sp_normed = normalize(self.get_SP(A))
+        ct_normed = normalize(self.get_CT(A))
+        self.assertTrue(np.allclose(sp_normed, ct_normed))
 
     def test_tree_SPCT_equality(self):
         A = sample.tree_matrix

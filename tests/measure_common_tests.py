@@ -77,46 +77,12 @@ class MeasureCommonTests(unittest.TestCase):
 
     def test_full_graph_SP_logFor_Walk_equality(self):
         param = 0.00001
-        DSP = sp_distance(sample.chain_graph)
-        DlogFor = logFor(sample.chain_graph).get_D(param)
-        DWalk = Walk(sample.chain_graph).get_D(param)
+        DSP = normalize(sp_distance(sample.chain_graph))
+        DlogFor = normalize(logFor(sample.chain_graph).get_D(param))
+        DWalk = normalize(Walk(sample.chain_graph).get_D(param))
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
         self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))
-
-    if __name__ == '__main__':
-        unittest.main()
-
-
-class MeasureSamplesTests(unittest.TestCase):
-    def test_chain_For_H(self):
-        for_chain0 = For_H(sample.triangle_graph).get_K(0)
-        for_chain0_etalon = np.array([
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ], dtype=np.float64)
-        self.assertTrue(np.allclose(for_chain0, for_chain0_etalon))
-
-        for_chain05 = For_H(sample.triangle_graph).get_K(0.5)
-        for_chain05_etalon = np.array([
-            [0.73214286, 0.19642857, 0.05357143, 0.01785714],
-            [0.19642857, 0.58928571, 0.16071429, 0.05357143],
-            [0.05357143, 0.16071429, 0.58928571, 0.19642857],
-            [0.01785714, 0.05357143, 0.19642857, 0.73214286]
-        ], dtype=np.float64)
-        self.assertTrue(np.allclose(for_chain05, for_chain05_etalon))
-
-    def test_triangle_For_H(self):
-        for_chain02 = For_H(sample.triangle_graph).get_K(0.2)
-        for_chain02_etalon = np.array([
-            [0.85185185, 0.11111111, 0.01851852, 0.01851852],
-            [0.11111111, 0.66666667, 0.11111111, 0.11111111],
-            [0.01851852, 0.11111111, 0.74768519, 0.12268519],
-            [0.01851852, 0.11111111, 0.12268519, 0.74768519]
-        ], dtype=np.float64)
-        self.assertTrue(np.allclose(for_chain02, for_chain02_etalon))
 
     if __name__ == '__main__':
         unittest.main()

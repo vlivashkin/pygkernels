@@ -146,6 +146,7 @@ class FE(RSP_like):
         return D_FE
 
 
+@deprecated
 class old_RSP(RSP):
     def __init__(self, A):
         super().__init__(A)
@@ -153,6 +154,7 @@ class old_RSP(RSP):
         self.C = shortest_path(A, directed=False)
 
 
+@deprecated
 class old_FE(FE):
     def __init__(self, A):
         super().__init__(A)
@@ -204,7 +206,7 @@ class GPD_RSP_like(Distance):
 
 class GPD_RSP(GPD_RSP_like):
     def __init__(self, A):
-        super().__init__('RSP 2', A)
+        super().__init__('GPD RSP', A)
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -239,7 +241,7 @@ class GPD_RSP(GPD_RSP_like):
 
 class GPD_FE(GPD_RSP_like):
     def __init__(self, A):
-        super().__init__('FE 2', A)
+        super().__init__('GPD FE', A)
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
