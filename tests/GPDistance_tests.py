@@ -3,12 +3,14 @@ import unittest
 import numpy as np
 
 from graphs import dataset
-from measure.distance import RSP, FE, GPD_FE, GPD_RSP
+from measure.distance import RSP_vanilla, FE_vanilla, FE, RSP
 from measure.shortcuts import get_L, commute_distance, H_to_D, resistance_kernel
 
 
 # GPDistance
 # https://github.com/jmmcd/GPDistance/blob/master/python/RandomWalks/graph_distances.py
+# Result of investigation: my implementation from article is unstable (will call it 'vanilla')
+# version from GPDistance is better, we will use it in general
 
 class GPDistance_tests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
@@ -67,66 +69,66 @@ class GPDistance_tests(unittest.TestCase):
         D_R /= np.average(D_R)
         self.assertTrue(np.allclose(D_CT, D_R))
 
-    def test_1_RSP_vanilla(self):
-        A, D_RSP_true = self.test1['A'], self.test1['RSP_true']
-        D_RSP_test = RSP(A).get_D(1)
-        self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001, equal_nan=True))
+    # def test_1_RSP_vanilla(self):
+    #     A, D_RSP_true = self.test1['A'], self.test1['RSP_true']
+    #     D_RSP_test = RSP_vanilla(A).get_D(1)
+    #     self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001, equal_nan=True))
 
-    def test_1_FE_vanilla(self):
-        A, D_FE_true = self.test1['A'], self.test1['FE_true']
-        D_FE_test = FE(A).get_D(1)
-        self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001, equal_nan=True))
+    # def test_1_FE_vanilla(self):
+    #     A, D_FE_true = self.test1['A'], self.test1['FE_true']
+    #     D_FE_test = FE_vanilla(A).get_D(1)
+    #     self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001, equal_nan=True))
 
     def test_1_RSP_GPD(self):
         A, D_RSP_true = self.test1['A'], self.test1['RSP_true']
-        D_RSP_test = GPD_RSP(A).get_D(1)
+        D_RSP_test = RSP(A).get_D(1)
         self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001, equal_nan=True))
 
     def test_1_FE_GPD(self):
         A, D_FE_true = self.test1['A'], self.test1['FE_true']
-        D_FE_test = GPD_FE(A).get_D(1)
+        D_FE_test = FE(A).get_D(1)
         self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001, equal_nan=True))
 
     def test_2_RSP_vanilla(self):
         A, D_RSP_true = self.test2['A'], self.test2['RSP_true']
-        D_RSP_test = RSP(A).get_D(1)
+        D_RSP_test = RSP_vanilla(A).get_D(1)
         self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001))
 
     def test_2_FE_vanilla(self):
         A, D_FE_true = self.test2['A'], self.test2['FE_true']
-        D_FE_test = FE(A).get_D(1)
+        D_FE_test = FE_vanilla(A).get_D(1)
         self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001))
 
     def test_2_RSP_GPD(self):
         A, D_RSP_true = self.test2['A'], self.test2['RSP_true']
-        D_RSP_test = GPD_RSP(A).get_D(1)
+        D_RSP_test = RSP(A).get_D(1)
         self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001))
 
     def test_2_FE_GPD(self):
         A, D_FE_true = self.test2['A'], self.test2['FE_true']
-        D_FE_test = GPD_FE(A).get_D(1)
+        D_FE_test = FE(A).get_D(1)
         self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001))
 
-    def test_compare_RSP_versions(self):
-        graphs, info = dataset.news_2cl_1
-        A, y_true = graphs[0]
-        my_RSP = RSP(A).get_D(1)
-        gpd_RSP = GPD_RSP(A).get_D(1)
-
-        print('max abs my', np.max([x for x in np.abs(my_RSP).ravel() if not np.isnan(x)]))
-        print('max abs gpd', np.max([x for x in np.abs(gpd_RSP).ravel() if not np.isnan(x)]))
-
-        self.assertTrue(np.allclose(my_RSP, gpd_RSP, atol=100., equal_nan=True),
-                        np.max([x for x in np.abs(my_RSP - gpd_RSP).ravel() if not np.isnan(x)]))
-
-    def test_compare_FE_versions(self):
-        graphs, info = dataset.news_2cl_1
-        A, y_true = graphs[0]
-        my_FE = FE(A).get_D(1)
-        gpd_FE = GPD_FE(A).get_D(1)
-
-        print('max abs my', np.max([x for x in np.abs(my_FE).ravel() if not np.isnan(x)]))
-        print('max abs gpd', np.max([x for x in np.abs(gpd_FE).ravel() if not np.isnan(x)]))
-
-        self.assertTrue(np.allclose(my_FE, gpd_FE, atol=100., equal_nan=True),
-                        np.max([x for x in np.abs(my_FE - gpd_FE).ravel() if not np.isnan(x)]))
+    # def test_compare_RSP_versions(self):
+    #     graphs, info = dataset.news_2cl_1
+    #     A, y_true = graphs[0]
+    #     my_RSP = RSP_vanilla(A).get_D(1)
+    #     gpd_RSP = RSP(A).get_D(1)
+    #
+    #     print('max abs my', np.max([x for x in np.abs(my_RSP).ravel() if not np.isnan(x)]))
+    #     print('max abs gpd', np.max([x for x in np.abs(gpd_RSP).ravel() if not np.isnan(x)]))
+    #
+    #     self.assertTrue(np.allclose(my_RSP, gpd_RSP, atol=100., equal_nan=True),
+    #                     np.max([x for x in np.abs(my_RSP - gpd_RSP).ravel() if not np.isnan(x)]))
+    #
+    # def test_compare_FE_versions(self):
+    #     graphs, info = dataset.news_2cl_1
+    #     A, y_true = graphs[0]
+    #     my_FE = FE_vanilla(A).get_D(1)
+    #     gpd_FE = FE(A).get_D(1)
+    #
+    #     print('max abs my', np.max([x for x in np.abs(my_FE).ravel() if not np.isnan(x)]))
+    #     print('max abs gpd', np.max([x for x in np.abs(gpd_FE).ravel() if not np.isnan(x)]))
+    #
+    #     self.assertTrue(np.allclose(my_FE, gpd_FE, atol=100., equal_nan=True),
+    #                     np.max([x for x in np.abs(my_FE - gpd_FE).ravel() if not np.isnan(x)]))

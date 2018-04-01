@@ -77,7 +77,7 @@ class SCCT(Distance):
         super().__init__('SCCT', scaler.Fraction, A, kernel.SCCT_H, 1.)
 
 
-class RSP_like(Distance):
+class RSP_vanilla_like(Distance):
     def __init__(self, name, A, C=None):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
@@ -105,9 +105,9 @@ class RSP_like(Distance):
         return W, Z
 
 
-class RSP(RSP_like):
+class RSP_vanilla(RSP_vanilla_like):
     def __init__(self, A):
-        super().__init__('RSP', A)
+        super().__init__('RSP vanilla', A)
 
     def get_D(self, beta):
         """
@@ -125,9 +125,9 @@ class RSP(RSP_like):
         return D_RSP
 
 
-class FE(RSP_like):
+class FE_vanilla(RSP_vanilla_like):
     def __init__(self, A):
-        super().__init__('FE', A)
+        super().__init__('FE vanilla', A)
 
     def get_D(self, beta):
         """
@@ -146,24 +146,8 @@ class FE(RSP_like):
         return D_FE
 
 
-@deprecated
-class old_RSP(RSP):
-    def __init__(self, A):
-        super().__init__(A)
-        self.name = 'old RSP'
-        self.C = shortest_path(A, directed=False)
-
-
-@deprecated
-class old_FE(FE):
-    def __init__(self, A):
-        super().__init__(A)
-        self.name = 'old FE'
-        self.C = shortest_path(A, directed=False)
-
-
 # From https://github.com/jmmcd/GPDistance
-class GPD_RSP_like(Distance):
+class RSP_like(Distance):
     def __init__(self, name, A):
         super().__init__(name, scaler.FractionReversed, A)
 
@@ -204,9 +188,9 @@ class GPD_RSP_like(Distance):
         return W, Z
 
 
-class GPD_RSP(GPD_RSP_like):
+class RSP(RSP_like):
     def __init__(self, A):
-        super().__init__('GPD RSP', A)
+        super().__init__('RSP', A)
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -239,9 +223,9 @@ class GPD_RSP(GPD_RSP_like):
         return D_RSP
 
 
-class GPD_FE(GPD_RSP_like):
+class FE(RSP_like):
     def __init__(self, A):
-        super().__init__('GPD FE', A)
+        super().__init__('FE', A)
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
