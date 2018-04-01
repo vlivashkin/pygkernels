@@ -18,7 +18,7 @@ class Distance:
 
     def grid_search(self, params=np.linspace(0, 1, 55)):
         results = np.array((params.shape[0],))
-        for idx, param in enumerate(self.scaler.scale(params)):
+        for idx, param in enumerate(self.scaler.scale_list(params)):
             results[idx] = self.get_D(param)
         return results
 

@@ -48,7 +48,7 @@ class MeasureCommonTests(unittest.TestCase):
         start, end, n_params = 0.1, 0.6, 30
         for distance in Distance.get_all():
             distance = distance(sample.chain_graph)
-            for idx, param in enumerate(distance.scaler.scale(np.linspace(start, end, n_params))):
+            for idx, param in enumerate(distance.scaler.scale_list(np.linspace(start, end, n_params))):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
                     for j in range(D.shape[1]):
@@ -59,7 +59,7 @@ class MeasureCommonTests(unittest.TestCase):
         start, end, n_params = 0.1, 0.6, 30
         for distance in Distance.get_all():
             distance = distance(sample.chain_graph)
-            for param in distance.scaler.scale(np.linspace(start, end, n_params)):
+            for param in distance.scaler.scale_list(np.linspace(start, end, n_params)):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
                     for j in range(i + 1, D.shape[1]):

@@ -39,7 +39,7 @@ class WorkflowTests(unittest.TestCase):
             mean = []
             for edges, nodes in graphs:
                 measure_o = measure(edges)
-                param = list(measure_o.scaler.scale([0.5]))[0]
+                param = list(measure_o.scaler.scale_list([0.5]))[0]
                 D = measure_o.get_K(param)
                 y_pred = Ward(len(list(set(graphs[0][1])))).predict(D)
                 ari = adjusted_rand_score(nodes, y_pred)
@@ -58,7 +58,7 @@ class WorkflowTests(unittest.TestCase):
             mean = []
             for edges, nodes in graphs:
                 measure_o = measure(edges)
-                param = list(measure_o.scaler.scale([0.5]))[0]
+                param = list(measure_o.scaler.scale_list([0.5]))[0]
                 D = measure_o.get_K(param)
                 if D is not None:
                     y_pred = Ward(len(list(set(graphs[0][1])))).predict(D, )
