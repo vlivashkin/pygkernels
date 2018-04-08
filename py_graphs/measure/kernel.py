@@ -140,7 +140,7 @@ class SPCT_H(Kernel):
 
     def __init__(self, A):
         super().__init__(A)
-        self.H_SP = D_to_K(sp_distance(A))
+        self.H_SP = sp_kernel(A)
         self.H_CT = 2 * resistance_kernel(A)
 
     def get_K(self, lmbda):
@@ -224,6 +224,7 @@ class SCCT_K(Kernel):
         super().__init__(A, distance.SCCT)
 
 
+@deprecated
 class RSP_vanilla_K(Kernel):
     name, default_scaler = 'RSP vanilla K', scaler.FractionReversed
 

@@ -127,7 +127,7 @@ class BalancedModel(Competition):
         self._compare(Heat, 0.0064, 0.0326)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.0066)
+        self._compare(NormalizedHeat, 0.0066, 0.4074)
 
     def test_regularizedLaplacian(self):
         self._compare(RegularizedLaplacian, 0.0072, 0.0326)
@@ -142,31 +142,31 @@ class BalancedModel(Competition):
         self._compare(HeatPersonalizedPageRank, 0.0074, 0.1621)
 
 
-class UnbalancedModel(Competition):
-    def __init__(self, *args, **kwargs):
-        super().__init__(0.012, *args, **kwargs)  # error bars in paper: 0.006
-        self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(100)  # 1000 graphs in paper
-
-    def test_katz(self):
-        self._compare(Katz, 0.012, 0.0068)
-
-    def test_communicability(self):
-        self._compare(Estrada, 0.011)
-
-    def test_heat(self):
-        self._compare(Heat, 0.026, 0.0104)
-
-    def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.009)
-
-    def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, 0.0026)
-
-    def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, 0.0021)
-
-    def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, 0.0022)
-
-    def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, 0.0021)
+# class UnbalancedModel(Competition):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(0.012, *args, **kwargs)  # error bars in paper: 0.006
+#         self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(100)  # 1000 graphs in paper
+#
+#     def test_katz(self):
+#         self._compare(Katz, 0.012, 0.0068)
+#
+#     def test_communicability(self):
+#         self._compare(Estrada, 0.011)
+#
+#     def test_heat(self):
+#         self._compare(Heat, 0.026, 0.0104)
+#
+#     def test_normalizedHeat(self):
+#         self._compare(NormalizedHeat, 0.009)
+#
+#     def test_regularizedLaplacian(self):
+#         self._compare(RegularizedLaplacian, 0.0026)
+#
+#     def test_personalizedPageRank(self):
+#         self._compare(PersonalizedPageRank, 0.0021)
+#
+#     def test_modifiedPageRank(self):
+#         self._compare(ModifiedPersonalizedPageRank, 0.0022)
+#
+#     def test_heatPageRank(self):
+#         self._compare(HeatPersonalizedPageRank, 0.0021)

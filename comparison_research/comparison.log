@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.3.18)  20 MAR 2018 13:56
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.4.8)  9 APR 2018 01:01
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -865,27 +865,83 @@ Package: subcaption 2016/05/22 v1.1-161 Sub-captions (AR)
 \c@subfigure=\count122
 \c@subtable=\count123
 )
-(./comparison.aux)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2016/11/25 v2.2 Span multiple rows of a table
+\multirow@colwidth=\skip61
+\multirow@cntb=\count124
+\multirow@dima=\skip62
+\bigstrutjot=\dimen136
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+)
+(/usr/local/texlive/2017/texmf-dist/tex/latex/colortbl/colortbl.sty
+Package: colortbl 2012/02/13 v1.0a Color table columns (DPC)
+
+(/usr/local/texlive/2017/texmf-dist/tex/latex/tools/array.sty
+Package: array 2016/10/06 v2.4d Tabular extension package (FMi)
+\col@sep=\dimen137
+\extrarowheight=\dimen138
+\NC@list=\toks28
+\extratabsurround=\skip63
+\backup@length=\skip64
+)
+\everycr=\toks29
+\minrowclearance=\skip65
+)
+\rownum=\count125
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+(./comparison.aux
+
+LaTeX Warning: Label `my-label' multiply defined.
+
+
+LaTeX Warning: Label `my-label' multiply defined.
+
+
+LaTeX Warning: Label `my-label' multiply defined.
+
+
+LaTeX Warning: Label `my-label' multiply defined.
+
+)
 \openout1 = `comparison.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T2A/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -922,43 +978,18 @@ LaTeX Font Info:    ... okay on input line 24.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \AtBeginShipoutBox=\box31
-(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/color.sty
-Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
-
-(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-cfg/color.cfg
-File: color.cfg 2016/01/02 v1.6 sample color configuration
-)
-Package color Info: Driver file: pdftex.def on input line 147.
-
-(/usr/local/texlive/2017/texmf-dist/tex/latex/graphics-def/pdftex.def
-File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
-
-(/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
-[Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count124
-\scratchdimen=\dimen136
-\scratchbox=\box32
-\nofMPsegments=\count125
-\nofMParguments=\count126
-\everyMPshowfont=\toks28
-\MPscratchCnt=\count127
-\MPscratchDim=\dimen137
-\MPnumerator=\count128
-\makeMPintoPDFobject=\count129
-\everyMPtoPDFconversion=\toks29
-)))
-Package hyperref Info: Link coloring ON on input line 24.
- (/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/nameref.sty
+Package hyperref Info: Link coloring ON on input line 25.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 
 (/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count130
+\c@section@level=\count126
 )
-LaTeX Info: Redefining \ref on input line 24.
-LaTeX Info: Redefining \pageref on input line 24.
-LaTeX Info: Redefining \nameref on input line 24.
+LaTeX Info: Redefining \ref on input line 25.
+LaTeX Info: Redefining \pageref on input line 25.
+LaTeX Info: Redefining \nameref on input line 25.
 
 (./comparison.out) (./comparison.out)
 \@outlinefile=\write3
@@ -967,124 +998,138 @@ LaTeX Info: Redefining \nameref on input line 24.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: floatrow package is loaded.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Try loading font information for U+msa on input line 27.
 
-(/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
+(/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count127
+\scratchdimen=\dimen139
+\scratchbox=\box32
+\nofMPsegments=\count128
+\nofMParguments=\count129
+\everyMPshowfont=\toks30
+\MPscratchCnt=\count130
+\MPscratchDim=\dimen140
+\MPnumerator=\count131
+\makeMPintoPDFobject=\count132
+\everyMPtoPDFconversion=\toks31
+)
+LaTeX Font Info:    Try loading font information for U+msa on input line 28.
+ (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 27.
+LaTeX Font Info:    Try loading font information for U+msb on input line 28.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 28.
+(babel)             in language  on input line 32.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 28.
-Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 31.
-Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 31.
-LaTeX Font Info:    Try loading font information for T2A+cmtt on input line 32.
+(babel)             in language  on input line 32.
+LaTeX Font Info:    Try loading font information for T2A+cmtt on input line 33.
 
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/cyrillic/t2acmtt.fd
 File: t2acmtt.fd 2001/08/11 v1.0a Computer Modern Cyrillic font definitions
 )
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 40.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 41.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 40.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 41.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 68.
+(babel)             in language  on input line 112.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 68.
+(babel)             in language  on input line 112.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 73.
+(babel)             in language  on input line 112.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 73.
-Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 76.
-Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 76.
-Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 76.
-Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 76.
+(babel)             in language  on input line 112.
  [1
 
 {/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 77.
+(babel)             in language  on input line 115.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 77.
+(babel)             in language  on input line 115.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 80.
+(babel)             in language  on input line 120.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 80.
+(babel)             in language  on input line 120.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 105.
+(babel)             in language  on input line 145.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 105.
+(babel)             in language  on input line 145.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 124.
+(babel)             in language  on input line 177.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 124.
+(babel)             in language  on input line 177.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 137.
+(babel)             in language  on input line 177.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 137.
-Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 137.
-Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 137.
+(babel)             in language  on input line 177.
  [2]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 158.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 158.
+(babel)             in language  on input line 180.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 158.
+(babel)             in language  on input line 180.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 158.
+(babel)             in language  on input line 233.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 158.
+(babel)             in language  on input line 233.
+Package babel Info: Redefining russian shorthand "|
+(babel)             in language  on input line 233.
+Package babel Info: Redefining russian shorthand "~
+(babel)             in language  on input line 233.
  [3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 158.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 282.
+Package babel Info: Redefining russian shorthand "|
+(babel)             in language  on input line 282.
+Package babel Info: Redefining russian shorthand "~
+(babel)             in language  on input line 282.
+Package babel Info: Redefining russian shorthand "|
+(babel)             in language  on input line 282.
+Package babel Info: Redefining russian shorthand "~
+(babel)             in language  on input line 282.
+ [4]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 282.
 
 (./comparison.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 158.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 158.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 282.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 282.
 Package rerunfilecheck Info: File `comparison.out' has not changed.
-(rerunfilecheck)             Checksum: 8040DCDAD324D075E60C6E15B7927CC6;2181.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 158.
+(rerunfilecheck)             Checksum: 80C7683C12D390E49C4BC80EB7412008;1822.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 282.
  ) 
 Here is how much of TeX's memory you used:
- 12486 strings out of 492982
- 174286 string characters out of 6132527
- 261227 words of memory out of 5000000
- 15919 multiletter control sequences out of 15000+600000
- 15958 words of font info for 48 fonts, out of 8000000 for 9000
+ 13032 strings out of 492982
+ 180697 string characters out of 6132528
+ 286405 words of memory out of 5000000
+ 16448 multiletter control sequences out of 15000+600000
+ 15141 words of font info for 47 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,6n,38p,711b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,11n,41p,1096b,373s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t2a.enc
 }</usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
 usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr
 /local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/
-local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/lo
-cal/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/loca
-l/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/
-texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/te
-xlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texl
-ive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb></usr/local/texliv
-e/2017/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on comparison.pdf (3 pages, 163594 bytes).
+local/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/lo
+cal/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/loca
+l/texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/
+texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/te
+xlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb></usr/local/texl
+ive/2017/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
+Output written on comparison.pdf (4 pages, 171852 bytes).
 PDF statistics:
- 105 PDF objects out of 1000 (max. 8388607)
- 88 compressed objects within 1 object stream
- 12 named destinations out of 1000 (max. 500000)
- 65 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 104 PDF objects out of 1000 (max. 8388607)
+ 87 compressed objects within 1 object stream
+ 18 named destinations out of 1000 (max. 500000)
+ 41 words of extra memory for PDF output out of 10000 (max. 10000000)
 

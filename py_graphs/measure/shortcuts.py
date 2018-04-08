@@ -2,7 +2,8 @@ import functools
 import warnings
 
 import numpy as np
-from scipy.sparse.csgraph import shortest_path
+from pykernels.graph.shortestpath import ShortestPath
+from scipy.sparse.csgraph._shortest_path import shortest_path
 
 
 def deprecated(func):
@@ -42,8 +43,13 @@ def get_L(A):
     return get_D(A) - A
 
 
+@deprecated
 def sp_distance(A):
     return shortest_path(A, directed=False)
+
+
+def sp_kernel(A):
+    return ShortestPath().gram(A)
 
 
 def resistance_kernel(A):

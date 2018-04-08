@@ -1,9 +1,5 @@
 import unittest
 
-from sklearn.metrics import normalized_mutual_info_score
-
-from cluster import KernelKMeans
-from graphs import dataset
 from graphs import sample
 from measure.distance import *
 from measure.shortcuts import *
