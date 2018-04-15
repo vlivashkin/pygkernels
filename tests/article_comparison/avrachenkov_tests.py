@@ -1,7 +1,9 @@
 import unittest
 from collections import defaultdict
 
-from cluster import KernelKMeans
+from tqdm import tqdm
+
+from cluster import KernelKMeans, SpectralClustering
 from graphs import sample
 from graphs.generator import StochasticBlockModel
 from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H
@@ -52,18 +54,18 @@ class Competition(unittest.TestCase):
         super().__init__(*args, **kwargs)
 
         self.atol = atol
-        self.graphs = None
+        self.n_params = 200
 
     def _search_best_param(self, measure):
         results = defaultdict(lambda: [])
         count, passes = 0, 0
-        for A, y_true in self.graphs:
+        for A, y_true in tqdm(self.graphs):
             mg = measure(A)
-            for param in mg.scaler.scale(np.linspace(0, 1, 50)):
+            for param in mg.scaler.scale(np.linspace(0, 1, self.n_params)):
                 try:
                     count += 1
                     K = mg.get_K(param)
-                    y_pred = KernelKMeans(2).fit_predict(K)
+                    y_pred = SpectralClustering(2).fit_predict(K)
                     results[param].append(max_accuracy(y_true, y_pred))
                     passes += 1
                 except:
@@ -80,7 +82,7 @@ class Competition(unittest.TestCase):
     def _use_best_param(self, measure, param):
         results = []
         count, passes = 0, 0
-        for A, y_true in self.graphs:
+        for A, y_true in tqdm(self.graphs):
             try:
                 count += 1
                 K = measure(A).get_K(param)
@@ -114,59 +116,65 @@ class Competition(unittest.TestCase):
 
 class BalancedModel(Competition):
     def __init__(self, *args, **kwargs):
-        super().__init__(0.004, *args, **kwargs)  # error bars in paper: 0.002
-        self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02).generate_graphs(100)
+        super().__init__(0.002, *args, **kwargs)  # error bars in paper: 0.002
+
+    @classmethod
+    def setUpClass(cls):
+        cls.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02).generate_graphs(200)  # 100 graphs in paper
 
     def test_katz(self):
-        self._compare(Katz, 0.0072, 0.0017)
+        self._compare(Katz, 0.0072)
 
     def test_communicability(self):
-        self._compare(Estrada, 0.0084, 0.0833)
+        self._compare(Estrada, 0.0084)
 
     def test_heat(self):
-        self._compare(Heat, 0.0064, 0.0326)
+        self._compare(Heat, 0.0064)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.0066, 0.4074)
+        self._compare(NormalizedHeat, 0.0066)
 
     def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, 0.0072, 0.0326)
+        self._compare(RegularizedLaplacian, 0.0072)
 
     def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, 0.0073, 0.0104)
+        self._compare(PersonalizedPageRank, 0.0073)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, 0.0072, 0.0568)
+        self._compare(ModifiedPersonalizedPageRank, 0.0072)
 
     def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, 0.0074, 0.1621)
+        self._compare(HeatPersonalizedPageRank, 0.0074)
 
 
-# class UnbalancedModel(Competition):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(0.012, *args, **kwargs)  # error bars in paper: 0.006
-#         self.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(100)  # 1000 graphs in paper
-#
-#     def test_katz(self):
-#         self._compare(Katz, 0.012, 0.0068)
-#
-#     def test_communicability(self):
-#         self._compare(Estrada, 0.011)
-#
-#     def test_heat(self):
-#         self._compare(Heat, 0.026, 0.0104)
-#
-#     def test_normalizedHeat(self):
-#         self._compare(NormalizedHeat, 0.009)
-#
-#     def test_regularizedLaplacian(self):
-#         self._compare(RegularizedLaplacian, 0.0026)
-#
-#     def test_personalizedPageRank(self):
-#         self._compare(PersonalizedPageRank, 0.0021)
-#
-#     def test_modifiedPageRank(self):
-#         self._compare(ModifiedPersonalizedPageRank, 0.0022)
-#
-#     def test_heatPageRank(self):
-#         self._compare(HeatPersonalizedPageRank, 0.0021)
+class UnbalancedModel(Competition):
+    def __init__(self, *args, **kwargs):
+        super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
+
+    @classmethod
+    def setUpClass(cls):
+        cls.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(1000)  # 1000 graphs in paper
+
+    def test_katz(self):
+        self._compare(Katz, 0.012)
+
+    def test_communicability(self):
+        self._compare(Estrada, 0.011)
+
+    def test_heat(self):
+        self._compare(Heat, 0.026, 0.0104)
+
+    def test_normalizedHeat(self):
+        self._compare(NormalizedHeat, 0.009)
+
+    def test_regularizedLaplacian(self):
+        self._compare(RegularizedLaplacian, 0.0026)
+
+    def test_personalizedPageRank(self):
+        self._compare(PersonalizedPageRank, 0.0021)
+
+    def test_modifiedPageRank(self):
+        self._compare(ModifiedPersonalizedPageRank, 0.0022)
+
+    def test_heatPageRank(self):
+        self._compare(HeatPersonalizedPageRank, 0.0021)

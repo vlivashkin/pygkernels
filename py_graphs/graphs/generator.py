@@ -1,4 +1,6 @@
 import numpy as np
+import logging
+
 
 
 class StochasticBlockModel:
@@ -18,9 +20,6 @@ class StochasticBlockModel:
             self.cluster_sizes = [cluster_size] * self.k
             self.n = cluster_size * self.k
 
-        print('Parameters for generation:\nn={}, k={}, p_in={}, p_out={}, cluster_sizes={}'.format(
-            self.n, self.k, self.p_in, self.p_out, self.cluster_sizes))
-
     def generate_graph(self):
         nodes = []
         for i in range(self.k):
@@ -36,6 +35,9 @@ class StochasticBlockModel:
         return edges, nodes
 
     def generate_graphs(self, count):
+        print('StochasticBlockModel: count={}, n={}, k={}, p_in={}, p_out={}, cluster_sizes={}'.format(
+            count, self.n, self.k, self.p_in, self.p_out, self.cluster_sizes))
+
         info = {
             'name': 'count:{}, n:{}, k:{}, p_in:{}, p_out:{}'.format(count, self.n, self.k, self.p_in, self.p_out),
             'count': count,
