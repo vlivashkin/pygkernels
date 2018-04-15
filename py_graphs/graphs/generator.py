@@ -1,6 +1,5 @@
+import networkx as nx
 import numpy as np
-import logging
-
 
 
 class StochasticBlockModel:
@@ -34,17 +33,65 @@ class StochasticBlockModel:
 
         return edges, nodes
 
-    def generate_graphs(self, count):
+    def generate_graphs(self, n_graphs):
         print('StochasticBlockModel: count={}, n={}, k={}, p_in={}, p_out={}, cluster_sizes={}'.format(
-            count, self.n, self.k, self.p_in, self.p_out, self.cluster_sizes))
+            n_graphs, self.n, self.k, self.p_in, self.p_out, self.cluster_sizes))
 
         info = {
-            'name': 'count:{}, n:{}, k:{}, p_in:{}, p_out:{}'.format(count, self.n, self.k, self.p_in, self.p_out),
-            'count': count,
+            'name': 'count:{}, n:{}, k:{}, p_in:{}, p_out:{}'.format(n_graphs, self.n, self.k, self.p_in, self.p_out),
+            'n_graphs': n_graphs,
             'n': self.n,
             'k': self.k,
             'p_in': self.p_in,
             'p_out': self.p_out
         }
-        graphs = [self.generate_graph() for _ in range(count)]
+        graphs = [self.generate_graph() for _ in range(n_graphs)]
         return graphs, info
+
+
+class RubanovModel():
+    def __init__(self, sizes, probs):
+        self.sizes = sizes
+        self.sums = np.cumsum(self.sizes)
+        self.probs = probs
+
+    def _get_graph(self, sizes, probs):
+        n_comms = len(sizes)
+        sums = np.cumsum(sizes)
+        ranges = [range(sums[0])] + [range(sums[k - 1], sums[k]) for k in range(1, n_comms)]
+        g = nx.Graph()
+        g.add_nodes_from(range(sums[-1]))
+        for i in range(n_comms):
+            for x in ranges[i]:
+                for y in range(x + 1, sums[i]):
+                    k = np.random.rand()
+                    if k < probs[i, i]:
+                        g.add_edge(x, y)
+            for j in range(i + 1, n_comms):
+                for x in ranges[i]:
+                    for y in ranges[j]:
+                        k = np.random.rand()
+                        if k < probs[i, j]:
+                            g.add_edge(x, y)
+        return g
+
+    def generate_graph(self):
+        while True:
+            g = self._get_graph(self.sizes, self.probs)
+            if nx.is_connected(g):
+                return nx.adjacency_matrix(g)
+            print("Not connected")
+
+    def _generate_y_true(self):
+        y_true = []
+        for idx, cls_size in enumerate(self.sizes):
+            y_true.extend([idx] * cls_size)
+        return y_true
+
+    def generate_graphs(self, n_graphs):
+        graphs = []
+        y_true = self._generate_y_true()
+        for _ in range(n_graphs):
+            graphs.append((self.generate_graph(), y_true))
+
+        return graphs, {}

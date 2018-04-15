@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from cluster import KernelKMeans, SpectralClustering
 from graphs import sample
-from graphs.generator import StochasticBlockModel
+from graphs.generator import RubanovModel
 from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H
 from measure.kernel_new import *
 from measure.shortcuts import *
@@ -120,7 +120,10 @@ class BalancedModel(Competition):
 
     @classmethod
     def setUpClass(cls):
-        cls.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02).generate_graphs(200)  # 100 graphs in paper
+        sizes = np.array([100, 100])
+        probs = np.array([[0.1, 0.02],
+                          [0.02, 0.1]])
+        cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(100)  # 100 graphs in paper
 
     def test_katz(self):
         self._compare(Katz, 0.0072)
@@ -153,7 +156,10 @@ class UnbalancedModel(Competition):
 
     @classmethod
     def setUpClass(cls):
-        cls.graphs, _ = StochasticBlockModel(200, 2, 0.1, 0.02, [50, 150]).generate_graphs(1000)  # 1000 graphs in paper
+        sizes = np.array([50, 150])
+        probs = np.array([[0.1, 0.02],
+                          [0.02, 0.1]])
+        cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
 
     def test_katz(self):
         self._compare(Katz, 0.012)
