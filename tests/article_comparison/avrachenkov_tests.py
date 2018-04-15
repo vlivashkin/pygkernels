@@ -9,7 +9,7 @@ from graphs.generator import RubanovModel
 from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H
 from measure.kernel_new import *
 from measure.shortcuts import *
-from scorer import max_accuracy
+from scorer import max_accuracy, FC
 
 
 # Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
@@ -66,12 +66,12 @@ class Competition(unittest.TestCase):
                     count += 1
                     K = mg.get_K(param)
                     y_pred = SpectralClustering(2).fit_predict(K)
-                    results[param].append(max_accuracy(y_true, y_pred))
+                    results[param].append(FC(y_true, y_pred))
                     passes += 1
                 except:
                     pass
         pairs = [(key, np.average(value)) for key, value in results.items()]
-        best_param, best_quality = pairs[np.argmax([x[1] for x in pairs])]
+        best_param, best_quality = pairs[np.nanargmax([x[1] for x in pairs])]
 
         # logging results for report
         print('{}; Passes: {}/{}; Min error: {:0.4f}, Best param: {:0.4f}'.format(
@@ -87,11 +87,11 @@ class Competition(unittest.TestCase):
                 count += 1
                 K = measure(A).get_K(param)
                 y_pred = KernelKMeans(2).fit_predict(K)
-                results.append(max_accuracy(y_true, y_pred))
+                results.append(FC(y_true, y_pred))
                 passes += 1
             except:
                 pass
-        quality = np.average(results)
+        quality = np.nanmean(results)
 
         # logging results for report
         print('{}; Passes: {}/{}; Using param {:0.4f}, error: {:0.4f}'.format(
@@ -101,10 +101,9 @@ class Competition(unittest.TestCase):
 
     def _compare(self, measure, error_true, param=None):
         if param is not None:
-            best_quality = self._use_best_param(measure, param)
+            error_test = self._use_best_param(measure, param)
         else:
-            _, best_quality = self._search_best_param(measure)
-        error_test = 1. - best_quality
+            _, error_test = self._search_best_param(measure)
         diff = np.abs(error_test - error_true)
 
         # logging results for report

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.4.8)  12 APR 2018 09:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2018.4.8)  16 APR 2018 00:02
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -921,6 +921,9 @@ LaTeX Warning: Label `my-label' multiply defined.
 
 LaTeX Warning: Label `my-label' multiply defined.
 
+
+LaTeX Warning: Label `my-label' multiply defined.
+
 )
 \openout1 = `comparison.aux'.
 
@@ -1097,41 +1100,41 @@ Package babel Info: Redefining russian shorthand "|
 Package babel Info: Redefining russian shorthand "~
 (babel)             in language  on input line 250.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 298.
+(babel)             in language  on input line 322.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 298.
+(babel)             in language  on input line 322.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 298.
+(babel)             in language  on input line 322.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 298.
+(babel)             in language  on input line 322.
  [4]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 312.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 338.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 312.
+(babel)             in language  on input line 338.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 312.
+(babel)             in language  on input line 338.
 Package babel Info: Redefining russian shorthand "|
-(babel)             in language  on input line 312.
+(babel)             in language  on input line 338.
 Package babel Info: Redefining russian shorthand "~
-(babel)             in language  on input line 312.
+(babel)             in language  on input line 338.
  [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 312.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 338.
 
 (./comparison.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 312.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 312.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 338.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 338.
 Package rerunfilecheck Info: File `comparison.out' has not changed.
 (rerunfilecheck)             Checksum: D2C724E130D0DA99C1BF102C103254F1;2585.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 312.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 338.
  ) 
 Here is how much of TeX's memory you used:
- 13043 strings out of 492982
- 180834 string characters out of 6132528
- 286405 words of memory out of 5000000
+ 13044 strings out of 492982
+ 180849 string characters out of 6132528
+ 288405 words of memory out of 5000000
  16454 multiletter control sequences out of 15000+600000
  15944 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1148,10 +1151,10 @@ texlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/te
 xlive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texl
 ive/2017/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb></usr/local/texliv
 e/2017/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on comparison.pdf (5 pages, 196684 bytes).
+Output written on comparison.pdf (5 pages, 200381 bytes).
 PDF statistics:
- 127 PDF objects out of 1000 (max. 8388607)
- 107 compressed objects within 2 object streams
- 22 named destinations out of 1000 (max. 500000)
+ 128 PDF objects out of 1000 (max. 8388607)
+ 108 compressed objects within 2 object streams
+ 23 named destinations out of 1000 (max. 500000)
  65 words of extra memory for PDF output out of 10000 (max. 10000000)
 
