@@ -79,14 +79,14 @@ class RubanovModel():
         while True:
             g = self._get_graph(self.sizes, self.probs)
             if nx.is_connected(g):
-                return nx.adjacency_matrix(g)
+                return np.array(np.array(nx.adjacency_matrix(g).todense()))
             print("Not connected")
 
     def _generate_y_true(self):
         y_true = []
         for idx, cls_size in enumerate(self.sizes):
             y_true.extend([idx] * cls_size)
-        return y_true
+        return np.array(y_true)
 
     def generate_graphs(self, n_graphs):
         graphs = []
