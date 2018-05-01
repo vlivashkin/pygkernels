@@ -133,12 +133,12 @@ pWalk 1.0 & true & 0,960 & 1,460 & 1,030 \\
        &         &        & \multicolumn{3}{c}{$D_{12} / D_{23}$} \\
 border & measure & param  & test   & true & diff   \\
        \hline
-left   & CT      &        & 1,5    & 1,5  & 0      \\
+left   & CT      & --       & 1,5    & 1,5  & 0      \\
        & logFor  & 500.0  & 1,4975 & 1,5  & 0,0025 \\
        & RSP     & 0.0001 & 1,4992 & 1,5  & 0,0008 \\
        & FE      & 0.0001 & 1,4996 & 1,5  & 0,0004 \\
        \hline
-right  & SP      &        & 1      & 1    & 0      \\
+right  & SP      & --       & 1      & 1    & 0      \\
        & logFor  & 0.01   & 1,0011 & 1    & 0,0011 \\
        & RSP     & 20.0   & 1      & 1    & 0      \\
        & FE      & 20.0   & 0,9834 & 1    & 0,0166
@@ -256,17 +256,17 @@ SP     & test & 0,003 & 0,003 & 0,009 & 0,003 & 0,021 & 0,006 & 0,677   & 0,861 
 \centering
 \caption{Balanced Model}
 \label{my-label}
-\begin{tabular}{r|rrrr}
-                             & best param & test   & true   & diff   \\
-                             \hline
-Katz                         & 0,0057     & 0.0000 & 0.0072 & \cellcolor{red!25} 0.0072 \\
-Estrada                      & 0,3292     & 0.0099 & 0.0084 & \cellcolor{yellow!25} 0.0015 \\
-Heat                         & 0,8267     & 0.0000 & 0.0064 & \cellcolor{red!25} 0.0064 \\
-NormalizedHeat               & 7,7917     & 0.0090 & 0.0066 & \cellcolor{yellow!25} 0.0024 \\
-RegularizedLaplacian         & 2,7097     & 0.0091 & 0.0072 & \cellcolor{yellow!25} 0.0019 \\
-PersonalizedPageRank         & 0.9632     & 0.0093 & 0.0073 & \cellcolor{yellow!25} 0.0020 \\
-ModifiedPersonalizedPageRank & 0.9214     & 0.0092 & 0.0072 & \cellcolor{yellow!25} 0.0020 \\
-HeatPersonalizedPageRank     & 2,931      & 0.0094 & 0.0074 & \cellcolor{yellow!25} 0.0020
+\begin{tabular}{rr|rrr}
+                               & best param & test   & true   & diff   \\
+                               \hline
+Katz                           & 0,0057     & 0.0000 & 0.0072 & \cellcolor{red!25} 0.0072 \\
+Estrada                        & 0,3292     & 0.0099 & 0.0084 & \cellcolor{yellow!25} 0.0015 \\
+Heat                           & 0,8267     & 0.0000 & 0.0064 & \cellcolor{red!25} 0.0064 \\
+Normalized Heat                & 7,7917     & 0.0090 & 0.0066 & \cellcolor{yellow!25} 0.0024 \\
+Regularized Laplacian          & 2,7097     & 0.0091 & 0.0072 & \cellcolor{yellow!25} 0.0019 \\
+Personalized PageRank          & 0.9632     & 0.0093 & 0.0073 & \cellcolor{yellow!25} 0.0020 \\
+Modified Personalized PageRank & 0.9214     & 0.0092 & 0.0072 & \cellcolor{yellow!25} 0.0020 \\
+Heat Personalized PageRank     & 2,931      & 0.0094 & 0.0074 & \cellcolor{yellow!25} 0.0020
 \end{tabular}
 \end{table}
 
@@ -287,7 +287,7 @@ Measure         & Shortest path            & +          & \cellcolor{red!25} +/-
                 & logForest                & +          & +        & +      & +           & +      \\
                 & Comm                     & +          &          &        &             & +      \\
                 & logComm                  &            &          &        & +           & +      \\
-                & Heat                     &            &          &        &             & \cellcolor{yellow!25} ? \\
+                & Heat                     &            &          &        &             & \cellcolor{yellow!25} + \\
                 & logHeat                  &            &          &        & +           & +      \\
                 & SCT                      &            & +        & +      &             & +      \\
                 & SCCT                     &            &          & +      &             & +      \\

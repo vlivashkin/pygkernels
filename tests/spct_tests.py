@@ -1,5 +1,6 @@
 import unittest
 
+import util
 from graphs import sample
 from measure.distance import *
 from measure.shortcuts import *
@@ -13,6 +14,7 @@ from measure.shortcuts import *
 class spctTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        util.configure_logging()
         self.get_CT = lambda A: SPCT(A).get_D(0)
         self.get_SP = lambda A: SPCT(A).get_D(1)
 
@@ -61,29 +63,29 @@ class spctTests(unittest.TestCase):
     #     # without normalization
     #     K = D_to_K(sp_distance(A))
     #     quality1 = test_quality(K)
-    #     print('without normalization', '\t', quality1)
+    #     logging.info('without normalization', '\t', quality1)
     #
     #     # normalization of distance
     #     K = D_to_K(normalize(sp_distance(A)))
     #     quality2 = test_quality(K)
-    #     print('normalization of distance', '\t', quality2)
+    #     logging.info('normalization of distance', '\t', quality2)
     #
     #     # normalization of kernel
     #     K = D_to_K(normalize(sp_distance(A)))
     #     quality3 = test_quality(K)
-    #     print('normalization of kernel', '\t', quality3)
+    #     logging.info('normalization of kernel', '\t', quality3)
     #
     #     # both
     #     K = normalize(D_to_K(normalize(sp_distance(A))))
     #     quality4 = test_quality(K)
-    #     print('both', '\t', quality4)
+    #     logging.info('both', '\t', quality4)
     #
     #     # distance
     #     K = sp_distance(A)
     #     quality4 = test_quality(K)
-    #     print('distance', '\t', quality4)
+    #     logging.info('distance', '\t', quality4)
     #
     #     # another measure (FE)
     #     K = D_to_K(FE(A).get_D(0.01))
     #     quality5 = test_quality(K)
-    #     print('another measure (FE)', '\t', quality5)
+    #     logging.info('another measure (FE)', '\t', quality5)

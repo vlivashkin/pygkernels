@@ -58,7 +58,7 @@ class Heat(KernelNew):  # this is logHeat, actually
     def get_K(self, t):
         K = KernelNew.mat_exp(- t * self.L, n=50)
         if np.any(K < 0):
-            # print(t, "K < 0")
+            # logging.info(t, "K < 0")
             return None
         return np.array(np.log(K))
 
@@ -76,7 +76,7 @@ class NormalizedHeat(KernelNew):
     def get_K(self, t):
         K = KernelNew.mat_exp(-t * self.Ll, n=50)
         if np.any(K < 0):
-            # print(t, "K < 0")
+            # logging.info(t, "K < 0")
             return None
         return np.array(np.log(K))
 
@@ -92,7 +92,7 @@ class RegularizedLaplacian(KernelNew):
     def get_K(self, beta):
         K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) + beta * self.L)
         if np.any(K < 0):
-            # print(beta, "K < 0")
+            # logging.info(beta, "K < 0")
             return None
         return np.array(np.log(K))
 
@@ -108,7 +108,7 @@ class PersonalizedPageRank(KernelNew):
     def get_K(self, alpha):
         K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - alpha * self.P)
         if np.any(K < 0):
-            # print(alpha, "K < 0")
+            # logging.info(alpha, "K < 0")
             return None
         return np.array(np.log(K))
 
@@ -123,7 +123,7 @@ class ModifiedPersonalizedPageRank(KernelNew):
     def get_K(self, alpha):
         K = np.linalg.inv(self.D - alpha * self.A)
         if np.any(K < 0):
-            # print(alpha, "K < 0")
+            # logging.info(alpha, "K < 0")
             return None
         return np.array(np.log(K))
 
@@ -139,7 +139,7 @@ class HeatPersonalizedPageRank(KernelNew):
     def get_K(self, t):
         K = KernelNew.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
         if np.any(K < 0):
-            # print(t, "K < 0")
+            # logging.info(t, "K < 0")
             return None
         return np.array(np.log(K))
 

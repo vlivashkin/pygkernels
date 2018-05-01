@@ -1,3 +1,5 @@
+import logging
+
 import networkx as nx
 import numpy as np
 
@@ -34,7 +36,7 @@ class StochasticBlockModel:
         return edges, nodes
 
     def generate_graphs(self, n_graphs):
-        print('StochasticBlockModel: count={}, n={}, k={}, p_in={}, p_out={}, cluster_sizes={}'.format(
+        logging.info('StochasticBlockModel: count={}, n={}, k={}, p_in={}, p_out={}, cluster_sizes={}'.format(
             n_graphs, self.n, self.k, self.p_in, self.p_out, self.cluster_sizes))
 
         info = {
@@ -80,7 +82,7 @@ class RubanovModel():
             g = self._get_graph(self.sizes, self.probs)
             if nx.is_connected(g):
                 return np.array(np.array(nx.adjacency_matrix(g).todense()))
-            print("Not connected")
+            logging.info("Not connected")
 
     def _generate_y_true(self):
         y_true = []

@@ -1,7 +1,9 @@
+import logging
 import unittest
 
 from sklearn.metrics import normalized_mutual_info_score
 
+import util
 from cluster import KernelKMeans
 from graphs.dataset import *
 from measure.kernel import *
@@ -14,6 +16,7 @@ from measure.kernel import *
 class Table3Tests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        util.configure_logging()
         self.etalon = {  # CCT, FE, logFor, RSP, SCT, SP
             'football': (0.7928, 0.9061, 0.9028, 0.9092, 0.8115, 0.8575),
             'news_2cl_1': (0.7944, 0.8050, 0.8381, 0.7966, 0.8174, 0.6540),
@@ -32,7 +35,7 @@ class Table3Tests(unittest.TestCase):
     def _dataset_results(self, measure_class, best_param, idx):
         results = []
         for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
-                             news_5cl_1, news_5cl_2, news_5cl_3, zachary, football  #, polblogs
+                             news_5cl_1, news_5cl_2, news_5cl_3, zachary, football  # , polblogs
                              ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
@@ -44,8 +47,9 @@ class Table3Tests(unittest.TestCase):
             diff = np.abs(test_nmi - true_nmi)
 
             # logging results for report
-            print('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
-            print('{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
+            logging.info('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
+            logging.info(
+                '{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
 
             results.append({
                 'measure_name': measure.name,

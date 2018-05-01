@@ -3,10 +3,10 @@
 # Author: Mathieu Blondel <mathieu@mblondel.org>
 # License: BSD 3 clause
 
-import numpy as np
+import logging
 
+import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
-from sklearn.metrics.pairwise import pairwise_kernels
 from sklearn.utils import check_random_state
 
 
@@ -59,7 +59,7 @@ class KernelKMeans(BaseEstimator, ClusterMixin):
             n_same = np.sum((self.labels_ - labels_old) == 0)
             if 1 - float(n_same) / n_samples < self.tol:
                 if self.verbose:
-                    print("Converged at iteration", it + 1)
+                    logging.info("Converged at iteration", it + 1)
                 break
 
         return self
@@ -102,5 +102,5 @@ if __name__ == '__main__':
     X, y = make_blobs(n_samples=1000, centers=5, random_state=0)
 
     km = KernelKMeans(n_clusters=5, max_iter=100, random_state=0, verbose=1)
-    print(km.fit_predict(X)[:10])
-    print(km.predict(X[:10]))
+    logging.info(km.fit_predict(X)[:10])
+    logging.info(km.predict(X[:10]))

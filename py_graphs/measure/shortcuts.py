@@ -2,7 +2,6 @@ import functools
 import warnings
 
 import numpy as np
-from pykernels.graph.shortestpath import ShortestPath
 from scipy.sparse.csgraph._shortest_path import shortest_path
 
 
@@ -49,7 +48,8 @@ def sp_distance(A):
 
 
 def sp_kernel(A):
-    return ShortestPath().gram(A)
+    return D_to_K(sp_distance(A))
+    # return ShortestPath().gram(A)
 
 
 def resistance_kernel(A):

@@ -1,5 +1,7 @@
+import logging
 import unittest
 
+import util
 from graphs import sample
 from measure.distance import *
 from measure.scaler import AlphaToT, Linear
@@ -13,14 +15,15 @@ class Figure1ComparisonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.graph = sample.chain_graph
+        util.configure_logging()
 
     def _comparison(self, name, D, true_values, atol=0.1):
         D *= 3. / (D[0, 1] + D[1, 2] + D[2, 3])
 
         # logging results for report
-        print('{}\tD_12\tD_23\tD_13\tD_14'.format(name))
-        print("True\t{:0.3f}\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(*true_values))
-        print("Test\t{:0.3f}\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(D[0, 1], D[1, 2], D[0, 2], D[0, 3]))
+        logging.info('{}\tD_12\tD_23\tD_13\tD_14'.format(name))
+        logging.info("True\t{:0.3f}\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(*true_values))
+        logging.info("Test\t{:0.3f}\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(D[0, 1], D[1, 2], D[0, 2], D[0, 3]))
 
         for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]][:len(true_values)], true_values):
             self.assertTrue(np.isclose(d, t, atol=atol),
@@ -75,14 +78,14 @@ class Table1ComparisonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.graph = sample.chain_graph
+        util.configure_logging()
 
     def _comparison(self, name, D, true_values, atol=0.1):
-
         # logging results for report
-        print('{}\tD_12/D_23\t(D_12+D_23)/D_13\tD_14/D_12'.format(name))
-        print("True\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(*true_values))
-        print("Test\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(D[0, 1] / D[1, 2], (D[0, 1] + D[1, 2]) / D[0, 2],
-                                                       D[0, 3] / D[0, 2]))
+        logging.info('{}\tD_12/D_23\t(D_12+D_23)/D_13\tD_14/D_12'.format(name))
+        logging.info("True\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(*true_values))
+        logging.info("Test\t{:0.3f}\t{:0.3f}\t{:0.3f}".format(D[0, 1] / D[1, 2], (D[0, 1] + D[1, 2]) / D[0, 2],
+                                                              D[0, 3] / D[0, 2]))
 
         for d, t in zip([D[0, 1] / D[1, 2], (D[0, 1] + D[1, 2]) / D[0, 2], D[0, 3] / D[0, 2]], true_values):
             self.assertTrue(np.isclose(d, t, atol=atol),

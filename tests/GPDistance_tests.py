@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 
+import util
 from graphs import dataset
 from measure.distance import RSP_vanilla, FE_vanilla, FE, RSP
 from measure.shortcuts import get_L, commute_distance, H_to_D, resistance_kernel
@@ -15,6 +16,7 @@ from measure.shortcuts import get_L, commute_distance, H_to_D, resistance_kernel
 class GPDistance_tests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        util.configure_logging()
 
         self.test1 = {
             'A': np.array([[0, 0, 0, 0],
@@ -115,8 +117,8 @@ class GPDistance_tests(unittest.TestCase):
     #     my_RSP = RSP_vanilla(A).get_D(1)
     #     gpd_RSP = RSP(A).get_D(1)
     #
-    #     print('max abs my', np.max([x for x in np.abs(my_RSP).ravel() if not np.isnan(x)]))
-    #     print('max abs gpd', np.max([x for x in np.abs(gpd_RSP).ravel() if not np.isnan(x)]))
+    #     logging.info('max abs my', np.max([x for x in np.abs(my_RSP).ravel() if not np.isnan(x)]))
+    #     logging.info('max abs gpd', np.max([x for x in np.abs(gpd_RSP).ravel() if not np.isnan(x)]))
     #
     #     self.assertTrue(np.allclose(my_RSP, gpd_RSP, atol=100., equal_nan=True),
     #                     np.max([x for x in np.abs(my_RSP - gpd_RSP).ravel() if not np.isnan(x)]))
@@ -127,8 +129,8 @@ class GPDistance_tests(unittest.TestCase):
     #     my_FE = FE_vanilla(A).get_D(1)
     #     gpd_FE = FE(A).get_D(1)
     #
-    #     print('max abs my', np.max([x for x in np.abs(my_FE).ravel() if not np.isnan(x)]))
-    #     print('max abs gpd', np.max([x for x in np.abs(gpd_FE).ravel() if not np.isnan(x)]))
+    #     logging.info('max abs my', np.max([x for x in np.abs(my_FE).ravel() if not np.isnan(x)]))
+    #     logging.info('max abs gpd', np.max([x for x in np.abs(gpd_FE).ravel() if not np.isnan(x)]))
     #
     #     self.assertTrue(np.allclose(my_FE, gpd_FE, atol=100., equal_nan=True),
     #                     np.max([x for x in np.abs(my_FE - gpd_FE).ravel() if not np.isnan(x)]))

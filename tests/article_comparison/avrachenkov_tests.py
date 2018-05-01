@@ -1,15 +1,21 @@
+import json
+import logging
+import os
 import unittest
 from collections import defaultdict
+from os.path import join as pj
 
+import networkx as nx
+import networkx.readwrite.json_graph as jg
 from tqdm import tqdm
 
+import util
 from cluster import KernelKMeans, SpectralClustering
 from graphs import sample
-from graphs.generator import RubanovModel
 from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H
 from measure.kernel_new import *
 from measure.shortcuts import *
-from scorer import max_accuracy, FC
+from scorer import FC
 
 
 # Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
@@ -18,6 +24,7 @@ from scorer import max_accuracy, FC
 class NewMeasuresEqualutyTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        util.configure_logging()
         self.graph = sample.diploma_matrix
 
     def test_katz(self):
@@ -52,16 +59,19 @@ class NewMeasuresEqualutyTests(unittest.TestCase):
 class Competition(unittest.TestCase):
     def __init__(self, atol, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        util.configure_logging()
 
         self.atol = atol
         self.n_params = 200
 
-    def _search_best_param(self, measure):
+    def _search_best_param(self, measure, params=None):
         results = defaultdict(lambda: [])
         count, passes = 0, 0
         for A, y_true in tqdm(self.graphs):
             mg = measure(A)
-            for param in mg.scaler.scale(np.linspace(0, 1, self.n_params)):
+            if params is None:
+                params = mg.scaler.scale(np.linspace(0, 1, self.n_params))
+            for param in params:
                 try:
                     count += 1
                     K = mg.get_K(param)
@@ -74,7 +84,7 @@ class Competition(unittest.TestCase):
         best_param, best_quality = pairs[np.nanargmax([x[1] for x in pairs])]
 
         # logging results for report
-        print('{}; Passes: {}/{}; Min error: {:0.4f}, Best param: {:0.4f}'.format(
+        logging.info('{}; Passes: {}/{}; Min error: {:0.4f}, Best param: {:0.4f}'.format(
             measure.name, passes, count, 1 - best_quality, best_param))
 
         return best_param, best_quality
@@ -94,20 +104,20 @@ class Competition(unittest.TestCase):
         quality = np.nanmean(results)
 
         # logging results for report
-        print('{}; Passes: {}/{}; Using param {:0.4f}, error: {:0.4f}'.format(
+        logging.info('{}; Passes: {}/{}; Using param {:0.4f}, error: {:0.4f}'.format(
             measure.name, passes, count, param, 1 - quality))
 
         return quality
 
-    def _compare(self, measure, error_true, param=None):
+    def _compare(self, measure, params, error_true, param=None):
         if param is not None:
             error_test = self._use_best_param(measure, param)
         else:
-            _, error_test = self._search_best_param(measure)
+            _, error_test = self._search_best_param(measure, params)
         diff = np.abs(error_test - error_true)
 
         # logging results for report
-        print('{}; Min error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(measure.name, error_test, error_true, diff))
+        logging.info('{}; Min error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(measure.name, error_test, error_true, diff))
 
         self.assertTrue(np.isclose(error_test, error_true, atol=self.atol),
                         "Test {:0.4f} != True {:0.4f}, diff={:0.4f}".format(error_test, error_true, diff))
@@ -116,70 +126,85 @@ class Competition(unittest.TestCase):
 class BalancedModel(Competition):
     def __init__(self, *args, **kwargs):
         super().__init__(0.002, *args, **kwargs)  # error bars in paper: 0.002
+        util.configure_logging()
 
     @classmethod
     def setUpClass(cls):
         sizes = np.array([100, 100])
         probs = np.array([[0.1, 0.02],
                           [0.02, 0.1]])
-        cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(100)  # 100 graphs in paper
+
+        folder = os.path.dirname(os.path.abspath(__file__))
+
+        with open(pj(folder, "Grahs_g100_100x100.json"), "r") as fp:
+            DATA = json.load(fp)
+
+        R_COMMS = cls.real_comms(sizes)
+
+        GS = [jg.node_link_graph(d) for d in DATA["GS"]]
+        GS = [(np.array(np.array(nx.adjacency_matrix(g).todense())), R_COMMS) for g in GS]
+
+        cls.graphs = GS
+
+    @staticmethod
+    def real_comms(sizes):
+        return np.array(sum(([i] * size for i, size in enumerate(sizes)), []))
 
     def test_katz(self):
-        self._compare(Katz, 0.0072)
+        self._compare(Katz, None, 0.0072)
 
     def test_communicability(self):
-        self._compare(Estrada, 0.0084)
+        self._compare(Estrada, np.linspace(0, 0.3, 101)[1:-1], 0.0084)
 
     def test_heat(self):
-        self._compare(Heat, 0.0064)
+        self._compare(Heat, np.linspace(0, 1.5, 101)[1:-1], 0.0064)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.0066)
+        self._compare(NormalizedHeat, np.linspace(0, 20, 101)[1:-1], 0.0066)
 
     def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, 0.0072)
+        self._compare(RegularizedLaplacian, np.linspace(0, 20, 101)[1:-1], 0.0072)
 
     def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, 0.0073)
+        self._compare(PersonalizedPageRank, np.linspace(0, 1, 101)[1:-1], 0.0073)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, 0.0072)
+        self._compare(ModifiedPersonalizedPageRank, np.linspace(0, 1, 101)[1:-1], 0.0072)
 
     def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, 0.0074)
+        self._compare(HeatPersonalizedPageRank, np.linspace(0, 20, 101)[1:-1], 0.0074)
 
-
-class UnbalancedModel(Competition):
-    def __init__(self, *args, **kwargs):
-        super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
-
-    @classmethod
-    def setUpClass(cls):
-        sizes = np.array([50, 150])
-        probs = np.array([[0.1, 0.02],
-                          [0.02, 0.1]])
-        cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
-
-    def test_katz(self):
-        self._compare(Katz, 0.012)
-
-    def test_communicability(self):
-        self._compare(Estrada, 0.011)
-
-    def test_heat(self):
-        self._compare(Heat, 0.026, 0.0104)
-
-    def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, 0.009)
-
-    def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, 0.0026)
-
-    def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, 0.0021)
-
-    def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, 0.0022)
-
-    def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, 0.0021)
+# class UnbalancedModel(Competition):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
+#
+#     @classmethod
+#     def setUpClass(cls):
+#         sizes = np.array([50, 150])
+#         probs = np.array([[0.1, 0.02],
+#                           [0.02, 0.1]])
+#         cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
+#
+#     def test_katz(self):
+#         self._compare(Katz, 0.012)
+#
+#     def test_communicability(self):
+#         self._compare(Estrada, 0.011)
+#
+#     def test_heat(self):
+#         self._compare(Heat, 0.026, 0.0104)
+#
+#     def test_normalizedHeat(self):
+#         self._compare(NormalizedHeat, 0.009)
+#
+#     def test_regularizedLaplacian(self):
+#         self._compare(RegularizedLaplacian, 0.0026)
+#
+#     def test_personalizedPageRank(self):
+#         self._compare(PersonalizedPageRank, 0.0021)
+#
+#     def test_modifiedPageRank(self):
+#         self._compare(ModifiedPersonalizedPageRank, 0.0022)
+#
+#     def test_heatPageRank(self):
+#         self._compare(HeatPersonalizedPageRank, 0.0021)

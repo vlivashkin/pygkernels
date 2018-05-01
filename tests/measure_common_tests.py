@@ -1,14 +1,16 @@
 import unittest
 
+import util
 from graphs import sample
 from measure.distance import *
-from measure.kernel import For_H
 from measure.shortcuts import *
 
 
 class ShortcutsTests(unittest.TestCase):
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
+        util.configure_logging()
+
         self.A = np.array([
             [1, 1, 0, 0, 1, 0],
             [1, 0, 1, 0, 1, 0],

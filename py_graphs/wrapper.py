@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 import numpy as np
-from joblib import Parallel, delayed
 from numpy.linalg import LinAlgError
 from tqdm import tqdm_notebook as tqdm
 
@@ -32,7 +31,7 @@ class ParallelByGraphs:
                 result = self.avg_by_graphs(measure_name, param, n_jobs)
                 if result is not None:
                     measure_results[measure_name][param] = result
-                    # print("{} {:0.2f} {:0.2f} {:0.2f}".format(measure_name, param, result[0], result[1]))
+                    # logging.info("{} {:0.2f} {:0.2f} {:0.2f}".format(measure_name, param, result[0], result[1]))
         return dict(measure_results)
 
     def avg_by_graphs(self, measure_name, param, n_jobs):

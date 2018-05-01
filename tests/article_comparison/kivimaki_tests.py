@@ -1,7 +1,9 @@
+import logging
 import unittest
 
 from sklearn.metrics import normalized_mutual_info_score
 
+import util
 from cluster import KernelKMeans
 from graphs import sample
 from graphs.dataset import *
@@ -16,14 +18,15 @@ from measure.shortcuts import *
 class Figure2ComparisonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        util.configure_logging()
         self.graph = sample.triangle_graph
 
     def _comparison(self, name, D, true_value, atol=0.02):
         div = D[0, 1] / D[1, 2]
 
         # logging results for report
-        print('\t\tD_12/D_23 test\tD_12/D_23 true\tdiff')
-        print('{}\t{:0.4f}\t{:0.4f}\t{:0.4f}'.format(name, div, true_value, np.abs(div - true_value)))
+        logging.info('\t\tD_12/D_23 test\tD_12/D_23 true\tdiff')
+        logging.info('{}\t{:0.4f}\t{:0.4f}\t{:0.4f}'.format(name, div, true_value, np.abs(div - true_value)))
 
         self.assertTrue(np.isclose(div, true_value, atol=atol),
                         "{}: {:0.3f} != {:0.3f}, diff={:0.3f}".format(name, div, true_value, div - true_value))
@@ -90,8 +93,9 @@ class Table2Tests(unittest.TestCase):
             diff = np.abs(test_nmi - true_nmi)
 
             # logging results for report
-            print('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
-            print('{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
+            logging.info('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
+            logging.info(
+                '{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
 
             results.append({
                 'measure_name': measure.name,
