@@ -64,10 +64,10 @@ class Competition(unittest.TestCase):
         self.atol = atol
         self.n_params = 200
 
-    def _search_best_param(self, measure, params=None):
+    def _calc_score(self, measure, params=None):
         results = defaultdict(lambda: [])
         count, passes = 0, 0
-        for A, y_true in tqdm(self.graphs):
+        for graph_idx, (A, y_true) in tqdm(enumerate(self.graphs), total=len(self.graphs)):
             mg = measure(A)
             if params is None:
                 params = mg.scaler.scale(np.linspace(0, 1, self.n_params))
@@ -76,44 +76,21 @@ class Competition(unittest.TestCase):
                     count += 1
                     K = mg.get_K(param)
                     y_pred = SpectralClustering(2).fit_predict(K)
-                    results[param].append(FC(y_true, y_pred))
+                    results[graph_idx].append(FC(y_true, y_pred))
                     passes += 1
                 except:
                     pass
-        pairs = [(key, np.average(value)) for key, value in results.items()]
-        best_param, best_quality = pairs[np.nanargmax([x[1] for x in pairs])]
+
+        mins = [min(x) for x in results.values()]
+        quality = np.mean(mins)
 
         # logging results for report
-        logging.info('{}; Passes: {}/{}; Min error: {:0.4f}, Best param: {:0.4f}'.format(
-            measure.name, passes, count, 1 - best_quality, best_param))
-
-        return best_param, best_quality
-
-    def _use_best_param(self, measure, param):
-        results = []
-        count, passes = 0, 0
-        for A, y_true in tqdm(self.graphs):
-            try:
-                count += 1
-                K = measure(A).get_K(param)
-                y_pred = KernelKMeans(2).fit_predict(K)
-                results.append(FC(y_true, y_pred))
-                passes += 1
-            except:
-                pass
-        quality = np.nanmean(results)
-
-        # logging results for report
-        logging.info('{}; Passes: {}/{}; Using param {:0.4f}, error: {:0.4f}'.format(
-            measure.name, passes, count, param, 1 - quality))
+        logging.info('{}; Passes: {}/{}; Min error: {:0.4f}'.format(measure.name, passes, count, 1 - quality))
 
         return quality
 
-    def _compare(self, measure, params, error_true, param=None):
-        if param is not None:
-            error_test = self._use_best_param(measure, param)
-        else:
-            _, error_test = self._search_best_param(measure, params)
+    def _compare(self, measure, params, error_true):
+        error_test = self._calc_score(measure, params)
         diff = np.abs(error_test - error_true)
 
         # logging results for report
