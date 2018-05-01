@@ -67,7 +67,7 @@ class Competition(unittest.TestCase):
     def _calc_score(self, measure, params=None):
         results = defaultdict(lambda: [])
         count, passes = 0, 0
-        for graph_idx, (A, y_true) in tqdm(enumerate(self.graphs), total=len(self.graphs)):
+        for graph_idx, (A, y_true) in tqdm(enumerate(self.graphs), total=len(self.graphs), desc=measure.name):
             mg = measure(A)
             if params is None:
                 params = mg.scaler.scale(np.linspace(0, 1, self.n_params))
