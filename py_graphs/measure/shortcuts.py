@@ -1,8 +1,11 @@
 import functools
 import warnings
 
+import networkx as nx
 import numpy as np
 from scipy.sparse.csgraph._shortest_path import shortest_path
+
+from pykernels.graph import ShortestPath
 
 
 def deprecated(func):
@@ -52,6 +55,16 @@ def sp_kernel(A):
     # return ShortestPath().gram(A)
 
 
+def CT(A):
+    """
+    Commute time kernel function.
+    Ref: Fouss (2007)
+    """
+    G = nx.from_numpy_matrix(A)
+    L = nx.laplacian_matrix(G, nodelist=sorted(G.nodes)).toarray().astype('float')
+    K = np.linalg.pinv(L)
+    return K
+
 def resistance_kernel(A):
     """
     H = (L + J)^{-1}
@@ -60,6 +73,15 @@ def resistance_kernel(A):
     L = get_L(A)
     J = np.ones((size, size)) / size
     return np.linalg.pinv(L + J)
+
+def resistance_kernel2(A):
+    """
+    H = (I + L)^{-1}
+    """
+    size = A.shape[0]
+    I = np.eye(size)
+    L = get_L(A)
+    return np.linalg.pinv(I + L)
 
 
 def commute_distance(A):

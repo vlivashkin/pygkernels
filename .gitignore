@@ -21,3 +21,9 @@ __pycache__/
 *.obj
 
 .DS_Store
+
+*.log
+*.gz
+*.out
+*.aux
+*.toc
