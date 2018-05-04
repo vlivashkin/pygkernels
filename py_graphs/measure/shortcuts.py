@@ -45,9 +45,10 @@ def get_L(A):
     return get_D(A) - A
 
 
-@deprecated
 def sp_distance(A):
-    return shortest_path(A, directed=False)
+    with np.errstate(divide='ignore', invalid='ignore'):
+        A = 1. / A
+    return np.array(shortest_path(A, directed=False), dtype=np.float64)
 
 
 def sp_kernel(A):

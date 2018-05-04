@@ -1,7 +1,10 @@
 import unittest
 
+from sklearn.metrics import adjusted_rand_score
+
 import util
-from graphs import sample
+from cluster import KernelKMeans
+from graphs import sample, dataset
 from measure.distance import *
 from measure.shortcuts import *
 
@@ -9,8 +12,6 @@ from measure.shortcuts import *
 # This is important:
 # lambda = 0 -> CT
 # lambda = 1 -> SP
-
-
 class spctTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -89,3 +90,36 @@ class spctTests(unittest.TestCase):
     #     K = D_to_K(FE(A).get_D(0.01))
     #     quality5 = test_quality(K)
     #     logging.info('another measure (FE)', '\t', quality5)
+
+
+class Figure2ComparisonTests(unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        util.configure_logging()
+
+        graph, info = dataset.news_2cl_1
+        self.graph, self.y_true = graph[0]
+
+    def call_and_print(self, name, K):
+        ari = adjusted_rand_score(KernelKMeans(2).fit_predict(K), self.y_true)
+        print('{}\t{:0.3f}'.format(name, ari))
+
+    def test_CT(self):
+        K_CT = kernel.SPCT_H(self.graph).get_K(0)
+        self.call_and_print('CT\t', K_CT)
+        K_logFor = kernel.logFor_H(self.graph).get_K(500.0)
+        self.call_and_print('logFor\t500', K_logFor)
+        K_RSP = kernel.RSP_K(self.graph).get_K(0.0001)
+        self.call_and_print('RSP\t0.0001', K_RSP)
+        K_FE = kernel.FE_K(self.graph).get_K(0.0001)
+        self.call_and_print('FE\t0.0001', K_FE)
+
+    def test_SP(self):
+        K_SP = sp_kernel(self.graph)
+        self.call_and_print('SP\t', K_SP)
+        K_logFor = kernel.logFor_H(self.graph).get_K(0.001)
+        self.call_and_print('logFor\t0.001', K_logFor)
+        K_RSP = kernel.RSP_K(self.graph).get_K(19.0)
+        self.call_and_print('RSP\t19', K_RSP)
+        K_FE = kernel.FE_K(self.graph).get_K(19.0)
+        self.call_and_print('FE\t19', K_FE)

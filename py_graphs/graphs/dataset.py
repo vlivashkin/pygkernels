@@ -1,8 +1,8 @@
 import os
-
+from os.path import join as pj
 import numpy as np
 
-ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datasets')
+ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
 
 
 class ImportedGraphBuilder:
@@ -83,23 +83,23 @@ class ImportedGraphBuilder:
 def load_polbooks_or_football(name, nodes, edges):
     return ImportedGraphBuilder() \
         .set_name(name) \
-        .import_nodes_id_name_class(os.path.join(ROOT_PATH, nodes)) \
-        .import_edges(os.path.join(ROOT_PATH, edges)) \
+        .import_nodes_id_name_class(pj(ROOT_PATH, nodes)) \
+        .import_edges(pj(ROOT_PATH, edges)) \
         .build()
 
 
 def load_polblogs_or_zachary(name, nodes):
     return ImportedGraphBuilder() \
         .set_name(name) \
-        .import_nodes_and_edges(os.path.join(ROOT_PATH, nodes)) \
+        .import_nodes_and_edges(pj(ROOT_PATH, nodes)) \
         .build()
 
 
 def load_newsgroup_graph(name, nodes, edges):
     return ImportedGraphBuilder() \
         .set_name(name) \
-        .import_nodes_class(os.path.join(ROOT_PATH, nodes)) \
-        .import_adjacency_matrix(os.path.join(ROOT_PATH, edges)) \
+        .import_nodes_class(pj(ROOT_PATH, nodes)) \
+        .import_adjacency_matrix(pj(ROOT_PATH, edges)) \
         .build()
 
 
