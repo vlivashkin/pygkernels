@@ -7,7 +7,7 @@ import util
 from cluster import KernelKMeans
 from graphs import sample
 from graphs.dataset import *
-from measure import kernel, distance
+from measure import *
 from measure.shortcuts import *
 
 
@@ -32,35 +32,35 @@ class Figure2ComparisonTests(unittest.TestCase):
                         "{}: {:0.3f} != {:0.3f}, diff={:0.3f}".format(name, div, true_value, div - true_value))
 
     def test_boundaries_left_CT(self):
-        D = distance.SPCT(self.graph).get_D(0)
+        D = SPCT(self.graph).get_D(0)
         self._comparison('CT', D, 1.5)
 
     def test_boundaries_left_logFor(self):
-        D = distance.logFor(self.graph).get_D(500.0)
+        D = logFor(self.graph).get_D(500.0)
         self._comparison('logFor 500.0', D, 1.5)
 
     def test_boundaries_left_RSP(self):
-        D = distance.RSP(self.graph).get_D(0.0001)
+        D = RSP(self.graph).get_D(0.0001)
         self._comparison('RSP 0.0001', D, 1.5)
 
     def test_boundaries_left_FE(self):
-        D = distance.FE(self.graph).get_D(0.0001)
+        D = FE(self.graph).get_D(0.0001)
         self._comparison('FE 0.0001', D, 1.5)
 
     def test_boundaries_right_SP(self):
-        D = distance.SPCT(self.graph).get_D(1)
+        D = SPCT(self.graph).get_D(1)
         self._comparison('SP', D, 1.0)
 
     def test_boundaries_right_logFor(self):
-        D = distance.logFor(self.graph).get_D(0.01)
+        D = logFor(self.graph).get_D(0.01)
         self._comparison('logFor 0.01', D, 1.0)
 
     def test_boundaries_right_RSP(self):
-        D = distance.RSP(self.graph).get_D(20.0)
+        D = RSP(self.graph).get_D(20.0)
         self._comparison('RSP 20.0', D, 1.0)
 
     def test_boundaries_right_FE(self):
-        D = distance.FE(self.graph).get_D(20.0)
+        D = FE(self.graph).get_D(20.0)
         self._comparison('FE 20.0', D, 1.0)
 
 
@@ -112,16 +112,16 @@ class Table2Tests(unittest.TestCase):
                                 result['true_nmi'], result['diff']))
 
     def test_RSP(self):
-        self._newsgroup_results(kernel.RSP_K, 0.02, 0)
+        self._newsgroup_results(RSP_K, 0.02, 0)
 
     def test_FE(self):
-        self._newsgroup_results(kernel.FE_K, 0.07, 1)
+        self._newsgroup_results(FE_K, 0.07, 1)
 
     def test_logFor(self):
-        self._newsgroup_results(kernel.logFor_H, 0.95, 2)
+        self._newsgroup_results(logFor_H, 0.95, 2)
 
     def test_SPCT(self):
-        self._newsgroup_results(kernel.SPCT_K, 0, 3)
+        self._newsgroup_results(SPCT_K, 1, 3)
 
     def test_SCT(self):
-        self._newsgroup_results(kernel.SCT_H, 26, 4)
+        self._newsgroup_results(SCT_H, 26, 4)

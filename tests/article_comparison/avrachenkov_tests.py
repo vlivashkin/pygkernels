@@ -10,10 +10,10 @@ import networkx.readwrite.json_graph as jg
 from tqdm import tqdm
 
 import util
-from cluster import KernelKMeans, SpectralClustering
+from cluster import SpectralClustering
 from graphs import sample
-from measure.kernel import logHeat_H, logFor_H, logComm_H, Walk_H
-from measure.kernel_new import *
+from measure import *
+from measure import scaler
 from measure.shortcuts import *
 from scorer import FC
 
@@ -29,28 +29,28 @@ class NewMeasuresEqualutyTests(unittest.TestCase):
 
     def test_katz(self):
         walk = Walk_H(self.graph)
-        katz = Katz(self.graph)
+        katz = Katz_R(self.graph)
         for param in scaler.Rho(self.graph).scale_list(np.linspace(0.1, 0.9, 50)):
             self.assertTrue(np.allclose(walk.get_K(param).ravel(), katz.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
 
     def test_estrada(self):
         comm = logComm_H(self.graph)
-        estrada = Estrada(self.graph)
+        estrada = Estrada_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
             self.assertTrue(np.allclose(comm.get_K(param).ravel(), estrada.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
 
     def test_heat(self):
         heat = logHeat_H(self.graph)
-        heat_new = Heat(self.graph)
+        heat_new = Heat_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
             self.assertTrue(np.allclose(heat.get_K(param).ravel(), heat_new.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
 
     def test_regularized_laplacian(self):
         forest = logFor_H(self.graph)
-        reg_laplacian = RegularizedLaplacian(self.graph)
+        reg_laplacian = RegularizedLaplacian_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.9, 50)):
             self.assertTrue(np.allclose(forest.get_K(param).ravel(), reg_laplacian.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
@@ -94,7 +94,8 @@ class Competition(unittest.TestCase):
         diff = np.abs(error_test - error_true)
 
         # logging results for report
-        logging.info('{}; Min error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(measure.name, error_test, error_true, diff))
+        logging.info(
+            '{}; Min error: {:0.4f}, true={:0.4f}, diff={:0.4f}'.format(measure.name, error_test, error_true, diff))
 
         self.assertTrue(np.isclose(error_test, error_true, atol=self.atol),
                         "Test {:0.4f} != True {:0.4f}, diff={:0.4f}".format(error_test, error_true, diff))
@@ -128,28 +129,28 @@ class BalancedModel(Competition):
         return np.array(sum(([i] * size for i, size in enumerate(sizes)), []))
 
     def test_katz(self):
-        self._compare(Katz, None, 0.0072)
+        self._compare(Katz_R, None, 0.0072)
 
     def test_communicability(self):
-        self._compare(Estrada, np.linspace(0, 0.3, 101)[1:-1], 0.0084)
+        self._compare(Estrada_R, np.linspace(0, 0.3, 101)[1:-1], 0.0084)
 
     def test_heat(self):
-        self._compare(Heat, np.linspace(0, 1.5, 101)[1:-1], 0.0064)
+        self._compare(Heat_R, np.linspace(0, 1.5, 101)[1:-1], 0.0064)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat, np.linspace(0, 20, 101)[1:-1], 0.0066)
+        self._compare(NormalizedHeat_R, np.linspace(0, 20, 101)[1:-1], 0.0066)
 
     def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian, np.linspace(0, 20, 101)[1:-1], 0.0072)
+        self._compare(RegularizedLaplacian_R, np.linspace(0, 20, 101)[1:-1], 0.0072)
 
     def test_personalizedPageRank(self):
-        self._compare(PersonalizedPageRank, np.linspace(0, 1, 101)[1:-1], 0.0073)
+        self._compare(PPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0073)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPersonalizedPageRank, np.linspace(0, 1, 101)[1:-1], 0.0072)
+        self._compare(ModifiedPPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0072)
 
     def test_heatPageRank(self):
-        self._compare(HeatPersonalizedPageRank, np.linspace(0, 20, 101)[1:-1], 0.0074)
+        self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0074)
 
 # class UnbalancedModel(Competition):
 #     def __init__(self, *args, **kwargs):

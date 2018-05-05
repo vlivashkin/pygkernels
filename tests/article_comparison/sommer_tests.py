@@ -6,7 +6,7 @@ from sklearn.metrics import normalized_mutual_info_score
 import util
 from cluster import KernelKMeans
 from graphs.dataset import *
-from measure.kernel import *
+from measure import *
 
 
 # Sommer: Comparison of Graph Node Distances on Clustering Tasks

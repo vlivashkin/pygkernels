@@ -9,7 +9,7 @@ from cluster import KernelKMeans, SpectralClustering
 from cluster.ward import Ward
 from graphs import dataset
 from graphs import sample
-from measure import kernel, kernel_new
+from measure import H_kernels_plus_RSP_FE, R_kernels
 from measure.shortcuts import *
 
 
@@ -21,7 +21,6 @@ class EstimatorsTests(unittest.TestCase):
     def test_simple_Ward(self):
         y_pred = Ward(2).predict(sample.diploma_matrix)
         logging.info(y_pred)
-
 
     def test_all_estimators(self):
         K = sample.diploma_matrix  # this is not kernel but who cares
@@ -37,7 +36,7 @@ class EstimatorsTests(unittest.TestCase):
 class WorkflowTests(unittest.TestCase):
     def test_ward_clustering(self):
         graphs, info = dataset.polbooks
-        for measure in kernel.H_kernels_plus_RSP_FE:
+        for measure in H_kernels_plus_RSP_FE:
             measureparamdict = {}
             mean = []
             for edges, nodes in graphs:
@@ -56,7 +55,7 @@ class WorkflowTests(unittest.TestCase):
 
     def test_ward_clustering_new_kernels(self):
         graphs, info = dataset.polbooks
-        for measure in kernel_new.NEW_kernels:
+        for measure in R_kernels:
             measureparamdict = {}
             mean = []
             for edges, nodes in graphs:

@@ -3,7 +3,7 @@ import unittest
 
 import util
 from graphs import sample
-from measure.distance import *
+from measure import *
 from measure.scaler import AlphaToT, Linear
 from measure.shortcuts import *
 
@@ -30,11 +30,11 @@ class Figure1ComparisonTests(unittest.TestCase):
                             "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(d, t, np.abs(d - t)))
 
     def test_chain_SP(self):
-        D = sp_distance(self.graph)
+        D = SP(self.graph).get_D(-1)
         self._comparison('SP', D, [1.000, 1.000, 2.000, 3.000])
 
     def test_chain_R(self):
-        D = H_to_D(resistance_kernel(self.graph))
+        D = CT(self.graph).get_D(-1)
         self._comparison('R', D, [1.000, 1.000, 2.000, 3.000])
 
     def test_chain_Walk(self):
@@ -53,7 +53,7 @@ class Figure1ComparisonTests(unittest.TestCase):
         self._comparison('For', D, [1.026, 0.947, 1.500, 1.895])
 
     def test_chain_SqResistance(self):
-        D = np.sqrt(H_to_D(resistance_kernel(self.graph)))
+        D = np.sqrt(CT(self.graph).get_D(-1))
         self._comparison('SqResistance', D, [1.000, 1.000, 1.414, 1.732])
 
     def test_chain_Comm(self):
@@ -96,11 +96,11 @@ class Table1ComparisonTests(unittest.TestCase):
                             "Test {:0.2f} != True {:0.2f}, diff={:0.2f}".format(d, t, np.abs(d - t)))
 
     def test_chain_SP(self):
-        D = sp_distance(self.graph)
+        D = SP(self.graph).get_D(-1)
         self._comparison('SP', D, [1., 1., 1.5])
 
     def test_chain_R(self):
-        D = H_to_D(resistance_kernel(self.graph))
+        D = CT(self.graph).get_D(-1)
         self._comparison('R', D, [1., 1., 1.5])
 
     def test_chain_Walk(self):

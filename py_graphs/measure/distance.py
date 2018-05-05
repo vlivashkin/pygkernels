@@ -1,21 +1,22 @@
-from . import kernel
-from . import scaler
-from .shortcuts import *
+from scipy.sparse.csgraph import shortest_path
+
+from measure import scaler
+from measure.shortcuts import *
 
 
 class Distance:
-    name, default_scaler = None, None
+    name, default_scaler, power = None, None, None
+    parent_kernel_class = None
 
-    def __init__(self, A, parent_kernel=None, power=1.):
+    def __init__(self, A):
         self.scaler = self.default_scaler(A)
+        self.parent_kernel = self.parent_kernel_class(A) if self.parent_kernel_class else None
         self.A = A
-        self.parent_kernel = parent_kernel(A) if parent_kernel is not None else None
-        self.power = power
 
     def get_D(self, param):
         H = self.parent_kernel.get_K(param)
         D = H_to_D(H)
-        return np.power(D, self.power) if self.power != 1 else D
+        return np.power(D, self.power) if self.power else D
 
     def grid_search(self, params=np.linspace(0, 1, 55)):
         results = np.array((params.shape[0],))
@@ -23,80 +24,39 @@ class Distance:
             results[idx] = self.get_D(param)
         return results
 
-    @staticmethod
-    def get_all():
-        return [pWalk, Walk, For, logFor, Comm, logComm, Heat, logHeat, SCT, SCCT, RSP, FE, SPCT]
+
+class SP(Distance):
+    name, default_scaler = 'SP', scaler.Linear
+
+    def get_D(self, param):
+        with np.errstate(divide='ignore', invalid='ignore'):
+            A = np.divide(1., self.A, where=lambda x: x!=0)
+        return np.array(shortest_path(A, directed=False), dtype=np.float64)
 
 
-class pWalk(Distance):
-    name, default_scaler = 'pWalk', scaler.Rho
+class CT(Distance):
+    name, default_scaler = 'CT', scaler.Linear
 
-    def __init__(self, A):
-        super().__init__(A, kernel.pWalk_H)
+    def commute_distance(self):
+        """
+        Original code copyright (C) Ulrike Von Luxburg, Python implementation by James McDermott.
+        """
+        size = self.A.shape[0]
+        L = get_L(self.A)
 
+        Linv = np.linalg.inv(L + np.ones(L.shape) / size) - np.ones(L.shape) / size
 
-class Walk(Distance):
-    name, default_scaler = 'Walk', scaler.Rho
+        Linv_diag = np.diag(Linv).reshape((size, 1))
+        Rexact = Linv_diag * np.ones((1, size)) + np.ones((size, 1)) * Linv_diag.T - 2 * Linv
 
-    def __init__(self, A):
-        super().__init__(A, kernel.Walk_H)
+        # convert from a resistance distance to a commute time distance
+        vol = np.sum(self.A)
+        Rexact *= vol
 
+        return Rexact
 
-class For(Distance):
-    name, default_scaler = 'For', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.For_H)
-
-
-class logFor(Distance):
-    name, default_scaler = 'logFor', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.logFor_H)
-
-
-class Comm(Distance):
-    name, default_scaler = 'Comm', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.Comm_H, .5)
-
-
-class logComm(Distance):
-    name, default_scaler = 'logComm', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.logComm_H, .5)
-
-
-class Heat(Distance):
-    name, default_scaler = 'Heat', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.Heat_H)
-
-
-class logHeat(Distance):
-    name, default_scaler = 'logHeat', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.logHeat_H)
-
-
-class SCT(Distance):
-    name, default_scaler = 'SCT', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.SCT_H)
-
-
-class SCCT(Distance):
-    name, default_scaler = 'SCCT', scaler.Fraction
-
-    def __init__(self, A):
-        super().__init__(A, kernel.SCCT_H)
-
+    def get_D(self, param):
+        return self.commute_distance()
 
 class RSP_vanilla_like(Distance):
     def __init__(self, A, C=None):
@@ -127,6 +87,7 @@ class RSP_vanilla_like(Distance):
         return W, Z
 
 
+@deprecated
 class RSP_vanilla(RSP_vanilla_like):
     name, default_scaler = 'RSP vanilla', scaler.FractionReversed
 
@@ -146,6 +107,7 @@ class RSP_vanilla(RSP_vanilla_like):
         return D_RSP
 
 
+@deprecated
 class FE_vanilla(RSP_vanilla_like):
     name, default_scaler = 'FE vanilla', scaler.FractionReversed
 
@@ -263,17 +225,3 @@ class FE(RSP_like):
         np.fill_diagonal(D_FE, 0.0)
 
         return D_FE
-
-
-class SPCT(Distance):
-    name, default_scaler = 'SP-CT', scaler.Linear
-
-    def __init__(self, A):
-        super().__init__(A)
-
-        self.D_SP = sp_distance(A)
-        self.D_CT = 2. * H_to_D(resistance_kernel(A))
-
-    def get_D(self, lmbda):
-        # when lambda = 0 this is CT, when lambda = 1 this is SP
-        return lmbda * self.D_SP + (1. - lmbda) * self.D_CT

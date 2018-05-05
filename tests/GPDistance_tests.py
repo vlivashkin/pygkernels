@@ -4,8 +4,8 @@ import numpy as np
 
 import util
 from graphs import dataset
-from measure.distance import RSP_vanilla, FE_vanilla, FE, RSP
-from measure.shortcuts import get_L, commute_distance, H_to_D, resistance_kernel
+from measure import RSP_vanilla, FE_vanilla, FE, RSP, CT, CT_H
+from measure.shortcuts import get_L, H_to_D
 
 
 # GPDistance
@@ -65,8 +65,8 @@ class GPDistance_tests(unittest.TestCase):
     def test_compare_CT_and_Resistance(self):
         graphs, info = dataset.news_2cl_1
         A, y_true = graphs[0]
-        D_CT = commute_distance(A)
-        D_R = H_to_D(resistance_kernel(A))
+        D_CT = CT(A).get_D(-1)
+        D_R = H_to_D(CT_H(A).get_K(-1))
         D_CT /= np.average(D_CT)
         D_R /= np.average(D_R)
         self.assertTrue(np.allclose(D_CT, D_R))

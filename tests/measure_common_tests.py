@@ -2,7 +2,8 @@ import unittest
 
 import util
 from graphs import sample
-from measure.distance import *
+from measure import *
+from measure import distances
 from measure.shortcuts import *
 
 
@@ -48,7 +49,7 @@ class ShortcutsTests(unittest.TestCase):
 class MeasureCommonTests(unittest.TestCase):
     def test_chain_all_distances_more_than_zero(self):
         start, end, n_params = 0.1, 0.6, 30
-        for distance in Distance.get_all():
+        for distance in distances:
             distance = distance(sample.chain_graph)
             for idx, param in enumerate(distance.scaler.scale_list(np.linspace(start, end, n_params))):
                 D = distance.get_D(param)
@@ -59,7 +60,7 @@ class MeasureCommonTests(unittest.TestCase):
 
     def test_chain_all_distances_symmetry_matrix(self):
         start, end, n_params = 0.1, 0.6, 30
-        for distance in Distance.get_all():
+        for distance in distances:
             distance = distance(sample.chain_graph)
             for param in distance.scaler.scale_list(np.linspace(start, end, n_params)):
                 D = distance.get_D(param)
@@ -70,7 +71,7 @@ class MeasureCommonTests(unittest.TestCase):
 
     def test_chain_all_distances_main_diagonal_zero(self):
         start, end, n_params = 0.0001, 0.5, 30
-        for distance in Distance.get_all():
+        for distance in distances:
             distance = distance(sample.chain_graph)
             for param in np.linspace(start, end, n_params):
                 D = distance.get_D(param)
@@ -79,7 +80,7 @@ class MeasureCommonTests(unittest.TestCase):
 
     def test_full_graph_SP_logFor_Walk_equality(self):
         param = 0.00001
-        DSP = normalize(sp_distance(sample.chain_graph))
+        DSP = normalize(SP(sample.chain_graph).get_D(-1))
         DlogFor = normalize(logFor(sample.chain_graph).get_D(param))
         DWalk = normalize(Walk(sample.chain_graph).get_D(param))
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))

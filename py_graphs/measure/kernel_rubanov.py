@@ -1,14 +1,13 @@
 import numpy as np
 import numpy.matlib
 
-from . import kernel
 from . import scaler
 from .kernel import Kernel
 from .shortcuts import get_D, get_L
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures
-# Implementation from Dmytro Rubanov
+# Implementation by Dmytro Rubanov
 
 class KernelNew(Kernel):
     name, default_scaler = None, None
@@ -23,8 +22,8 @@ class KernelNew(Kernel):
         return R
 
 
-class Katz(KernelNew):
-    name, default_scaler = 'NEW Katz', scaler.Rho
+class Katz_R(KernelNew):
+    name, default_scaler = 'Katz R', scaler.Rho
 
     def __init__(self, A):
         super().__init__(A)
@@ -40,16 +39,16 @@ class Katz(KernelNew):
         return np.array(np.log(K))
 
 
-class Estrada(KernelNew):
-    name, default_scaler = 'NEW Estrada', scaler.Fraction
+class Estrada_R(KernelNew):
+    name, default_scaler = 'Estrada R', scaler.Fraction
 
     def get_K(self, t):
         K = KernelNew.mat_exp(t * self.A)
         return np.array(np.log(K))
 
 
-class Heat(KernelNew):  # this is logHeat, actually
-    name, default_scaler = 'NEW Heat', scaler.Fraction
+class Heat_R(KernelNew):  # this is logHeat, actually
+    name, default_scaler = 'Heat R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -63,8 +62,8 @@ class Heat(KernelNew):  # this is logHeat, actually
         return np.array(np.log(K))
 
 
-class NormalizedHeat(KernelNew):
-    name, default_scaler = 'NEW NormalizedHeat', scaler.Fraction
+class NormalizedHeat_R(KernelNew):
+    name, default_scaler = 'NormalizedHeat R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -81,8 +80,8 @@ class NormalizedHeat(KernelNew):
         return np.array(np.log(K))
 
 
-class RegularizedLaplacian(KernelNew):
-    name, default_scaler = 'NEW RegularizedLaplacian', scaler.Fraction
+class RegularizedLaplacian_R(KernelNew):
+    name, default_scaler = 'RegularizedLaplacian R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -97,8 +96,8 @@ class RegularizedLaplacian(KernelNew):
         return np.array(np.log(K))
 
 
-class PersonalizedPageRank(KernelNew):
-    name, default_scaler = 'NEW PersonalizedPageRank', scaler.Fraction
+class PPageRank_R(KernelNew):
+    name, default_scaler = 'PersonalizedPageRank R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -113,8 +112,8 @@ class PersonalizedPageRank(KernelNew):
         return np.array(np.log(K))
 
 
-class ModifiedPersonalizedPageRank(KernelNew):
-    name, default_scaler = 'NEW ModifiedPersonalizedPageRank', scaler.Fraction
+class ModifiedPPageRank_R(KernelNew):
+    name, default_scaler = 'ModifiedPersonalizedPageRank R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -128,8 +127,8 @@ class ModifiedPersonalizedPageRank(KernelNew):
         return np.array(np.log(K))
 
 
-class HeatPersonalizedPageRank(KernelNew):
-    name, default_scaler = 'NEW HeatPersonalizedPageRank', scaler.Fraction
+class HeatPPageRank_R(KernelNew):
+    name, default_scaler = 'HeatPersonalizedPageRank R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -142,15 +141,3 @@ class HeatPersonalizedPageRank(KernelNew):
             # logging.info(t, "K < 0")
             return None
         return np.array(np.log(K))
-
-
-NEW_kernels = [
-    Katz, Estrada, Heat,
-    NormalizedHeat,
-    RegularizedLaplacian,
-    PersonalizedPageRank,
-    ModifiedPersonalizedPageRank,
-    HeatPersonalizedPageRank
-]
-
-ALL_kernels = kernel.H_kernels_plus_RSP_FE + NEW_kernels

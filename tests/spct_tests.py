@@ -5,7 +5,7 @@ from sklearn.metrics import adjusted_rand_score
 import util
 from cluster import KernelKMeans
 from graphs import sample, dataset
-from measure.distance import *
+from measure import *
 from measure.shortcuts import *
 
 
@@ -21,21 +21,24 @@ class spctTests(unittest.TestCase):
 
     def test_SPCT_order(self):
         A = sample.diploma_matrix
-        SP, CT = sp_distance(A), 2. * H_to_D(resistance_kernel(A))
-        self.assertTrue(np.allclose(SP, self.get_SP(A)))
-        self.assertTrue(np.allclose(CT, self.get_CT(A)))
+        D_SP, D_CT = SP(A).get_D(-1), 2 * H_to_D(CT_H(A).get_K(-1))
+        self.assertTrue(np.allclose(D_SP, self.get_SP(A)))
+        self.assertTrue(np.allclose(D_CT, self.get_CT(A)))
 
     def test_tree_SPCT_inequality(self):
         A = sample.diploma_matrix
-        self.assertFalse(np.allclose(self.get_SP(A), self.get_CT(A)))
+        D_SP, D_CT = self.get_SP(A), self.get_CT(A)
+        self.assertFalse(np.allclose(D_SP, D_CT))
 
     def test_chain_SPCT_equality(self):
         A = sample.chain_graph
-        self.assertTrue(np.allclose(self.get_SP(A), self.get_CT(A)))
+        D_SP, D_CT = self.get_SP(A), self.get_CT(A)
+        self.assertTrue(np.allclose(D_SP, D_CT))
 
     def test_big_chain_SPCT_equality(self):
         A = sample.big_chain
-        self.assertTrue(np.allclose(self.get_SP(A), self.get_CT(A)))
+        D_SP, D_CT = self.get_SP(A), self.get_CT(A)
+        self.assertTrue(np.allclose(D_SP, D_CT))
 
     def test_full_graph_SPCT_equality(self):
         A = sample.full_graph
@@ -45,10 +48,12 @@ class spctTests(unittest.TestCase):
 
     def test_tree_SPCT_equality(self):
         A = sample.tree_matrix
-        self.assertTrue(np.allclose(self.get_SP(A), self.get_CT(A)))
+        D_SP, D_CT = self.get_SP(A), self.get_CT(A)
+        self.assertTrue(np.allclose(D_SP, D_CT))
 
     def test_weighted_graph_SP(self):
-        A = sample.weighted
+        with np.errstate(divide='ignore', invalid='ignore'):
+            A = np.divide(1., sample.weighted, where=sample.weighted != 0)
         true_SP = sample.weighted_sp
         self.assertTrue(np.allclose(self.get_SP(A), true_SP))
 
@@ -105,21 +110,21 @@ class Figure2ComparisonTests(unittest.TestCase):
         print('{}\t{:0.3f}'.format(name, ari))
 
     def test_CT(self):
-        K_CT = kernel.SPCT_H(self.graph).get_K(0)
+        K_CT = CT_H(self.graph).get_K(0)
         self.call_and_print('CT\t', K_CT)
-        K_logFor = kernel.logFor_H(self.graph).get_K(500.0)
+        K_logFor = logFor_H(self.graph).get_K(500.0)
         self.call_and_print('logFor\t500', K_logFor)
-        K_RSP = kernel.RSP_K(self.graph).get_K(0.0001)
+        K_RSP = RSP_K(self.graph).get_K(0.0001)
         self.call_and_print('RSP\t0.0001', K_RSP)
-        K_FE = kernel.FE_K(self.graph).get_K(0.0001)
+        K_FE = FE_K(self.graph).get_K(0.0001)
         self.call_and_print('FE\t0.0001', K_FE)
 
     def test_SP(self):
-        K_SP = sp_kernel(self.graph)
+        K_SP = SP_K(self.graph).get_K(-1)
         self.call_and_print('SP\t', K_SP)
-        K_logFor = kernel.logFor_H(self.graph).get_K(0.001)
+        K_logFor = logFor_H(self.graph).get_K(0.001)
         self.call_and_print('logFor\t0.001', K_logFor)
-        K_RSP = kernel.RSP_K(self.graph).get_K(19.0)
+        K_RSP = RSP_K(self.graph).get_K(19.0)
         self.call_and_print('RSP\t19', K_RSP)
-        K_FE = kernel.FE_K(self.graph).get_K(19.0)
+        K_FE = FE_K(self.graph).get_K(19.0)
         self.call_and_print('FE\t19', K_FE)
