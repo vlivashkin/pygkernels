@@ -1,11 +1,11 @@
 import logging
 import unittest
 
-import util
-from graphs import sample
-from measure import *
-from measure.scaler import AlphaToT, Linear
-from measure.shortcuts import *
+from py_graphs import util
+from py_graphs.graphs import sample
+from py_graphs.measure import *
+from py_graphs.measure.scaler import AlphaToT, Linear
+from py_graphs.measure.shortcuts import *
 
 
 # Chebotarev: Studying new classes of graph metrics

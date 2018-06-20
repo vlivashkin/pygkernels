@@ -3,10 +3,10 @@ import unittest
 
 from sklearn.metrics import normalized_mutual_info_score
 
-import util
-from cluster import KernelKMeans
-from graphs.dataset import *
-from measure import *
+from py_graphs import util
+from py_graphs.cluster import KernelKMeans
+from py_graphs.graphs.dataset import *
+from py_graphs.measure import *
 
 
 # Sommer: Comparison of Graph Node Distances on Clustering Tasks

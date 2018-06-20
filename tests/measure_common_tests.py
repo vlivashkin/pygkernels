@@ -1,10 +1,10 @@
 import unittest
 
-import util
-from graphs import sample
-from measure import *
-from measure import distances
-from measure.shortcuts import *
+from py_graphs import util
+from py_graphs.graphs import sample
+from py_graphs.measure import *
+from py_graphs.measure import distances
+from py_graphs.measure.shortcuts import *
 
 
 class ShortcutsTests(unittest.TestCase):

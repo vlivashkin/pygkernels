@@ -1,7 +1,7 @@
 from scipy.sparse.csgraph import shortest_path
 
-from measure import scaler
-from measure.shortcuts import *
+from py_graphs.measure import scaler
+from py_graphs.measure.shortcuts import *
 
 
 class Distance:

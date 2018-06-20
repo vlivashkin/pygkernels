@@ -4,13 +4,13 @@ import unittest
 
 from sklearn.metrics import adjusted_rand_score
 
-import util
-from cluster import KernelKMeans, SpectralClustering
-from cluster.ward import Ward
-from graphs import dataset
-from graphs import sample
-from measure import H_kernels_plus_RSP_FE, R_kernels
-from measure.shortcuts import *
+from py_graphs import util
+from py_graphs.cluster import KernelKMeans, SpectralClustering
+from py_graphs.cluster.ward import Ward
+from py_graphs.graphs import dataset
+from py_graphs.graphs import sample
+from py_graphs.measure import H_kernels_plus_RSP_FE, R_kernels
+from py_graphs.measure.shortcuts import *
 
 
 class EstimatorsTests(unittest.TestCase):

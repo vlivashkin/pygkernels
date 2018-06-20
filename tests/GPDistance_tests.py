@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
-import util
-from graphs import dataset
-from measure import RSP_vanilla, FE_vanilla, FE, RSP, CT, CT_H
-from measure.shortcuts import get_L, H_to_D
+from py_graphs import util
+from py_graphs.graphs import dataset
+from py_graphs.measure import RSP_vanilla, FE_vanilla, FE, RSP, CT, CT_H
+from py_graphs.measure.shortcuts import get_L, H_to_D
 
 
 # GPDistance

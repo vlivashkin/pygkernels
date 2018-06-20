@@ -1,8 +1,8 @@
 import networkx as nx
 from scipy.linalg import expm
 
-from measure import scaler
-from measure.shortcuts import *
+from py_graphs.measure import scaler
+from py_graphs.measure.shortcuts import *
 
 
 class Kernel:

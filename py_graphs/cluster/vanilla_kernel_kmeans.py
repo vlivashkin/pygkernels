@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.utils import check_random_state
 
-from graphs import dataset
+from py_graphs.graphs import dataset
 
 
 # Francois Fouss, Marco Saerens, Masashi Shimbo

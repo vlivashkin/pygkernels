@@ -3,12 +3,12 @@ import unittest
 
 from sklearn.metrics import normalized_mutual_info_score
 
-import util
-from cluster import KernelKMeans
-from graphs import sample
-from graphs.dataset import *
-from measure import *
-from measure.shortcuts import *
+from py_graphs import util
+from py_graphs.cluster import KernelKMeans
+from py_graphs.graphs import sample
+from py_graphs.graphs.dataset import *
+from py_graphs.measure import *
+from py_graphs.measure.shortcuts import *
 
 
 # Kivimäki: Developments in the theory of randomized shortest paths with a article_comparison of graph node distances

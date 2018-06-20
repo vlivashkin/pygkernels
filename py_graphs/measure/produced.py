@@ -1,6 +1,7 @@
-from measure import scaler, kernel, distance, H_to_D
-from measure.distance import Distance
-from measure.kernel import Kernel
+from py_graphs.measure import scaler, kernel, distance
+from py_graphs.measure.distance import Distance
+from py_graphs.measure.kernel import Kernel
+from py_graphs.measure.shortcuts import H_to_D
 
 
 # H KERNELS
@@ -48,6 +49,7 @@ class SPCT(Distance):
     def get_D(self, lmbda):
         # when lambda = 0 this is CT, when lambda = 1 this is SP
         return lmbda * self.D_SP + (1. - lmbda) * self.D_CT
+
 
 class pWalk(Distance):
     name, default_scaler, parent_kernel_class = 'pWalk', scaler.Rho, kernel.pWalk_H
