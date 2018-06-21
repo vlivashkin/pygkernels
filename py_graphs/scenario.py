@@ -51,13 +51,14 @@ class ParallelByGraphs:
         kernel = kernel_class(edges)
         graph_results = {}
         for param_flat in self.params_flat:
-            param = kernel.scaler.scale(param_flat)
+            param = -1
             try:
+                param = kernel.scaler.scale(param_flat)
                 K = kernel.get_K(param)
                 y_pred = clf.predict(K)
                 ari = self.scorer(nodes, y_pred)
                 graph_results[param_flat] = ari
-            except Exception as e:
+            except Exception or FloatingPointError as e:
                 if self.verbose:
                     logging.error("{}, {:.2f}, graph {}: {}".format(kernel_class.name, param, graph_idx, e))
         return graph_results

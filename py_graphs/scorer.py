@@ -1,4 +1,5 @@
 import itertools
+from collections import defaultdict
 
 import numpy as np
 
@@ -20,6 +21,18 @@ def rand_index(y_true, y_pred):
                 good += 1
             all += 1
     return good / all
+
+
+def copeland(results):
+    scores = defaultdict(lambda: 0)
+    for a, b in list(itertools.combinations(enumerate(results), 2)):
+        if a[1] > b[1]:
+            scores[a[0]] += 1
+            scores[b[0]] -= 1
+        elif a[1] < b[1]:
+            scores[a[0]] -= 1
+            scores[b[0]] += 1
+    return scores
 
 
 def _getMs(comms1, comms2):
