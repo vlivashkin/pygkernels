@@ -25,7 +25,8 @@ def rand_index(y_true, y_pred):
 
 def copeland(results):
     scores = defaultdict(lambda: 0)
-    for a, b in list(itertools.combinations(enumerate(results), 2)):
+    for a, b in list(itertools.combinations(results, 2)):
+
         if a[1] > b[1]:
             scores[a[0]] += 1
             scores[b[0]] -= 1
