@@ -1,5 +1,6 @@
 import os
 from os.path import join as pj
+
 import numpy as np
 
 ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
@@ -120,4 +121,11 @@ news = [
     news_2cl_1, news_2cl_2, news_2cl_3,
     news_3cl_1, news_3cl_2, news_3cl_3,
     news_5cl_1, news_5cl_2, news_5cl_3
+]
+all_datasets = [
+    football,
+    polbooks,
+    # polblogs,
+    zachary,
+    *news
 ]
