@@ -39,7 +39,7 @@ class StochasticBlockModel:
         random_matrix = [[[] for _ in range(self.k)] for _ in range(self.k)]
         for i in range(self.k):
             for j in range(i, self.k):
-                a = np.random.choice([0, 1], edges.shape, p=[1 - self.probabilities[i][j], self.p_in])
+                a = np.random.choice([0, 1], edges.shape, p=[1 - self.probabilities[i][j], self.probabilities[i][j]])
                 random_matrix[i][j] = a
                 random_matrix[j][i] = a
 
