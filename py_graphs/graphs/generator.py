@@ -1,11 +1,12 @@
 import logging
+from itertools import product
 
 import networkx as nx
 import numpy as np
 
 
 class StochasticBlockModel:
-    def __init__(self, n, k, p_in, p_out, cluster_sizes=None):
+    def __init__(self, n, k, p_in, p_out, cluster_sizes=None, probabilities=None):
         self.n = n
         self.k = k
         self.p_in = p_in
@@ -21,17 +22,30 @@ class StochasticBlockModel:
             self.cluster_sizes = [cluster_size] * self.k
             self.n = cluster_size * self.k
 
+        if probabilities is not None:
+            self.probabilities = probabilities
+        else:
+            self.probabilities = np.zeros((self.k, self.k))
+            for i, j in product(range(self.k), range(self.k)):
+                self.probabilities[i][j] = self.p_in if i == j else self.p_out
+
     def generate_graph(self):
         nodes = []
         for i in range(self.k):
             nodes.extend([i] * self.cluster_sizes[i])
 
         edges = np.zeros((self.n, self.n))
-        random_pin = np.random.choice([0, 1], edges.shape, p=[1 - self.p_in, self.p_in])
-        random_pout = np.random.choice([0, 1], edges.shape, p=[1 - self.p_out, self.p_out])
+
+        random_matrix = [[[] for _ in range(self.k)] for _ in range(self.k)]
+        for i in range(self.k):
+            for j in range(i, self.k):
+                a = np.random.choice([0, 1], edges.shape, p=[1 - self.probabilities[i][j], self.p_in])
+                random_matrix[i][j] = a
+                random_matrix[j][i] = a
+
         for i in range(edges.shape[0]):
             for j in range(edges.shape[1]):
-                edges[i][j] = random_pin[i][j] if nodes[i] == nodes[j] else random_pout[i][j]
+                edges[i][j] = random_matrix[nodes[i]][nodes[j]][i][j]
 
         return edges, nodes
 
