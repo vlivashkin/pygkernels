@@ -65,7 +65,7 @@ class ParallelByGraphs:
 
 
 def plot_ax(ax, name, x, y, error, color1, color2):
-    ax.semilogx(x, y, 'k', color=color1, label=name)
+    ax.plot(x, y, color=color1, label=name)
     ax.fill_between(x, y - error, y + error,
                     alpha=0.2, edgecolor=color1, facecolor=color2,
                     linewidth=1, antialiased=True)
