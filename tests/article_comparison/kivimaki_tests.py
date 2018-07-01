@@ -82,7 +82,7 @@ class Table2Tests(unittest.TestCase):
 
     def _newsgroup_results(self, measure_class, best_param, idx):
         results = []
-        for graphs, info in news:
+        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
