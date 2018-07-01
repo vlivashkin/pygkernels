@@ -14,6 +14,7 @@ setup(
         'matplotlib',
         'networkx',
         'numpy',
+        'orange3',
         'scikit-learn',
         'scipy',
         'tqdm'
