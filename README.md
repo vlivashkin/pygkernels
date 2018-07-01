@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/illusionww/py_graphs.svg?branch=master)](https://travis-ci.org/illusionww/py_graphs)
+[![Build Status](https://travis-ci.com/illusionww/py_graphs.svg?branch=master)](https://travis-ci.com/illusionww/py_graphs)
 
 # py_graphs
 
