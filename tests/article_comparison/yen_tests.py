@@ -13,6 +13,7 @@ from py_graphs.scorer import rand_index
 
 # Luh Yen: Graph Nodes Clustering based on the Commute-Time Kernel
 # https://pdfs.semanticscholar.org/1206/63cc9644efbd4a4f92f6dc3d83b78e11791f.pdf
+@unittest.skip
 class Table1Tests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

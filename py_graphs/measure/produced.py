@@ -68,11 +68,11 @@ class logFor(Distance):
 
 
 class Comm(Distance):
-    name, default_scaler, parent_kernel_class, power = 'Comm', scaler.Fraction, kernel.Comm_H, 1
+    name, default_scaler, parent_kernel_class, power = 'Comm', scaler.Fraction, kernel.Comm_H, .5
 
 
 class logComm(Distance):
-    name, default_scaler, parent_kernel_class, power = 'logComm', scaler.Fraction, logComm_H, 1
+    name, default_scaler, parent_kernel_class, power = 'logComm', scaler.Fraction, logComm_H, .5
 
 
 class Heat(Distance):
