@@ -42,10 +42,10 @@ class ParallelByGraphs:
 
         param_dict = {}
         for param, values in raw_param_dict.items():
-            print(len(values), 0.5 * len(graphs))
+            # print(len(values), 0.5 * len(graphs))
             if len(values) >= 0.5 * len(graphs):
                 param_dict[param] = np.nanmean(values), np.nanstd(values)
-        print('param_dict', param_dict)
+        # print('param_dict', param_dict)
         if len(param_dict) > 0:
             x, y, error = zip(*[(x, y[0], y[1]) for x, y in sorted(param_dict.items(), key=lambda x: x[0])])
         else:
