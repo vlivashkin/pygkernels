@@ -45,8 +45,11 @@ class ParallelByGraphs:
             print(len(values), 0.5 * len(graphs))
             if len(values) >= 0.5 * len(graphs):
                 param_dict[param] = np.nanmean(values), np.nanstd(values)
-        print('a', len(param_dict.keys()))
-        x, y, error = zip(*[(x, y[0], y[1]) for x, y in sorted(param_dict.items(), key=lambda x: x[0])])
+        print('param_dict', param_dict)
+        if len(param_dict) > 0:
+            x, y, error = zip(*[(x, y[0], y[1]) for x, y in sorted(param_dict.items(), key=lambda x: x[0])])
+        else:
+            x, y, error = [], [], []
         return np.array(x), np.array(y), np.array(error)
 
     def calc_graph(self, graph, kernel_class, clf, graph_idx):
