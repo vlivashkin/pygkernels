@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score
 
 from py_graphs import util
 from py_graphs.cluster import VanillaKernelKMeans
-from py_graphs.graphs.dataset import news
+from py_graphs.graphs.dataset import news_2cl_3, news_2cl_2, news_2cl_1
 from py_graphs.measure import *
 from py_graphs.scorer import rand_index
 
@@ -31,7 +31,7 @@ class Table1Tests(unittest.TestCase):
 
     def _newsgroup_results(self, name, kernel_func, scorer_func, result_idx, atol):
         results = []
-        for graphs, info in news:
+        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3]:
             A, labels_true = graphs[0]
             K = kernel_func(A)
             labels_pred = VanillaKernelKMeans(n_clusters=info['k']).fit_predict(K)

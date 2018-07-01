@@ -6,7 +6,7 @@ from sklearn.metrics import normalized_mutual_info_score
 from py_graphs import util
 from py_graphs.cluster import KernelKMeans
 from py_graphs.graphs import sample
-from py_graphs.graphs.dataset import *
+from py_graphs.graphs.dataset import news_2cl_3, news_2cl_2, news_2cl_1
 from py_graphs.measure import *
 from py_graphs.measure.shortcuts import *
 
