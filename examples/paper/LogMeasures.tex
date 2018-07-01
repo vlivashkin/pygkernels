@@ -130,7 +130,10 @@
 		\bottomrule
 	\end{tabular}\caption{\label{t_Optt}Optimal family parameters and the corresponding ARI's}
 \end{table}
-		
+
+Ошибка была в том, что подобранные параметры из таблицы выше принадлежат к диапазону $[0, 1]$, а значит их нужно преобразовывать к диапазону, специфичному для конкретной метрики. Я же этого не делал.
+Вторая ошибка состояла в том, что я использовал тут близости вместо расстояний. Еще тогда, когда я строил их в прошлый раз, я заметил, что по близостям logComm совсем не обгоняет остальные меры, но по расстояниям эффект выраженный. Тут его тоже видно:
+
 \begin{figure}[H] %tb
 	\begin{minipage}{.24\textwidth} %49
 		\leftfigure{\includegraphics[width=\linewidth]{pictures/4_pWalk.png}}
@@ -196,8 +199,42 @@
 		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_all.png}}
 		\\\centerline{(a) All families}
 	\end{minipage}%
+	\begin{minipage}{.56\textwidth}
+		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_4best.png}}
+		\\\centerline{(a) All families}
+	\end{minipage}%
 \caption{\label{f_Rcur}Average reject curves}
 \end{figure}
+
+На картинках выше видно, что Comm и logComm ведут себя довольно странно. Я вспомнил, что только из расстояний Comm и logComm мы берем корень. Я не могу вспомнить, чем все-таки он здесь оправдан, но это было нужно для того, чтобы результаты совпадали со статьей Studying new classes of graph metrics. Если убрать корень, то результаты становятся очень похожи на то, что было в "Do Logarithmic Proximity Measures Outperform Plain Ones in Graph Clustering?":
+
+\begin{figure}[H] %tb
+	\begin{minipage}{.33\textwidth}
+		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_Comm_alt.png}}
+		\\\centerline{(a) All families}
+	\end{minipage}%
+	\begin{minipage}{.33\textwidth}
+		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_logComm_alt.png}}
+		\\\centerline{(a) All families}
+	\end{minipage}%
+\caption{\label{f_Rcur}Alternative Comm and logComm}
+\end{figure}
+
+Тогда общая картина будет выглядеть так:
+
+\begin{figure}[H] %tb
+	\begin{minipage}{.56\textwidth}
+		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_all_alt.png}}
+		\\\centerline{(a) All families}
+	\end{minipage}%
+	\begin{minipage}{.56\textwidth}
+		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_4best_alt.png}}
+		\\\centerline{(a) All families}
+	\end{minipage}%
+\caption{\label{f_Rcur}Average reject curves with alternative Comm and logComm}
+\end{figure}
+
+В принципе, еще можно подозревать внешний вид графика pWalk. У меня есть подозрение, почему он такой: мы фиксируем параметр в [0, 1] и для каждого графа преобразуем в параметр меры в зависимости от спектрального радиуса матрицы $A$ ($ param = t / \rho(A)), t \in [0, 1]$). Могу проверить это, но, кажется, это не очень важно.
 
 
 \newpage
@@ -243,6 +280,10 @@ $$}
 
 \newpage
 \section{Cluster analysis on several classical datasets}
+
+Здесь ошибка была в том, что я зафиксировал число классов -- 2, хотя в датасете football их 12.
+Теперь все похоже на статью:
+
 \begin{figure}[H]
 	\begin{minipage}{.32\textwidth}
 		\leftfigure{\includegraphics[width=\linewidth]{pictures/6_football.png}}
@@ -275,6 +316,5 @@ $$}
 	\end{minipage}
   \caption{\label{f_datasets}ARI of various measure families on classical datasets}
 \end{figure}
-
 
 \end{document}
