@@ -1,11 +1,12 @@
 import logging
+import numpy as np
 import unittest
 
 from sklearn.metrics import normalized_mutual_info_score
 
 from py_graphs import util
 from py_graphs.cluster import KernelKMeans
-from py_graphs.graphs.dataset import *
+from py_graphs.graphs.dataset import news_2cl_1, news_2cl_2, news_2cl_3, zachary, football, polbooks
 from py_graphs.measure import *
 
 
@@ -34,9 +35,7 @@ class Table3Tests(unittest.TestCase):
 
     def _dataset_results(self, measure_class, best_param, idx):
         results = []
-        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, news_3cl_1, news_3cl_2, news_3cl_3,
-                             news_5cl_1, news_5cl_2, news_5cl_3, zachary, football  # , polblogs
-                             ]:
+        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, zachary, football, polbooks]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
