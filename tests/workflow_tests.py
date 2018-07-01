@@ -28,9 +28,9 @@ class EstimatorsTests(unittest.TestCase):
         y_pred_kmeans = KernelKMeans(n_clusters=2, max_iter=100, random_state=0).fit_predict(K)
         y_pred_ward = Ward(n_clusters=2).fit_predict(K)
         y_pred_spectral = SpectralClustering(n_clusters=2).fit_predict(K)
-        logging.info('KMeans:', y_pred_kmeans)
-        logging.info('Ward:', y_pred_ward)
-        logging.info('Spectral Clustering:', y_pred_spectral)
+        logging.info('KMeans: {}'.format(y_pred_kmeans))
+        logging.info('Ward: {}'.format(y_pred_ward))
+        logging.info('Spectral Clustering: {}'.format(y_pred_spectral))
 
 
 class WorkflowTests(unittest.TestCase):
