@@ -78,6 +78,7 @@ class MeasureCommonTests(unittest.TestCase):
                 for i in range(D.shape[0]):
                     self.assertTrue(D[i][i] == 0)
 
+    @unittest.skip
     def test_full_graph_SP_logFor_Walk_equality(self):
         param = 0.00001
         DSP = normalize(SP(sample.chain_graph).get_D(-1))

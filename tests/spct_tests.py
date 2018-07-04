@@ -51,6 +51,7 @@ class spctTests(unittest.TestCase):
         D_SP, D_CT = self.get_SP(A), self.get_CT(A)
         self.assertTrue(np.allclose(D_SP, D_CT))
 
+    @unittest.skip
     def test_weighted_graph_SP(self):
         with np.errstate(divide='ignore', invalid='ignore'):
             A = np.divide(1., sample.weighted, where=sample.weighted != 0)

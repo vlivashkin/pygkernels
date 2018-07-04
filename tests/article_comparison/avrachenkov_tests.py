@@ -12,6 +12,7 @@ from tqdm import tqdm
 from py_graphs import util
 from py_graphs.cluster import SpectralClustering
 from py_graphs.graphs import sample
+from py_graphs.graphs.generator import RubanovModel
 from py_graphs.measure import *
 from py_graphs.measure import scaler
 from py_graphs.measure.shortcuts import *
@@ -101,88 +102,91 @@ class Competition(unittest.TestCase):
                         "Test {:0.4f} != True {:0.4f}, diff={:0.4f}".format(error_test, error_true, diff))
 
 
-# class BalancedModel(Competition):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(0.002, *args, **kwargs)  # error bars in paper: 0.002
-#         util.configure_logging()
-#
-#     @classmethod
-#     def setUpClass(cls):
-#         sizes = np.array([100, 100])
-#         probs = np.array([[0.1, 0.02],
-#                           [0.02, 0.1]])
-#
-#         folder = os.path.dirname(os.path.abspath(__file__))
-#
-#         with open(pj(folder, "Grahs_g100_100x100.json"), "r") as fp:
-#             DATA = json.load(fp)
-#
-#         R_COMMS = cls.real_comms(sizes)
-#
-#         GS = [jg.node_link_graph(d) for d in DATA["GS"]]
-#         GS = [(np.array(np.array(nx.adjacency_matrix(g).todense())), R_COMMS) for g in GS]
-#
-#         cls.graphs = GS
-#
-#     @staticmethod
-#     def real_comms(sizes):
-#         return np.array(sum(([i] * size for i, size in enumerate(sizes)), []))
-#
-#     def test_katz(self):
-#         self._compare(Katz_R, None, 0.0072)
-#
-#     def test_communicability(self):
-#         self._compare(Estrada_R, np.linspace(0, 0.3, 101)[1:-1], 0.0084)
-#
-#     def test_heat(self):
-#         self._compare(Heat_R, np.linspace(0, 1.5, 101)[1:-1], 0.0064)
-#
-#     def test_normalizedHeat(self):
-#         self._compare(NormalizedHeat_R, np.linspace(0, 20, 101)[1:-1], 0.0066)
-#
-#     def test_regularizedLaplacian(self):
-#         self._compare(RegularizedLaplacian_R, np.linspace(0, 20, 101)[1:-1], 0.0072)
-#
-#     def test_personalizedPageRank(self):
-#         self._compare(PPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0073)
-#
-#     def test_modifiedPageRank(self):
-#         self._compare(ModifiedPPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0072)
-#
-#     def test_heatPageRank(self):
-#         self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0074)
+@unittest.skip
+class BalancedModel(Competition):
+    def __init__(self, *args, **kwargs):
+        super().__init__(0.002, *args, **kwargs)  # error bars in paper: 0.002
+        util.configure_logging()
 
-# class UnbalancedModel(Competition):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
-#
-#     @classmethod
-#     def setUpClass(cls):
-#         sizes = np.array([50, 150])
-#         probs = np.array([[0.1, 0.02],
-#                           [0.02, 0.1]])
-#         cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
-#
-#     def test_katz(self):
-#         self._compare(Katz, 0.012)
-#
-#     def test_communicability(self):
-#         self._compare(Estrada, 0.011)
-#
-#     def test_heat(self):
-#         self._compare(Heat, 0.026, 0.0104)
-#
-#     def test_normalizedHeat(self):
-#         self._compare(NormalizedHeat, 0.009)
-#
-#     def test_regularizedLaplacian(self):
-#         self._compare(RegularizedLaplacian, 0.0026)
-#
-#     def test_personalizedPageRank(self):
-#         self._compare(PersonalizedPageRank, 0.0021)
-#
-#     def test_modifiedPageRank(self):
-#         self._compare(ModifiedPersonalizedPageRank, 0.0022)
-#
-#     def test_heatPageRank(self):
-#         self._compare(HeatPersonalizedPageRank, 0.0021)
+    @classmethod
+    def setUpClass(cls):
+        sizes = np.array([100, 100])
+        probs = np.array([[0.1, 0.02],
+                          [0.02, 0.1]])
+
+        folder = os.path.dirname(os.path.abspath(__file__))
+
+        with open(pj(folder, "Grahs_g100_100x100.json"), "r") as fp:
+            DATA = json.load(fp)
+
+        R_COMMS = cls.real_comms(sizes)
+
+        GS = [jg.node_link_graph(d) for d in DATA["GS"]]
+        GS = [(np.array(np.array(nx.adjacency_matrix(g).todense())), R_COMMS) for g in GS]
+
+        cls.graphs = GS
+
+    @staticmethod
+    def real_comms(sizes):
+        return np.array(sum(([i] * size for i, size in enumerate(sizes)), []))
+
+    def test_katz(self):
+        self._compare(Katz_R, None, 0.0072)
+
+    def test_communicability(self):
+        self._compare(Estrada_R, np.linspace(0, 0.3, 101)[1:-1], 0.0084)
+
+    def test_heat(self):
+        self._compare(Heat_R, np.linspace(0, 1.5, 101)[1:-1], 0.0064)
+
+    def test_normalizedHeat(self):
+        self._compare(NormalizedHeat_R, np.linspace(0, 20, 101)[1:-1], 0.0066)
+
+    def test_regularizedLaplacian(self):
+        self._compare(RegularizedLaplacian_R, np.linspace(0, 20, 101)[1:-1], 0.0072)
+
+    def test_personalizedPageRank(self):
+        self._compare(PPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0073)
+
+    def test_modifiedPageRank(self):
+        self._compare(ModifiedPPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0072)
+
+    def test_heatPageRank(self):
+        self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0074)
+
+
+@unittest.skip
+class UnbalancedModel(Competition):
+    def __init__(self, *args, **kwargs):
+        super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
+
+    @classmethod
+    def setUpClass(cls):
+        sizes = np.array([50, 150])
+        probs = np.array([[0.1, 0.02],
+                          [0.02, 0.1]])
+        cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
+
+    def test_katz(self):
+        self._compare(Katz_R, 0.012)
+
+    def test_communicability(self):
+        self._compare(Estrada_R, 0.011)
+
+    def test_heat(self):
+        self._compare(Heat_R, 0.026, 0.0104)
+
+    def test_normalizedHeat(self):
+        self._compare(NormalizedHeat_R, 0.009)
+
+    def test_regularizedLaplacian(self):
+        self._compare(RegularizedLaplacian_R, 0.0026)
+
+    def test_personalizedPageRank(self):
+        self._compare(PPageRank_R, 0.0021)
+
+    def test_modifiedPageRank(self):
+        self._compare(ModifiedPPageRank_R, 0.0022)
+
+    def test_heatPageRank(self):
+        self._compare(HeatPPageRank_R, 0.0021)
