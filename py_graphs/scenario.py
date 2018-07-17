@@ -83,3 +83,13 @@ def plot_results(ax, toplot):
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.legend()
+
+
+class PrintOnce:
+    def __init__(self):
+        self.printed = False
+
+    def __call__(self, message):
+        if not self.printed:
+            print(message)
+            self.printed = True

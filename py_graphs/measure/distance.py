@@ -3,17 +3,6 @@ from scipy.sparse.csgraph import shortest_path
 from py_graphs.measure import scaler
 from py_graphs.measure.shortcuts import *
 
-
-class PrintOnce:
-    def __init__(self):
-        self.printed = False
-
-    def __call__(self, message):
-        if not self.printed:
-            print(message)
-            self.printed = True
-
-
 class Distance:
     name, default_scaler, power = None, None, None
     parent_kernel_class = None
@@ -22,17 +11,11 @@ class Distance:
         self.scaler = self.default_scaler(A)
         self.parent_kernel = self.parent_kernel_class(A) if self.parent_kernel_class else None
         self.A = A
-        self.print_once = PrintOnce()
 
     def get_D(self, param):
         H = self.parent_kernel.get_K(param)
         D = H_to_D(H)
-        # return np.power(D, self.power) if self.power else D
-        if self.power == 0.5:
-            self.print_once('np.sqrt(D)')
-            return np.sqrt(D)
-        else:
-            return D
+        return np.power(D, self.power) if self.power else D
 
     def grid_search(self, params=np.linspace(0, 1, 55)):
         results = np.array((params.shape[0],))
