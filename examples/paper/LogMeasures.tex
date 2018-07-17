@@ -29,9 +29,12 @@
 
 \maketitle
 
-\section{Introduction}
+\setcounter{section}{1}
 
 \section{Logarithmic vs. plain measures}
+
+Здесь RI, а не ARI
+
 \begin{figure}[H]
 	\includegraphics[width=.99\linewidth]{pictures/2_1.png}
 	\caption{\label{f_vs1}Logarithmic vs. plain measures for $G(100, (2)0.2, 0.05)$}
@@ -153,11 +156,11 @@
 	\end{minipage}
     \\[6pt]
 	\begin{minipage}{.24\textwidth} %49
-		\leftfigure{\includegraphics[width=\linewidth]{pictures/4_Comm.png}}
+		\leftfigure{\includegraphics[width=\linewidth]{pictures/4_Comm_alt.png}}
 		\\\centerline{(e) Comm}
 	\end{minipage}
 	\begin{minipage}{.24\textwidth} %49
-		\leftfigure{\includegraphics[width=\linewidth]{pictures/4_logComm.png}}
+		\leftfigure{\includegraphics[width=\linewidth]{pictures/4_logComm_alt.png}}
 		\\\centerline{(f) logComm}
 	\end{minipage}
 	\begin{minipage}{.24\textwidth} %49
@@ -196,34 +199,6 @@
 
 \begin{figure}[H] %tb
 	\begin{minipage}{.56\textwidth}
-		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_all.png}}
-		\\\centerline{(a) All families}
-	\end{minipage}%
-	\begin{minipage}{.56\textwidth}
-		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_4best.png}}
-		\\\centerline{(a) All families}
-	\end{minipage}%
-\caption{\label{f_Rcur}Average reject curves}
-\end{figure}
-
-На картинках выше видно, что Comm и logComm ведут себя довольно странно. Я вспомнил, что только из расстояний Comm и logComm мы берем корень. Я не могу вспомнить, чем все-таки он здесь оправдан, но это было нужно для того, чтобы результаты совпадали со статьей Studying new classes of graph metrics. Если убрать корень, то результаты становятся очень похожи на то, что было в "Do Logarithmic Proximity Measures Outperform Plain Ones in Graph Clustering?":
-
-\begin{figure}[H] %tb
-	\begin{minipage}{.33\textwidth}
-		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_Comm_alt.png}}
-		\\\centerline{(a) All families}
-	\end{minipage}%
-	\begin{minipage}{.33\textwidth}
-		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_logComm_alt.png}}
-		\\\centerline{(a) All families}
-	\end{minipage}%
-\caption{\label{f_Rcur}Alternative Comm and logComm}
-\end{figure}
-
-Тогда общая картина будет выглядеть так:
-
-\begin{figure}[H] %tb
-	\begin{minipage}{.56\textwidth}
 		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_all_alt.png}}
 		\\\centerline{(a) All families}
 	\end{minipage}%
@@ -231,10 +206,12 @@
 		\leftfigure{\includegraphics[width=.75\linewidth]{pictures/4_4best_alt.png}}
 		\\\centerline{(a) All families}
 	\end{minipage}%
-\caption{\label{f_Rcur}Average reject curves with alternative Comm and logComm}
+\caption{\label{f_Rcur}Average reject curves}
 \end{figure}
 
-В принципе, еще можно подозревать внешний вид графика pWalk. У меня есть подозрение, почему он такой: мы фиксируем параметр в [0, 1] и для каждого графа преобразуем в параметр меры в зависимости от спектрального радиуса матрицы $A$ ($ param = t / \rho(A)), t \in [0, 1]$). Могу проверить это, но, кажется, это не очень важно.
+Здесь была проблема со взятием корня из Comm/logComm. А проблема была такая: если некоторые значения матрицы D при взятии корня превращаются в nan, то стандартная сортировка оставляет их на тех же позициях и отдельно сортирует массив слева и справа от них. Получается кусочно-возрастающая функция, из которой потом получаются несколько маленьких reject curve вместо одной большой. Решение -- фильтровать эти nan и сортировать без них. Раз такой эффект вообще возник, значит в матрице D иногда появляются отрицательные значения.
+
+Можно подозревать внешний вид графика pWalk. Может быть, это связано с тем, как мы фиксируем параметр. Параметром считаем отскалированое в [0, 1] число, для каждого графа преобразуем его в зависимости от спектрального радиуса матрицы $A$ ($ param = t / \rho(A)), t \in [0, 1]$).
 
 
 \newpage
