@@ -15,6 +15,10 @@ class VanillaKernelKMeans(BaseEstimator, ClusterMixin):
         self.random_state = random_state
 
     def fit(self, K, y=None, sample_weight=None):
+        self.labels_ = self.predict(K)
+        return self
+
+    def predict(self, K):
         n = K.shape[0]
         U = np.zeros((n, self.m))
 
@@ -36,12 +40,7 @@ class VanillaKernelKMeans(BaseEstimator, ClusterMixin):
                 nn[k] = np.sum([U[i][k] for i in range(0, n)])
                 h[k] = U[:, k] / nn[k]
 
-        self.labels_ = np.argmax(U, axis=1)
-
-        return self
-
-    def predict(self, K):
-        pass
+        return np.argmax(U, axis=1)
 
 
 if __name__ == '__main__':

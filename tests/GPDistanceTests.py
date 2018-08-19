@@ -13,7 +13,7 @@ from py_graphs.measure.shortcuts import get_L, H_to_D
 # Result of investigation: my implementation from article is unstable (will call it 'vanilla')
 # version from GPDistance is better, we will use it in general
 
-class GPDistance_tests(unittest.TestCase):
+class GPDistanceTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()

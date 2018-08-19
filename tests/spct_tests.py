@@ -12,7 +12,7 @@ from py_graphs.measure.shortcuts import *
 # This is important:
 # lambda = 0 -> CT
 # lambda = 1 -> SP
-class spctTests(unittest.TestCase):
+class SPCTTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()

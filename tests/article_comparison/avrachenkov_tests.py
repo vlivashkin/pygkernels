@@ -12,7 +12,7 @@ from tqdm import tqdm
 from py_graphs import util
 from py_graphs.cluster import SpectralClustering
 from py_graphs.graphs import sample
-from py_graphs.graphs.generator import RubanovModel
+from py_graphs.graphs.generators import RubanovModel
 from py_graphs.measure import *
 from py_graphs.measure import scaler
 from py_graphs.measure.shortcuts import *
@@ -168,25 +168,25 @@ class UnbalancedModel(Competition):
         cls.graphs, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
 
     def test_katz(self):
-        self._compare(Katz_R, 0.012)
+        self._compare(Katz_R, None, 0.012)
 
     def test_communicability(self):
-        self._compare(Estrada_R, 0.011)
+        self._compare(Estrada_R, np.linspace(0, 0.3, 101)[1:-1], 0.011)
 
     def test_heat(self):
-        self._compare(Heat_R, 0.026, 0.0104)
+        self._compare(Heat_R, np.linspace(0, 1.5, 101)[1:-1], 0.0104)
 
     def test_normalizedHeat(self):
-        self._compare(NormalizedHeat_R, 0.009)
+        self._compare(NormalizedHeat_R, np.linspace(0, 20, 101)[1:-1], 0.009)
 
     def test_regularizedLaplacian(self):
-        self._compare(RegularizedLaplacian_R, 0.0026)
+        self._compare(RegularizedLaplacian_R, np.linspace(0, 20, 101)[1:-1], 0.0026)
 
     def test_personalizedPageRank(self):
-        self._compare(PPageRank_R, 0.0021)
+        self._compare(PPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0021)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPPageRank_R, 0.0022)
+        self._compare(ModifiedPPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0022)
 
     def test_heatPageRank(self):
-        self._compare(HeatPPageRank_R, 0.0021)
+        self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0021)
