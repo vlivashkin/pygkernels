@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/illusionww/py_graphs.svg?branch=master)](https://travis-ci.com/illusionww/py_graphs)
 
-# py_graphs
+# pygraphs
 
 Framework for clustering graphs using various distances/proximity measures.
 
