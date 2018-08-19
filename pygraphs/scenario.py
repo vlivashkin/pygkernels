@@ -5,7 +5,7 @@ import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm_notebook as tqdm
 
-from py_graphs.colors import d3
+from pygraphs.colors import d3
 
 
 def linspace(start, end, count):

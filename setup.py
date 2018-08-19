@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='py_graphs',
+    name='pygraphs',
     version='1.0',
-    packages=['py_graphs'],
+    packages=['pygraphs'],
     url='',
     license='MIT',
     author='Vladimir Ivashkin',

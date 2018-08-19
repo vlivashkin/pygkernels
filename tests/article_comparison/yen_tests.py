@@ -4,11 +4,11 @@ import unittest
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
-from py_graphs import util
-from py_graphs.cluster import VanillaKernelKMeans
-from py_graphs.graphs.dataset import news_2cl_3, news_2cl_2, news_2cl_1
-from py_graphs.measure import *
-from py_graphs.scorer import rand_index
+from pygraphs import util
+from pygraphs.cluster import VanillaKernelKMeans
+from pygraphs.graphs.dataset import news_2cl_3, news_2cl_2, news_2cl_1
+from pygraphs.measure import *
+from pygraphs.scorer import rand_index
 
 
 # Luh Yen: Graph Nodes Clustering based on the Commute-Time Kernel

@@ -2,11 +2,11 @@ import unittest
 
 from sklearn.metrics import adjusted_rand_score
 
-from py_graphs import util
-from py_graphs.cluster import KernelKMeans
-from py_graphs.graphs import sample, dataset
-from py_graphs.measure import *
-from py_graphs.measure.shortcuts import *
+from pygraphs import util
+from pygraphs.cluster import KernelKMeans
+from pygraphs.graphs import sample, dataset
+from pygraphs.measure import *
+from pygraphs.measure.shortcuts import *
 
 
 # This is important:

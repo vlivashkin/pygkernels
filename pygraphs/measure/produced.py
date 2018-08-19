@@ -1,7 +1,7 @@
-from py_graphs.measure import scaler, kernel, distance
-from py_graphs.measure.distance import Distance
-from py_graphs.measure.kernel import Kernel
-from py_graphs.measure.shortcuts import H_to_D
+from pygraphs.measure import scaler, kernel, distance
+from pygraphs.measure.distance import Distance
+from pygraphs.measure.kernel import Kernel
+from pygraphs.measure.shortcuts import H_to_D
 
 
 # H KERNELS

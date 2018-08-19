@@ -9,14 +9,14 @@ import networkx as nx
 import networkx.readwrite.json_graph as jg
 from tqdm import tqdm
 
-from py_graphs import util
-from py_graphs.cluster import SpectralClustering
-from py_graphs.graphs import sample
-from py_graphs.graphs.generators import RubanovModel
-from py_graphs.measure import *
-from py_graphs.measure import scaler
-from py_graphs.measure.shortcuts import *
-from py_graphs.scorer import FC
+from pygraphs import util
+from pygraphs.cluster import SpectralClustering
+from pygraphs.graphs import sample
+from pygraphs.graphs.generators import RubanovModel
+from pygraphs.measure import *
+from pygraphs.measure import scaler
+from pygraphs.measure.shortcuts import *
+from pygraphs.scorer import FC
 
 
 # Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
