@@ -61,7 +61,7 @@ class ParallelByGraphs:
             try:
                 param = kernel.scaler.scale(param_flat)
                 K = kernel.get_K(param)
-                y_pred = clf.predict(K)
+                y_pred = clf.fit_predict(K)
                 ari = self.scorer(nodes, y_pred)
                 graph_results[param_flat] = ari
             except Exception or FloatingPointError as e:
