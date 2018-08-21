@@ -16,6 +16,7 @@
 \usepackage{subcaption}
 \usepackage{multirow}
 \usepackage[table]{xcolor}
+\usepackage{graphicx}
 
 \title{
         Воспроизведение результатов известных статей в \href{https://github.com/illusionww/py_graphs}{py\_graphs} и анализ сравнения.
@@ -299,6 +300,31 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
 
 Взятие корня из CT тоже поправляет метрики. Это воспроизводится и на kMeans (который был проверен выше), и на Ward.
 
+
+\section{Сравнение кластеризаторов Ward и KMeans с реализациями из Sklearn}
+Здесь я построил графики ARI от параметра метрики для основного набора метрик для двух разных реализаций Ward и KMeans: самодельные, которые мы использовали до сих пор, и реализации, предложенные Николаем Козырским.
+
+\begin{figure}[H]
+	\includegraphics[width=.7\linewidth]{pictures/pg-vs-sklearn_pout01_averaging200.png}
+	\caption{\label{f_vs2} Ours vs Sklearn $p_{out}=0.1$ averaging 200}
+\end{figure}
+
+\begin{figure}[H]
+	\includegraphics[width=.7\linewidth]{pictures/pg-vs-sklearn_pout01_averaging500.png}
+	\caption{\label{f_vs2} Ours vs Sklearn $p_{out}=0.1$ averaging 500}
+\end{figure}
+
+\section{Сравнение генератора графов с версией Рубанова}
+
+\begin{figure}[H]
+	\includegraphics[width=.7\linewidth]{pictures/pg-vs-rubanov_pgward_pout01_averaging200.png}
+	\caption{\label{f_vs2} Ours vs Rubanov, ours Ward, $p_{out}=0.1$ averaging 200}
+\end{figure}
+
+\begin{figure}[H]
+	\includegraphics[width=.7\linewidth]{pictures/pg-vs-rubanov_pgward_pout01_averaging200_2.png}
+	\caption{\label{f_vs2} Ours vs Rubanov, ours Ward, $p_{out}=0.1$ averaging 200}
+\end{figure}
 
 \section*{Общий результат}
 
