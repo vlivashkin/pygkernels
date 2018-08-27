@@ -1,6 +1,7 @@
 # Python compiled
 __pycache__/
 *.pyc
+.pytest_cache
 
 # JetBrains
 .idea/

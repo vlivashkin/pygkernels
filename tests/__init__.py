@@ -1,5 +1,5 @@
 from .measure_common_tests import *
-from .GPDistanceTests import *
+from .gpdistance_tests import *
 from .spct_tests import *
 from .workflow_tests import *
 
