@@ -1,21 +1,26 @@
 import logging
 from collections import defaultdict
+from itertools import product, combinations
 
 import numpy as np
 from joblib import Parallel, delayed
+from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm_notebook as tqdm
 
-from pygraphs.colors import d3
+from pygraphs.colors import d3, d3_category20
+from pygraphs.util import ddict2dict
 
-
-def linspace(start, end, count):
-    grid = list(np.linspace(start, end, count))
-    step = (end - start) / (count - 1)
-    grid.extend([0.1 * step, 0.5 * step, end - 0.1 * step, end - 0.5 * step])
-    return sorted(grid)
+d3_right_order = []
+for i in range(6):
+    d3_right_order.extend([d3_category20[2 * i + 1], d3_category20[2 * i]])
+d3_right_order.append(d3_category20[12])
 
 
 class ParallelByGraphs:
+    """
+    High-level class for calculate quality vs. param graphs
+    """
+
     def __init__(self, scorer, params_flat, progressbar=False, verbose=False):
         self.scorer = scorer
         self.params_flat = params_flat
@@ -85,11 +90,78 @@ def plot_results(ax, toplot):
     ax.legend()
 
 
-class PrintOnce:
-    def __init__(self):
-        self.printed = False
+class RejectCurve:
+    """
+    High-level class for calculation i.e. reject curves: tpr vs. fpr
+    """
 
-    def __call__(self, message):
-        if not self.printed:
-            print(message)
-            self.printed = True
+    def __init__(self, n_nodes: list, n_classes: list, p_in: list, p_out: list, kernels: list, distances: list,
+                 generator_class, estimator_class):
+        self.n_nodes = n_nodes
+        self.n_classes = n_classes
+        self.p_in = p_in
+        self.p_out = p_out
+        self.kernels = kernels
+        self.distances = distances
+        self.generator_class = generator_class
+        self.estimator_class = estimator_class
+
+        self.best_params = None
+
+    def calc(self, n_graphs, n_jobs=-1):
+        print("calc data to find best params...")
+        results = defaultdict(lambda: defaultdict(lambda: 0))
+        for column in tqdm(list(product(self.n_nodes, self.n_classes, self.p_in, self.p_out))):
+            n_nodes, n_classes, p_in, p_out = column
+            graphs, info = self.generator_class(n_nodes, n_classes, p_in, p_out).generate_graphs(n_graphs)
+            classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 51), progressbar=True)
+            for kernel_class in tqdm(self.kernels, desc=str(column)):
+                results[column][kernel_class.name] = classic_plot.perform(self.estimator_class, kernel_class, graphs,
+                                                                          n_classes, n_jobs=n_jobs)
+
+        print("find best params...")
+        best_params = defaultdict(lambda: defaultdict(lambda: 0))
+        for column, measures in results.items():
+            for measure_name, measure_results in measures.items():
+                x, y, error = measure_results
+                best_idx = np.argmax(y)
+                print('{}\t{}\t{:0.2f} ({:0.2f})'.format(column, measure_name.ljust(8, ' '), x[best_idx], y[best_idx]))
+                best_params[column][measure_name] = x[best_idx]
+
+        self.best_params = ddict2dict(best_params)
+        return self.best_params
+
+    def _reject_curve(self, K, y_true):
+        y_true_combinations = [0 if a == b else 1 for a, b in combinations(y_true, 2)]
+        K_combinations = [K[a, b] for a, b in combinations(range(K.shape[0]), 2)]
+        pairs = [(x, y) for x, y in zip(K_combinations, y_true_combinations) if not np.isnan(x)]
+        pairs = sorted(pairs, key=lambda x: x[0])
+        tpr, fpr = [0], [0]
+        for _, class_ in pairs:
+            if class_ == 1:
+                increment = 1, 0
+            else:
+                increment = 0, 1
+            tpr.append(tpr[-1] + increment[0])
+            fpr.append(fpr[-1] + increment[1])
+        return np.array(tpr, dtype=np.float) / tpr[-1], np.array(fpr, dtype=np.float) / fpr[-1]
+
+    def perform(self, n_graphs):
+        results = defaultdict(lambda: defaultdict(lambda: list()))
+        for column in tqdm(self.best_params.keys()):
+            n_nodes, n_classes, p_in, p_out = column
+            graphs, info = self.generator_class(n_nodes, n_classes, p_in, p_out).generate_graphs(n_graphs)
+            for edges, nodes in tqdm(graphs, desc=str(column)):
+                for kernel_class in self.distances:
+                    try:
+                        param_flat = self.best_params[column][kernel_class.name + ' H']
+                        mname = kernel_class.name + ' H'
+                    except:
+                        param_flat = self.best_params[column][kernel_class.name + ' K']
+                        mname = kernel_class.name + ' K'
+                    kernel = kernel_class(edges)
+                    best_param = kernel.scaler.scale(param_flat)
+                    K = kernel.get_D(best_param)
+                    tpr, fpr = self._reject_curve(K, nodes)
+                    results[column][mname].append((tpr, fpr))
+        return results

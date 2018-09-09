@@ -7,14 +7,14 @@ from sklearn.utils import deprecated
 
 @deprecated()
 class StochasticBlockModel:
-    def __init__(self, n, k, p_in, p_out, cluster_sizes=None, probabilities=None):
-        self.n = n
-        self.k = k
+    def __init__(self, n_nodes, n_classes, p_in, p_out, cluster_sizes=None, probabilities=None):
+        self.n = n_nodes
+        self.k = n_classes
         self.p_in = p_in
         self.p_out = p_out
 
         if cluster_sizes is not None:
-            if len(cluster_sizes) == k and np.sum(cluster_sizes) == n:
+            if len(cluster_sizes) == n_classes and np.sum(cluster_sizes) == n_nodes:
                 self.cluster_sizes = cluster_sizes
             else:
                 raise ValueError()

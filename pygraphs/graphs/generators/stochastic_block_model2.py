@@ -4,9 +4,9 @@ import numpy as np
 
 
 class StochasticBlockModel2:
-    def __init__(self, n, k, p_in, p_out):
-        self.n = n
-        self.k = k
+    def __init__(self, n_nodes, n_classes, p_in, p_out):
+        self.n = n_nodes
+        self.k = n_classes
         self.p_in = p_in
         self.p_out = p_out
 
