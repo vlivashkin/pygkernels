@@ -17,10 +17,10 @@ class StochasticBlockModel2:
 
         edges = np.zeros((self.n, self.n))
         for i in range(self.n):
-            for j in range(i, self.n):
-                is_in = nodes[i] == nodes[j]
-                k = np.random.choice([0, 1], 1, p=[0.7, 0.3]) if is_in else np.random.choice([0, 1], 1, p=[0.9, 0.1])
-                if (is_in and k) or (not is_in and k):
+            for j in range(i + 1c, self.n):
+                p = self.p_in if nodes[i] == nodes[j] else self.p_out
+                k = np.random.choice([0, 1], p=[1 - p, p])
+                if k:
                     edges[i][j] = 1
                     edges[j][i] = 1
 

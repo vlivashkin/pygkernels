@@ -15,6 +15,24 @@ for i in range(6):
     d3_right_order.extend([d3_category20[2 * i + 1], d3_category20[2 * i]])
 d3_right_order.append(d3_category20[12])
 
+measures_right_order = [
+    'pWalk H',
+    'Walk H',
+    'For H',
+    'logFor H',
+    'Comm H',
+    'logComm H',
+    'Heat H',
+    'logHeat H',
+    'SCT H',
+    'SCCT H',
+    'RSP K',
+    'FE K',
+    'SP-CT H',
+    'SP K',
+    'CT H'
+]
+
 
 class ParallelByGraphs:
     """
@@ -129,7 +147,7 @@ class RejectCurve:
                 best_params[column][measure_name] = x[best_idx]
 
         self.best_params = ddict2dict(best_params)
-        return self.best_params
+        return results
 
     def _reject_curve(self, K, y_true):
         y_true_combinations = [0 if a == b else 1 for a, b in combinations(y_true, 2)]
@@ -151,17 +169,15 @@ class RejectCurve:
         for column in tqdm(self.best_params.keys()):
             n_nodes, n_classes, p_in, p_out = column
             graphs, info = self.generator_class(n_nodes, n_classes, p_in, p_out).generate_graphs(n_graphs)
-            for edges, nodes in tqdm(graphs, desc=str(column)):
-                for kernel_class in self.distances:
+            for edges, nodes in graphs:
+                for distance_class in self.distances:
                     try:
-                        param_flat = self.best_params[column][kernel_class.name + ' H']
-                        mname = kernel_class.name + ' H'
+                        param_flat = self.best_params[column][distance_class.name + ' H']
                     except:
-                        param_flat = self.best_params[column][kernel_class.name + ' K']
-                        mname = kernel_class.name + ' K'
-                    kernel = kernel_class(edges)
+                        param_flat = self.best_params[column][distance_class.name + ' K']
+                    kernel = distance_class(edges)
                     best_param = kernel.scaler.scale(param_flat)
                     K = kernel.get_D(best_param)
                     tpr, fpr = self._reject_curve(K, nodes)
-                    results[column][mname].append((tpr, fpr))
+                    results[column][distance_class.name].append((tpr, fpr))
         return results
