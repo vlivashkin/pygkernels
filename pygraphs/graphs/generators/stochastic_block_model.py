@@ -2,8 +2,10 @@ import logging
 from itertools import product
 
 import numpy as np
+from sklearn.utils import deprecated
 
 
+@deprecated
 class StochasticBlockModel:
     def __init__(self, n, k, p_in, p_out, cluster_sizes=None, probabilities=None):
         self.n = n
