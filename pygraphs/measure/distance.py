@@ -86,7 +86,7 @@ class RSP_vanilla_like(Distance):
         return W, Z
 
 
-@deprecated
+@deprecated()
 class RSP_vanilla(RSP_vanilla_like):
     name, default_scaler = 'RSP vanilla', scaler.FractionReversed
 
@@ -106,7 +106,7 @@ class RSP_vanilla(RSP_vanilla_like):
         return D_RSP
 
 
-@deprecated
+@deprecated()
 class FE_vanilla(RSP_vanilla_like):
     name, default_scaler = 'FE vanilla', scaler.FractionReversed
 

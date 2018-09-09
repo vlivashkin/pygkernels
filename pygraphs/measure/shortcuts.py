@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.utils import deprecated
 
 
-@deprecated
+@deprecated()
 def normalize(dm):
     return dm / dm.std() if dm.std() != 0 else dm
 
