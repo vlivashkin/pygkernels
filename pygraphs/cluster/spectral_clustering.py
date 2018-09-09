@@ -29,5 +29,3 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         sgns = np.sign(np.asarray(X)[max_pos, range(X.shape[1])])
         S = np.asmatrix(np.diag(sgns))
         return np.asmatrix(X) * S
-
-

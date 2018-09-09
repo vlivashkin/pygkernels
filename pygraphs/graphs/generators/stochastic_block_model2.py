@@ -1,5 +1,4 @@
 import logging
-from itertools import product
 
 import numpy as np
 

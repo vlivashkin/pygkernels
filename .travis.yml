@@ -1,7 +1,7 @@
 language: python
 python:
-    - "3.6"
+- "3.6"
 install:
-  - pip install .
+- pip install .
 script:
-    - python -m unittest discover
+- python -m unittest discover

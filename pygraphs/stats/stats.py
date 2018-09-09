@@ -1,7 +1,8 @@
 from statistics import mean, stdev
-from scipy.stats import friedmanchisquare, rankdata, norm
-import matplotlib.pyplot as plt
+
 import Orange
+import matplotlib.pyplot as plt
+from scipy.stats import friedmanchisquare, rankdata
 
 
 def get_stats(results):

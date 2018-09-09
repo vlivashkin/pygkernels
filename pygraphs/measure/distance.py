@@ -3,6 +3,7 @@ from scipy.sparse.csgraph import shortest_path
 from pygraphs.measure import scaler
 from pygraphs.measure.shortcuts import *
 
+
 class Distance:
     name, default_scaler, power = None, None, None
     parent_kernel_class = None
@@ -29,7 +30,7 @@ class SP(Distance):
 
     def get_D(self, param):
         with np.errstate(divide='ignore', invalid='ignore'):
-            A = np.divide(1., self.A, where=lambda x: x!=0)
+            A = np.divide(1., self.A, where=lambda x: x != 0)
         return np.array(shortest_path(A, directed=False), dtype=np.float64)
 
 
@@ -56,6 +57,7 @@ class CT(Distance):
 
     def get_D(self, param):
         return self.commute_distance()
+
 
 class RSP_vanilla_like(Distance):
     def __init__(self, A, C=None):
