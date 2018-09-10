@@ -1,6 +1,7 @@
 import logging
 from collections import defaultdict
 from itertools import product, combinations
+from random import shuffle
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -150,19 +151,19 @@ class RejectCurve:
         return results
 
     def _reject_curve(self, K, y_true):
-        y_true_combinations = [0 if a == b else 1 for a, b in combinations(y_true, 2)]
-        K_combinations = [K[a, b] for a, b in combinations(range(K.shape[0]), 2)]
-        pairs = [(x, y) for x, y in zip(K_combinations, y_true_combinations) if not np.isnan(x)]
+        pairs = [(K[a, b], y_true[a] == y_true[b])
+                 for a, b in combinations(range(K.shape[0]), 2) if a != b and not np.isnan(K[a, b])]
+        shuffle(pairs)
         pairs = sorted(pairs, key=lambda x: x[0])
         tpr, fpr = [0], [0]
-        for _, class_ in pairs:
-            if class_ == 1:
+        for _, same_class in pairs:
+            if same_class:
                 increment = 1, 0
             else:
                 increment = 0, 1
             tpr.append(tpr[-1] + increment[0])
             fpr.append(fpr[-1] + increment[1])
-        return np.array(tpr, dtype=np.float) / tpr[-1], np.array(fpr, dtype=np.float) / fpr[-1]
+        return np.array(fpr, dtype=np.float) / fpr[-1], np.array(tpr, dtype=np.float) / tpr[-1]
 
     def perform(self, n_graphs):
         results = defaultdict(lambda: defaultdict(lambda: list()))

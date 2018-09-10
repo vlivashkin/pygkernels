@@ -308,12 +308,12 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
 \begin{figure}[H] %tb
 	\begin{minipage}{.5\textwidth}
 		\centerline{
-			\includegraphics[width=.9\linewidth]{pictures/pg-vs-rubanov_pgward_pout01_averaging200.png}
+			\includegraphics[width=.9\linewidth]{pictures/pg-vs-rubanov/pgward_pout01_averaging200.png}
 		}
 	\end{minipage}%
 	\begin{minipage}{.5\textwidth}
 		\centerline{
-			\includegraphics[width=.9\linewidth]{pictures/pg-vs-rubanov_pgward_pout01_averaging200_2.png}
+			\includegraphics[width=.9\linewidth]{pictures/pg-vs-rubanov/pgward_pout01_averaging200_2.png}
 		}
 	\end{minipage}%
 \caption{\label{f_Rcur}Ours vs Rubanov, ours Ward, $p_{out}=0.1$ averaging 200 (two runs)}
@@ -329,7 +329,7 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
 Окей, я написал еще один генератор, проще чем оба предыдущие. Новый генератор практически сошелся с генератором Рубанова. Ниже график с усреднением по 20 графам.
 
 \begin{figure}[H]
-	\includegraphics[width=.75\linewidth]{pictures/pg-vs-rubanov-three-gen.png}
+	\includegraphics[width=.75\linewidth]{pictures/pg-vs-rubanov/three-gen.png}
 	\caption{\label{f_vs2} Сравнение трех генераторов}
 \end{figure}
 
@@ -340,12 +340,12 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
 Здесь я построил графики ARI от параметра метрики для основного набора метрик для двух разных реализаций Ward и KMeans: самодельные, которые мы использовали до сих пор, и реализации, предложенные Николаем Козырским.
 
 \begin{figure}[H]
-	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn_pout01_averaging200.png}
+	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn/pout01_averaging200.png}
 	\caption{\label{f_vs2} Ours vs Sklearn $p_{out}=0.1$ averaging 200}
 \end{figure}
 
 \begin{figure}[H]
-	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn_pout01_averaging500.png}
+	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn/pout01_averaging500.png}
 	\caption{\label{f_vs2} Ours vs Sklearn $p_{out}=0.1$ averaging 500}
 \end{figure}
 
@@ -356,17 +356,17 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
 У меня есть некоторое недоверие к методам из sklearn, в документации не написано, что они используются именно для кернелов. Вдруг они оптимизируются при других параметрах, потому что при них кернел больше похож на матрицу расстояний? Решил провести такой эксперимент: взять самый простой граф и посмотреть качество на нем.
 
 \begin{figure}[H]
-	\includegraphics[width=.3\linewidth]{pictures/pg-vs-sklearn-examplegraph.png}
+	\includegraphics[width=.3\linewidth]{pictures/pg-vs-sklearn/examplegraph.png}
 	\caption{\label{f_vs2} Матрица смежности для простого графа}
 \end{figure}
 
 \begin{figure}[H]
-	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn-singlegraph-averaging1.png}
+	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn/singlegraph-averaging1.png}
 	\caption{\label{f_vs2} Зависимость качества от параметра метрики для простого графа}
 \end{figure}
 
 \begin{figure}[H]
-	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn-singlegraph-averaging100.png}
+	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn/singlegraph-averaging100.png}
 	\caption{\label{f_vs2} Зависимость качества от параметра метрики, усредненная на ста запусках для одного и того же простого графа}
 \end{figure}
 
@@ -378,11 +378,113 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
 
 
 \begin{figure}[H]
-	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn-rubanovs-generator.png}
+	\includegraphics[width=.75\linewidth]{pictures/pg-vs-sklearn/rubanovs-generator.png}
 	\caption{\label{f_vs2}}
 \end{figure}
 
 Эта картинка гораздо приятнее выглядит. Здесь почти везде видна корреляция трех графиков. Можно предположить, что моя реализация Ward правильная, но наивная, поэтому она проигрывает.
+
+
+\section{Вопросы по reject curves}
+
+\subsection{}
+\textit{Привлекает внимание Heat (p.4). Частично мы это уже обсуждали. Самое невероятное - что при $p_{out} = 0.1$ для абсолютного большинства графов Heat разделяет классы лучше, чем при $p_{out} = 0.05$. Т.е. при $0.05$ просто нет графов, кот. разделяются так же хорошо, как большинство при $0.1$. Как это возможно? Или лучшие графы при $0.05$ дают переполнение и отбрасываются?}
+	
+\textit{При $p_{out} = 0.1$ есть буквально 5 патологических графов. Что с ними происходит, почему Heat не справляется? Можно было бы предположить, что это графы, где плотность межклассовых связей существенно отклоняется вверх от $0.1$.}
+	
+\textit{При $p_{out} = 0.15$ - единственное широкое равномерное разнообразие - от хорошего до плохого разделения классов. Т.е. Heat необычайно чувствителен к каким-то колебаниям в графе. Некоторые другие меры, например, Walk дают больший разброс при низком $p_{out}$. Совершенно удивительно, что в среднем при этом Heat справляется примерно так же, как при $p_{out} = 0.05$.}
+
+Похоже, у меня есть ответ на этот вопрос. 
+
+Во-первых, был нестабильный генератор. Пересчитанные reject curves для нового генератора:
+
+\begin{figure}[H]
+	\includegraphics[width=.37\linewidth]{pictures/questions/1/rq_all.png}
+	\caption{\label{f_vs2}}
+\end{figure}
+
+
+\begin{figure}[H] %tb
+	\begin{minipage}{.5\textwidth}
+		\centerline{
+			\includegraphics[width=.9\linewidth]{pictures/questions/1/rq_avg_all.png}
+		}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centerline{
+			\includegraphics[width=.9\linewidth]{pictures/questions/1/rq_avg_4.png}
+		}
+	\end{minipage}%
+\caption{\label{f_Rcur} Усреднение}
+\end{figure}
+
+Во-вторых, построение тут ведется в два этапа: сначала мы для сотни сгенерированных графов определяем оптимальные параметры (используя Ward, потому что определить качество без использования кластеризатора нельзя), потом генерируем новые графы и строим графики для определенных ранее параметров. Так как параметр не зафиксирован, при плохом усреднении мы можем получить плохие параметры мер. Вот пример зависимости качества от параметра:
+
+\begin{figure}[H]
+	\includegraphics[width=.5\linewidth]{pictures/questions/1/quality.jpeg}
+	\caption{\label{f_vs2} Heat}
+\end{figure}
+
+Здесь по оси x -- параметр от 0 до 1 (считал с шагом 0.02, поэтому шкала от 0 до 50), яркость обозначает качество (желтый -– 1 по ARI, синий -- 0), первая строчка -- абсолютный результат, вторая – относительный, деленный на максимум в этой строке. 
+
+Здесь видно, например, что оптимальный параметр для Heat для всех параметров $p_{out} = 0.8$, в последних трех строчках видно, что при любом параметре качество близкое к нулю, но максимумом будет параметр близкий к единице, там где Heat вообще, скорее всего, не существует.
+
+Итак, если для всех параметров генерации графов выбрать параметр Heat 0.8, то будут вот такие графы и вот такое усреднение:
+
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{pictures/questions/1/08_all.png}
+	\caption{\label{f_vs2} Графы}
+\end{figure}
+
+\begin{figure}[H]
+	\includegraphics[width=.5\linewidth]{pictures/questions/1/08_avg.png}
+	\caption{\label{f_vs2} Усреднение}
+\end{figure}  
+
+\subsection{}
+\textit{Интересно, что $Comm$ при $p_{out} = 0.05$ обгоняет $logComm$. Еще лучше $SCCT$ -- практически абсолютный результат.}
+
+Теперь не обгоняет =)
+
+
+\subsection{}
+\textit{Интересен вертикальный участок справа у SP. Если это строится так, как я представляю, значит, при любом $p_{out}$ ровно $0.25$ пар "одноклассников" имеют максимальное расстояние, недостижимое для разноклассников. Чему оно равно? 3?}
+
+Да, 3. Вот распределение для одного из графов, сгенерированных для $p_{out} = 0.05$
+\begin{figure}[H]
+	\includegraphics[width=.75\linewidth]{pictures/questions/3/download.png}
+	\caption{\label{f_vs2} Распределения значений матрицы расстояний SP для одного графа}
+\end{figure}
+Кстати, получается что здесь reject curve строится несколько произвольно: точки резких перегибов на своих местах, а вот кривая между ними зависит от порядка вершин в матрице смежности. Это может касаться и других мер: если мы не перемешиваем вершины в матрице смежности, то мы склонны всегда занижать или завышать качество, определенное через reject curve. Сейчас именно такой вариант: оба генератора, прошедшие проверку, не перемешивают вершины.
+Тут есть и еще один вопрос: если значения у SP всего три, то откуда вмозможны три излома? Может быть, я докидываю диагональные элементы, у которых SP=0?
+
+
+\subsection{}
+\textit{Еще было бы интересно построить матрицу ранговых корреляций мер по множеству случайных графов.
+Тогда будет ясно, какие меры наиболее близки, какие далеки в смысле порядка.}
+К сожалению, я не знаю, как это правильно нужно делать, нашел примеры здесь: \url{http://cito-web.yspu.org/link1/metod/theory/node42.html}. Понял это так:
+\begin{enumerate}
+\item У нас есть $n$ измерений, для каждого измерения мы ранжируем меры по результатам
+\item Для каждой пары мер считаем сумму квадратов разностей $\sum_{M_1M_2} d_i^2$
+\item По формуле $r_{M_1M_2} = 1 - \frac{6 * \sum_{M_1M_2} d_i^2}{(n-1)n(n+1}$ (корреляция Спирмена) считаем элементы матрицы корреляций
+\end{enumerate}
+
+Очень просто посчитать такое для нашей таблицы рангов 
+
+
+\subsection{}
+\textit{Берем функцию распределения (кумулятивную, S-образная кривая) ненулевых внутриклассовых расстояний и вычитаем из нее функцию распределения межклассовых расстояний. Должна получиться n-образная кривая. Преимущество ее, например, в том, что она показывает интервал, на котором распределено расстояние.}
+
+\textit{Для эффектности ее можно продифференцировать - тогда экстремумы покажут точки сосредоточения тех и других расстояний. Аналогично можно делать для kernels - будет видно, на distances основной эффект оказывают диагональные или недиагональные эл-ты kernels. (Кстати, недостаток commute time, возможно, - в доминировании эффекта диагонали kernel. И для Forest, возможно, дело в том же.)}
+
+\textit{Это хорошо бы сделать для heat, кот. вел себя странно.}
+
+
+
+\textit{Вот любопытный пример, правда, с равными частотами внутри и вне.  $V = \{a, b, c, d, A, B, С, D\}, E = \{aB, aD, bA, bC, cB, cD, dA, dC\}$, "классы": $K1 = \{a, b, c, d\}, K2 = \{A, B, C, D\}$. Частота внутри: $3/6$, частота вовне $8/16$. При этом $SP$ между классами: 1 или 2, но $SP$ внутри классов для $(a, d)$ и $(A, D)$ равно 3. Интересно, выделит ли эти "классы" какая-либо мера.}
+
+\textit{Но скорее дело обстоит иначе. Ступенчатая кривая может быть связана со специфическим априорным упорядочением пар вершин, определяющим порядок при равном SP. Вертикальные участки могут быть из-за того, что четверть пар одноклассников, имеющих то же SP, что предыдущие, априори стоят позже и потому оказываются в конце. Предлагаю сделать вот что. К каждому SP прибавлять случайное число, распределенное равномерно, скажем, на $[-1/3, 1/3]$ (или меньшем симм. интервале), чтобы снять влияние априорного упорядочения. Как это повлияет на ступенчатость?}
+
 
 \section*{Общий результат}
 
@@ -394,7 +496,7 @@ Heat Personalized PageRank     & 0.0082 & 0.0074 & 0.0008
                 &                          & Chebotarev & Kivim{\"a}ki & Sommer & Avrachenkov & Result \\
                 \hline
 \multirow{18}{*}{Measure} & Shortest path  & +          & \cellcolor{red!25} +/- & \cellcolor{red!25} +/- & & \cellcolor{red!25} - \\
-                & Resistance               & +          & +        &        &             &  \cellcolor{yellow!25} +* \\
+                & Resistance               & +          & +        &        &             & \cellcolor{yellow!25} +* \\
                 & plain Walk               & +          &          &        &             & +      \\
                 & Walk                     & +          &          &        & +           & +      \\
                 & Forest                   & +          &          &        &             & +      \\
