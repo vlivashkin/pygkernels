@@ -101,11 +101,11 @@ def plot_ax(ax, name, x, y, error, color1, color2):
                     linewidth=1, antialiased=True)
 
 
-def plot_results(ax, toplot):
+def plot_results(ax, toplot, xlim=(0, 1), ylim=(-0.01, 1.01)):
     for (name, x, y, error), (color1, color2) in zip(toplot, d3()):
         plot_ax(ax, name, x, y, error, color1, color2)
-    ax.set_xlim(0, 1)
-    ax.set_ylim(-0.01, 1.01)
+    ax.set_xlim(*xlim)
+    ax.set_ylim(*ylim)
     ax.legend()
 
 

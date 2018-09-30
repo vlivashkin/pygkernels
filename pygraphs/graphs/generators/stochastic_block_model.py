@@ -27,7 +27,7 @@ class StochasticBlockModel:
         return edges, nodes
 
     def generate_graphs(self, n_graphs):
-        logging.info('StochasticBlockModel2: count={}, n={}, k={}, p_in={}, p_out={}'.format(
+        logging.info('StochasticBlockModel: count={}, n={}, k={}, p_in={}, p_out={}'.format(
             n_graphs, self.n, self.k, self.p_in, self.p_out))
 
         info = {
