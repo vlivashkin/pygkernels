@@ -60,7 +60,15 @@ __all__ = [
     "RegularizedLaplacian_R",
     "PPageRank_R",
     "ModifiedPPageRank_R",
-    "HeatPPageRank_R"
+    "HeatPPageRank_R",
+
+    # Lists
+    "distances",
+    "H_kernels",
+    "H_kernels_plus_RSP_FE",
+    "K_kernels",
+    "R_kernels",
+    "ALL_kernels"
 ]
 
 distances = [pWalk, Walk, For, logFor, Comm, logComm, Heat, logHeat, SCT, SCCT, RSP, FE, SPCT]

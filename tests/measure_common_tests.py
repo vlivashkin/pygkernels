@@ -8,8 +8,8 @@ from pygraphs.measure.shortcuts import *
 
 
 class ShortcutsTests(unittest.TestCase):
-    def __init__(self, methodName='runTest'):
-        super().__init__(methodName)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         util.configure_logging()
 
         self.A = np.array([

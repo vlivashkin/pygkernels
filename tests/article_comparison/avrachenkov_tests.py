@@ -12,7 +12,7 @@ from tqdm import tqdm
 from pygraphs import util
 from pygraphs.cluster import SpectralClustering
 from pygraphs.graphs import sample
-from pygraphs.graphs.generators import RubanovModel
+from pygraphs.graphs.generator import RubanovModel
 from pygraphs.measure import *
 from pygraphs.measure import scaler
 from pygraphs.measure.shortcuts import *
