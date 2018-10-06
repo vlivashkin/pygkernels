@@ -4,16 +4,19 @@ import numpy as np
 
 
 class StochasticBlockModel:
-    def __init__(self, n_nodes, n_classes, p_in, p_out):
+    def __init__(self, n_nodes, n_classes, p_in, p_out, cluster_sizes=None):
         self.n = n_nodes
         self.k = n_classes
         self.p_in = p_in
         self.p_out = p_out
 
+        if cluster_sizes is None:
+            self.cluster_sizes = self.n // self.k
+
     def generate_graph(self):
         nodes = []
         for i in range(self.k):
-            nodes.extend([i] * (self.n // self.k))
+            nodes.extend([i] * self.cluster_sizes[i])
 
         edges = np.zeros((self.n, self.n))
         for i in range(self.n):
