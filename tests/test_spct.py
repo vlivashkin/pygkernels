@@ -9,10 +9,13 @@ from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
 
 
-# This is important:
-# lambda = 0 -> CT
-# lambda = 1 -> SP
-class SPCTTests(unittest.TestCase):
+class TestSPCT(unittest.TestCase):
+    """
+    This is important:
+    lambda = 0 -> CT
+    lambda = 1 -> SP
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -129,3 +132,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         self.call_and_print('RSP\t19', K_RSP)
         K_FE = FE_K(self.graph).get_K(19.0)
         self.call_and_print('FE\t19', K_FE)
+
+
+if __name__ == "__main__":
+    unittest.main()

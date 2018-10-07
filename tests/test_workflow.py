@@ -13,7 +13,7 @@ from pygraphs.measure import H_kernels_plus_RSP_FE, R_kernels
 from pygraphs.measure.shortcuts import *
 
 
-class EstimatorsTests(unittest.TestCase):
+class TestEstimators(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -33,7 +33,7 @@ class EstimatorsTests(unittest.TestCase):
         logging.info('Spectral Clustering: {}'.format(y_pred_spectral))
 
 
-class WorkflowTests(unittest.TestCase):
+class TestWorkflow(unittest.TestCase):
     def test_ward_clustering(self):
         graphs, info = dataset.polbooks
         for measure in H_kernels_plus_RSP_FE:
@@ -74,3 +74,7 @@ class WorkflowTests(unittest.TestCase):
                 measureparamdict[0.5] = score
             maxparam = max(measureparamdict.items(), key=operator.itemgetter(1))[0]
             logging.info("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))
+
+
+if __name__ == "__main__":
+    unittest.main()

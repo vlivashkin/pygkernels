@@ -1,3 +1,8 @@
+"""
+Kivimäki: Developments in the theory of randomized shortest paths with a article_comparison of graph node distances
+https://arxiv.org/abs/1212.1666
+"""
+
 import logging
 import unittest
 
@@ -11,11 +16,9 @@ from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
 
 
-# Kivimäki: Developments in the theory of randomized shortest paths with a article_comparison of graph node distances
-# https://arxiv.org/abs/1212.1666
+class TestFigure2Comparison(unittest.TestCase):
+    """Figure 2"""
 
-# Figure 2
-class Figure2ComparisonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -64,8 +67,9 @@ class Figure2ComparisonTests(unittest.TestCase):
         self._comparison('FE 20.0', D, 1.0)
 
 
-# Table 2 with optimal values from Table 1
-class Table2Tests(unittest.TestCase):
+class TestTable2(unittest.TestCase):
+    """Table 2 with optimal values from Table 1"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.etalon = {
@@ -125,3 +129,7 @@ class Table2Tests(unittest.TestCase):
 
     def test_SCT(self):
         self._newsgroup_results(SCT_H, 26, 4)
+
+
+if __name__ == "__main__":
+    unittest.main()

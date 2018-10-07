@@ -1,7 +1,13 @@
+"""
+Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
+https://hal.inria.fr/hal-01647915/document
+"""
+
 import json
 import logging
 import os
 import unittest
+from abc import ABC
 from collections import defaultdict
 from os.path import join as pj
 
@@ -19,10 +25,7 @@ from pygraphs.measure.shortcuts import *
 from pygraphs.scorer import FC
 
 
-# Konstantin Avrachenkov, Pavel Chebotarev, Dmytro Rubanov: Kernels on Graphs as Proximity Measures
-# https://hal.inria.fr/hal-01647915/document
-
-class NewMeasuresEqualutyTests(unittest.TestCase):
+class TestNewMeasuresEqualuty(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -57,7 +60,7 @@ class NewMeasuresEqualutyTests(unittest.TestCase):
                             'error in param={:0.3f}'.format(param))
 
 
-class Competition(unittest.TestCase):
+class TestCompetition(unittest.TestCase, ABC):
     def __init__(self, atol, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -103,7 +106,7 @@ class Competition(unittest.TestCase):
 
 
 @unittest.skip
-class BalancedModel(Competition):
+class BalancedModel(TestCompetition):
     def __init__(self, *args, **kwargs):
         super().__init__(0.002, *args, **kwargs)  # error bars in paper: 0.002
         util.configure_logging()
@@ -156,7 +159,7 @@ class BalancedModel(Competition):
 
 
 @unittest.skip
-class UnbalancedModel(Competition):
+class TestUnbalancedModel(TestCompetition):
     def __init__(self, *args, **kwargs):
         super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
 
@@ -190,3 +193,7 @@ class UnbalancedModel(Competition):
 
     def test_heatPageRank(self):
         self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0021)
+
+
+if __name__ == "__main__":
+    unittest.main()

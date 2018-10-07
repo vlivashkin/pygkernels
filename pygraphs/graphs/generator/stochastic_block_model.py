@@ -44,10 +44,10 @@ class StochasticBlockModel:
         edges = np.zeros((self.n, self.n))
         for i in range(self.n):
             for j in range(i + 1, self.n):
-                if self.probability_matrix is None:
-                    p = self.p_in if nodes[i] == nodes[j] else self.p_out
-                else:
+                if self.probability_matrix_mode:
                     p = self.probability_matrix[nodes[i]][nodes[j]]
+                else:
+                    p = self.p_in if nodes[i] == nodes[j] else self.p_out
                 k = np.random.choice([0, 1], p=[1 - p, p])
                 if k:
                     edges[i][j] = 1

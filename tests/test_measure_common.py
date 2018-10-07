@@ -7,7 +7,7 @@ from pygraphs.measure import distances
 from pygraphs.measure.shortcuts import *
 
 
-class ShortcutsTests(unittest.TestCase):
+class TestShortcuts(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -46,7 +46,7 @@ class ShortcutsTests(unittest.TestCase):
         self.assertTrue(np.array_equal(L, self.L))
 
 
-class MeasureCommonTests(unittest.TestCase):
+class TestMeasureCommon(unittest.TestCase):
     def test_chain_all_distances_more_than_zero(self):
         start, end, n_params = 0.1, 0.6, 30
         for distance in distances:
@@ -87,3 +87,7 @@ class MeasureCommonTests(unittest.TestCase):
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
         self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,3 +1,10 @@
+"""
+GPDistance
+https://github.com/jmmcd/GPDistance/blob/master/python/RandomWalks/graph_distances.py
+Result of investigation: my implementation from article is unstable (will call it 'vanilla')
+version from GPDistance is better, we will use it in general
+"""
+
 import unittest
 
 import numpy as np
@@ -8,12 +15,7 @@ from pygraphs.measure import RSP_vanilla, FE_vanilla, FE, RSP, CT, CT_H
 from pygraphs.measure.shortcuts import get_L, H_to_D
 
 
-# GPDistance
-# https://github.com/jmmcd/GPDistance/blob/master/python/RandomWalks/graph_distances.py
-# Result of investigation: my implementation from article is unstable (will call it 'vanilla')
-# version from GPDistance is better, we will use it in general
-
-class GPDistanceTests(unittest.TestCase):
+class TestGPDistance(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -134,3 +136,7 @@ class GPDistanceTests(unittest.TestCase):
     #
     #     self.assertTrue(np.allclose(my_FE, gpd_FE, atol=100., equal_nan=True),
     #                     np.max([x for x in np.abs(my_FE - gpd_FE).ravel() if not np.isnan(x)]))
+
+
+if __name__ == "__main__":
+    unittest.main()

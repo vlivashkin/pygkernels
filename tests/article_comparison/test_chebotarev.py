@@ -8,10 +8,12 @@ from pygraphs.measure.scaler import AlphaToT, Linear
 from pygraphs.measure.shortcuts import *
 
 
-# Chebotarev: Studying new classes of graph metrics
-# https://arxiv.org/abs/1305.7514
+class TestFigure1Comparison(unittest.TestCase):
+    """
+    Chebotarev: Studying new classes of graph metrics
+    https://arxiv.org/abs/1305.7514
+    """
 
-class Figure1ComparisonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.graph = sample.chain_graph
@@ -71,10 +73,13 @@ class Figure1ComparisonTests(unittest.TestCase):
         self._comparison('pWalk 1.0', D, [0.988, 1.025, 1.379, 1.416])
 
 
-# Chebotarev: The Walk Distances in Graphs
-# https://arxiv.org/abs/1103.2059
+#
+class TestTable1Comparison(unittest.TestCase):
+    """
+    Chebotarev: The Walk Distances in Graphs
+    https://arxiv.org/abs/1103.2059
+    """
 
-class Table1ComparisonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.graph = sample.chain_graph
@@ -127,3 +132,7 @@ class Table1ComparisonTests(unittest.TestCase):
         parameter = AlphaToT(self.graph).scale(1.0)
         D = pWalk(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.96, 1.46, 1.03])
+
+
+if __name__ == "__main__":
+    unittest.main()

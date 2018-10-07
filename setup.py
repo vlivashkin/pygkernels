@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pygraphs',
-    version='1.0',
+    version='0.9',
     packages=['pygraphs'],
     url='',
     license='MIT',

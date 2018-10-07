@@ -1,3 +1,8 @@
+"""
+Sommer: Comparison of Graph Node Distances on Clustering Tasks
+no known link to paper
+"""
+
 import logging
 import unittest
 
@@ -10,11 +15,9 @@ from pygraphs.graphs.dataset import news_2cl_1, news_2cl_2, news_2cl_3, football
 from pygraphs.measure import *
 
 
-# Sommer: Comparison of Graph Node Distances on Clustering Tasks
-# no known link to paper
+class TestTable3(unittest.TestCase):
+    """Table 3 with optimal parameters from Table 2"""
 
-# Table 3 with optimal parameters from Table 2
-class Table3Tests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
@@ -90,3 +93,7 @@ class Table3Tests(unittest.TestCase):
 
     def test_SP(self):
         self._dataset_results(SPCT_H, 1, 5)
+
+
+if __name__ == "__main__":
+    unittest.main()

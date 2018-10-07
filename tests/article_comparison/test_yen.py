@@ -1,3 +1,8 @@
+"""
+Luh Yen: Graph Nodes Clustering based on the Commute-Time Kernel
+https://pdfs.semanticscholar.org/1206/63cc9644efbd4a4f92f6dc3d83b78e11791f.pdf
+"""
+
 import logging
 import unittest
 
@@ -82,3 +87,7 @@ class Table1Tests(unittest.TestCase):
     def test_SP_ARI(self):
         self._newsgroup_results('SP ARI', lambda A: SP(A).get_D(-1),
                                 adjusted_rand_score, 1, 0.01)
+
+
+if __name__ == "__main__":
+    unittest.main()

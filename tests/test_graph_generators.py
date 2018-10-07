@@ -3,10 +3,10 @@ from collections import Counter
 
 import numpy as np
 
-from graphs.generator import StochasticBlockModel, RubanovModel
+from pygraphs.graphs.generator import StochasticBlockModel, RubanovModel
 
 
-class GraphGeneratorsTests(unittest.TestCase):
+class TestGraphGenerators(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -43,7 +43,7 @@ class GraphGeneratorsTests(unittest.TestCase):
         self.assertTrue(np.isclose(whole_out_stat, p_out, atol=0.001))
 
     def test_stochasticblockmodel(self):
-        model = StochasticBlockModel(self.n_nodes, 2, self.p_in, self.p_out)
+        model = StochasticBlockModel(self.n_nodes, 2, p_in=self.p_in, p_out=self.p_out)
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)
@@ -53,3 +53,7 @@ class GraphGeneratorsTests(unittest.TestCase):
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)
+
+
+if __name__ == "__main__":
+    unittest.main()
