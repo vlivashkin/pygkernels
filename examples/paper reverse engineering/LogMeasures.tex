@@ -21,7 +21,7 @@
 \usepackage{bm}
 
 \title{
-        Воспроизведение результатов статьи в \href{https://github.com/illusionww/py_graphs}{py\_graphs}.
+        Воспроизведение результатов статьи в \href{https://github.com/illusionww/pygraphs}{pygraphs}.
 }
 \author{Владимир Ивашкин}
 
@@ -33,81 +33,83 @@
 
 \section{Logarithmic vs. plain measures}
 
-Здесь RI, а не ARI
+Не ясно, в оригинале был RI или ARI. Если был ARI, то он на тот момент был неправильным. Привожу тут оба варианта
 
 \begin{figure}[H]
-	\includegraphics[width=.99\linewidth]{pictures/2_1.png}
-	\caption{\label{f_vs1}Logarithmic vs. plain measures for $G(100, (2)0.2, 0.05)$}
+	\includegraphics[width=.99\linewidth]{pictures/2_1_RI.png}
+	\includegraphics[width=.99\linewidth]{pictures/2_1_ARI.png}
+	\caption{\label{f_2_1} $G(100, (2)0.2, 0.05)$, RI and ARI respectively}
 \end{figure}
 
 \begin{figure}[H]
-	\includegraphics[width=.99\linewidth]{pictures/2_2.png}
-	\caption{\label{f_vs2}Logarithmic vs. plain measures for $G(100, (3)0.3, 0.1)$}
+	\includegraphics[width=.99\linewidth]{pictures/2_2_RI.png}
+	\includegraphics[width=.99\linewidth]{pictures/2_2_ARI.png}
+	\caption{\label{f_2_2} $G(100, (3)0.3, 0.1)$, RI and ARI respectively}
 \end{figure}
 
+
 \begin{figure}[H]
-	\includegraphics[width=.99\linewidth]{pictures/2_3.png}
-	\caption{\label{f_vs3}Logarithmic vs. plain measures for $G(200, (2)0.3, 0.1)$}
+	\includegraphics[width=.99\linewidth]{pictures/2_3_RI.png}
+	\includegraphics[width=.99\linewidth]{pictures/2_3_ARI.png}
+	\caption{\label{f_2_3} $G(200, (2)0.3, 0.1)$, RI and ARI respectively}
 \end{figure}
+
 \nopagebreak
 
 
 \newpage
 \section{Competition by Copeland's score}
 \begin{table}[H]{\small
-	\begin{minipage}{.49\textwidth}		
-		\centering
-		\begin{tabular}{lrrrrrrrrr}
-			\toprule
-			\multicolumn{1}{r}{\textbf{Nodes}}         & 100&    100& 100&  100& 200&  200& 200&  200&{\textbf{Sum}} \\
-			\multicolumn{1}{r}{\textbf{Classes}}	   &   2&      2&   4&    4&   2&    2&   4&    4&{\textbf{  of}} \\  %\multicolumn{1}{l}
-			\multicolumn{1}{r}{$\bm{p_{\mathbf{out}}}$}& 0.1&	0.15& 0.1& 0.15& 0.1& 0.15& 0.1& 0.15&{\textbf{scores}} \\
-			\midrule
-            logComm &	383 &	547 &	476 &	-66 &	301 &	565 &	592 &	 &	$\bm{2798}$\\
-            Comm &	249 &	150 &	308 &	418 &	291 &	212 &	325 &	 &	$\bm{1953}$\\
-            SCCT &	316 &	299 &	166 &	44 &	293 &	392 &	412 &	 &	$\bm{1922}$\\
-            logHeat &	308 &	314 &	180 &	-264 &	301 &	321 &	343 &	 &	$\bm{1503}$\\
-            pWalk &	-81 &	26 &	56 &	418 &	-105 &	-155 &	6 &	 &	$\bm{165}$\\
-            SCT &	-74 &	36 &	78 &	44 &	47 &	-24 &	44 &	 &	$\bm{151}$\\
-            Heat &	221 &	-342 &	-456 &	418 &	295 &	205 &	-478 &	 &	$\bm{-137}$\\
-            RSP &	-96 &	4 &	62 &	-272 &	-32 &	-85 &	-30 &	 &	$\bm{-449}$\\
-            Walk &	-90 &	-26 &	78 &	-222 &	-149 &	-125 &	-26 &	 &	$\bm{-560}$\\
-            logFor &	-92 &	-44 &	-24 &	-264 &	-63 &	-92 &	-32 &	 &	$\bm{-611}$\\
-            FE &	-202 &	-64 &	-44 &	-224 &	-135 &	-169 &	-134 &	 &	$\bm{-972}$\\
-            For &	-387 &	-566 &	-456 &	418 &	-525 &	-574 &	-478 &	 &	$\bm{-2568}$\\
-            SP-CT &	-455 &	-334 &	-424 &	-448 &	-519 &	-471 &	-544 &	 &	$\bm{-3195}$\\
-			\bottomrule
-		\end{tabular}
-		\\[8pt]\centerline{(a) optimal parameters}
-	\end{minipage}\ \ \ \ \
-	\begin{minipage}{.49\textwidth}
-		\centering
-		\begin{tabular}{lrrrrrrrrr}
-			\toprule
-			\multicolumn{1}{r}{\textbf{Nodes}}         & 100&    100& 100&  100& 200&  200& 200&  200&{\textbf{Sum}}\\
-			\multicolumn{1}{r}{\textbf{Classes}}	   &   2&      2&   4&    4&   2&    2&   4&    4&{\textbf{  of}}\\ %\multicolumn{1}{l}
-			\multicolumn{1}{r}{$\bm{p_{\mathbf{out}}}$}& 0.1&	0.15& 0.1& 0.15& 0.1& 0.15& 0.1& 0.15&{\textbf{scores}}\\
-			\midrule
-            logComm &	413 &	568 &	448 &	356 &	332 &	568 &	598 &	598 &	$\bm{3881}$\\
-            SCCT &	269 &	274 &	136 &	78 &	340 &	391 &	423 &	360 &	$\bm{2271}$\\
-            logHeat &	318 &	183 &	290 &	142 &	340 &	273 &	202 &	98 &	$\bm{1846}$\\
-            Comm &	168 &	151 &	222 &	172 &	286 &	258 &	333 &	178 &	$\bm{1768}$\\
-            SCT &	58 &	92 &	46 &	90 &	26 &	45 &	38 &	104 &	$\bm{499}$\\
-            logFor &	-114 &	60 &	56 &	110 &	-55 &	-115 &	4 &	88 &	$\bm{34}$\\
-            Walk &	-84 &	-10 &	132 &	86 &	-140 &	-85 &	30 &	66 &	$\bm{-5}$\\
-            pWalk &	-125 &	-40 &	54 &	74 &	-163 &	-79 &	-2 &	-14 &	$\bm{-295}$\\
-            FE &	-198 &	-27 &	-27 &	120 &	-120 &	-186 &	-66 &	32 &	$\bm{-472}$\\
-            RSP &	-151 &	-1 &	-8 &	78 &	-138 &	-179 &	-106 &	-16 &	$\bm{-521}$\\
-            Heat &	299 &	-341 &	-502 &	-490 &	340 &	154 &	-417 &	-515 &	$\bm{-1472}$\\
-            SP-CT &	-463 &	-345 &	-320 &	-228 &	-558 &	-462 &	-446 &	-396 &	$\bm{-3218}$\\
-            For &	-390 &	-564 &	-588 &	-588 &	-490 &	-583 &	-591 &	-583 &	$\bm{-4377}$\\
-			\bottomrule
-		\end{tabular}
-		\\[8pt]\centerline{(b) 90th percentiles}
-	\end{minipage}
-	\caption{\label{t_CopComp}Copeland's scores of the measure families on random graphs}
+	\centering
+	\begin{tabular}{lrrrrrrrrr}
+		\toprule
+		\multicolumn{1}{r}{\textbf{Nodes}}         & 100&    100& 100&  100& 200&  200& 200&  200&{\textbf{Sum}} \\
+		\multicolumn{1}{r}{\textbf{Classes}}	   &   2&      2&   4&    4&   2&    2&   4&    4&{\textbf{  of}} \\
+		\multicolumn{1}{r}{$\bm{p_{\mathbf{out}}}$}& 0.1&	0.15& 0.1& 0.15& 0.1& 0.15& 0.1& 0.15&{\textbf{scores}} \\
+		\midrule
+logComm  & 10 & 512 & 406 & -122 & 580 & 333 & 152 & 600 & $\bm{2471}$\\
+Comm & 4 & 185 & 86 & 448 & 244 & 297 & 442 & 246 & $\bm{1952}$\\
+SCCT & 10 & 287 & 188 & 148 & 289 & 238 & 76 & 458 & $\bm{1694}$\\
+Heat & 10 & -310 & 86 & 448 & 136 & 332 & 442 & -260 & $\bm{884}$\\
+pWalk & -3 & -41 & 86 & 448 & -41 & -106 & 442 & -138 & $\bm{647}$\\
+logHeat & 4 & 67 & -16 & -294 & 202 & 332 & -292 & 166 & $\bm{169}$\\
+SCT & -6 & 51 & -106 & 148 & -39 & 69 & 76 & -42 & $\bm{151}$\\
+logFor & -8 & 33 & -70 & -298 & 3 & -83 & -262 & 50 & $\bm{-635}$\\
+FE & 0 & -12 & -104 & -294 & -97 & -102 & -294 & -4 & $\bm{-907}$\\
+For & -10 & -560 & 86 & 448 & -568 & -546 & 442 & -260 & $\bm{-968}$\\
+RSP & -3 & 92 & -132 & -358 & -107 & -1 & -336 & -124 & $\bm{-969}$\\
+Walk & 4 & 20 & -40 & -316 & -144 & -221 & -346 & -98 & $\bm{-1141}$\\
+SP-CT & -12 & -324 & -470 & -406 & -458 & -542 & -542 & -594 & $\bm{-3348}$\\
+		\bottomrule
+	\end{tabular}
+	\caption{\label{t_CopComp} Optimal parameters}
 }\end{table}
 
+\begin{table}[H]{\small
+	\centering
+	\begin{tabular}{lrrrrrrrrr}
+		\toprule
+		\multicolumn{1}{r}{\textbf{Nodes}}         & 100&    100& 100&  100& 200&  200& 200&  200&{\textbf{Sum}}\\
+		\multicolumn{1}{r}{\textbf{Classes}}	   &   2&      2&   4&    4&   2&    2&   4&    4&{\textbf{  of}}\\
+		\multicolumn{1}{r}{$\bm{p_{\mathbf{out}}}$}& 0.1&	0.15& 0.1& 0.15& 0.1& 0.15& 0.1& 0.15&{\textbf{scores}}\\
+		\midrule
+logComm & 440 & 501 & 466 & 340 & 398 & 565 & 574 & 582 & $\bm{3866}$\\
+SCCT & 263 & 295 & 360 & 184 & 295 & 397 & 438 & 370 & $\bm{2602}$\\
+Comm & 109 & 149 & 106 & 120 & 198 & 60 & 168 & 158 & $\bm{1068}$\\
+logHeat & 236 & 59 & 80 & 32 & 391 & 11 & 148 & 98 & $\bm{1055}$\\
+logFor & -23 & 57 & 148 & 116 & -126 & 44 & 134 & 94 & $\bm{444}$\\
+FE & -74 & 80 & 50 & 120 & -30 & 30 & 38 & 52 & $\bm{266}$\\
+Walk & -79 & 119 & 114 & 102 & -84 & -4 & 20 & 76 & $\bm{264}$\\
+SCT & -27 & 27 & 4 & -32 & 52 & -6 & 36 & 30 & $\bm{84}$\\
+pWalk & 45 & 1 & 20 & 10 & -62 & -31 & -10 & 26 &$\bm{-1}$\\
+Heat & 296 & -322 & -492 & -445 & 386 & 249 & -215 & -472 & $\bm{-1015}$\\
+RSP & -313 & -117 & -16 & 14 & -338 & -268 & -280 & -84 & $\bm{-1402}$\\
+SP-CT & -482 & -287 & -250 & 0 & -585 & -460 & -452 & -352 & $\bm{-2868}$\\
+For & -391 & -562 & -590 & -561 & -495 & -587 & -599 & -578 & $\bm{-4363}$\\
+		\bottomrule
+	\end{tabular}
+	\caption{\label{t_CopComp} 90th percentiles}
+}\end{table}
 
 \newpage
 \section{Reject curves}

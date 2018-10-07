@@ -10,7 +10,7 @@ class StochasticBlockModel:
         self.p_in = p_in
         self.p_out = p_out
 
-        self.cluster_sizes = cluster_sizes if cluster_sizes is not None else self.n // self.k
+        self.cluster_sizes = cluster_sizes if cluster_sizes is not None else [self.n // self.k] * self.k
 
     def generate_graph(self):
         nodes = []

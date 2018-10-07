@@ -1,3 +1,5 @@
+from abc import ABC
+
 import numpy as np
 import numpy.matlib
 
@@ -9,7 +11,7 @@ from .shortcuts import get_D, get_L
 # Avrachenkov: Kernels on Graphs as Proximity Measures
 # Implementation by Dmytro Rubanov
 
-class KernelNew(Kernel):
+class KernelNew(Kernel, ABC):
     name, default_scaler = None, None
 
     @staticmethod

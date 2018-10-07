@@ -1,3 +1,5 @@
+from abc import ABC
+
 import networkx as nx
 from scipy.linalg import expm
 
@@ -5,7 +7,7 @@ from pygraphs.measure import scaler
 from pygraphs.measure.shortcuts import *
 
 
-class Kernel:
+class Kernel(ABC):
     name, default_scaler = None, None
     parent_distance_class, parent_kernel_class = None, None
 

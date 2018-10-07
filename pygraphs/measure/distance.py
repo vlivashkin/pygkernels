@@ -1,10 +1,12 @@
+from abc import ABC
+
 from scipy.sparse.csgraph import shortest_path
 
 from pygraphs.measure import scaler
 from pygraphs.measure.shortcuts import *
 
 
-class Distance:
+class Distance(ABC):
     name, default_scaler, power = None, None, None
     parent_kernel_class = None
 
@@ -59,7 +61,7 @@ class CT(Distance):
         return self.commute_distance()
 
 
-class RSP_vanilla_like(Distance):
+class RSP_vanilla_like(Distance, ABC):
     def __init__(self, A, C=None):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
@@ -130,7 +132,7 @@ class FE_vanilla(RSP_vanilla_like):
 
 
 # From https://github.com/jmmcd/GPDistance
-class RSP_like(Distance):
+class RSP_like(Distance, ABC):
     def __init__(self, A):
         super().__init__(A)
 

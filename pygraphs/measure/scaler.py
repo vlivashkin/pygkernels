@@ -1,7 +1,9 @@
+from abc import ABC
+
 import numpy as np
 
 
-class Scaler:
+class Scaler(ABC):
     def __init__(self, A=None):
         self.A = A
 
