@@ -66,7 +66,7 @@ class StochasticBlockModel:
             'cluster_sizes_mode': self.cluster_sizes_mode,
             'probability_matrix_mode': self.probability_matrix_mode
         }
-        if self.probability_matrix_mode:
+        if not self.probability_matrix_mode:
             info.update({
                 'p_in': self.p_in,
                 'p_out': self.p_out
