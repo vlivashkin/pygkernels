@@ -60,8 +60,8 @@ measures_right_order = [
     'RSP K',
     'FE K',
     'SP-CT H',
-    'SP K',
-    'CT H'
+    # 'SP K',
+    # 'CT H'
 ]
 
 
