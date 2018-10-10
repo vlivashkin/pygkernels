@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from itertools import product, combinations
+from itertools import combinations
 from random import shuffle
 
 import numpy as np
@@ -60,8 +60,8 @@ measures_right_order = [
     'RSP K',
     'FE K',
     'SP-CT H',
-    # 'SP K',
-    # 'CT H'
+    'SP K',
+    'CT H'
 ]
 
 
@@ -76,8 +76,8 @@ class ParallelByGraphs:
         self.progressbar = progressbar
         self.verbose = verbose
 
-    def perform(self, clf_class, kernel_class, graphs, n_class, n_jobs=1):
-        clf = clf_class(n_class)
+    def perform(self, estimator_class, kernel_class, graphs, n_class, n_jobs=1):
+        clf = estimator_class(n_class)
 
         raw_param_dict = defaultdict(list)
         if self.progressbar:
@@ -144,46 +144,49 @@ class RejectCurve:
     High-level class for calculation i.e. reject curves: tpr vs. fpr
     """
 
-    def __init__(self, n_nodes: list, n_classes: list, p_in: list, p_out: list, kernels: list, distances: list,
-                 generator_class, estimator_class):
-        self.n_nodes = n_nodes
-        self.n_classes = n_classes
-        self.p_in = p_in
-        self.p_out = p_out
-        self.kernels = kernels
+    def __init__(self, columns: list, distances: list, generator_class, n_graphs):
+        self.columns = columns
         self.distances = distances
         self.generator_class = generator_class
-        self.estimator_class = estimator_class
 
-        self.best_params = None
+        self._best_params = None
 
-    def calc(self, n_graphs, n_jobs=-1):
+    def set_best_params(self, best_params):
+        sorted_distance_names = sorted([x.name for x in self.distances])
+        assert sorted(list(best_params.keys())) == sorted(self.columns)
+        for distances_in_column in [x.keys() for x in best_params.values()]:
+            assert sorted(distances_in_column) == sorted_distance_names
+        self._best_params = best_params
+
+    def calc_best_params(self, kernels: list, estimator_class, n_graphs, n_jobs=-1):
         print("calc data to find best params...")
         results = defaultdict(lambda: defaultdict(lambda: 0))
-        for column in tqdm(list(product(self.n_nodes, self.n_classes, self.p_in, self.p_out))):
+        for column in tqdm(self.columns):
             n_nodes, n_classes, p_in, p_out = column
-            graphs, info = self.generator_class(n_nodes, n_classes, p_in, p_out).generate_graphs(n_graphs)
+            graphs, info = self.generator_class(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
             classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 51), progressbar=True)
-            for kernel_class in tqdm(self.kernels, desc=str(column)):
-                results[column][kernel_class.name] = classic_plot.perform(self.estimator_class, kernel_class, graphs,
+            for kernel_class in tqdm(kernels, desc=str(column)):
+                results[column][kernel_class.name] = classic_plot.perform(estimator_class, kernel_class, graphs,
                                                                           n_classes, n_jobs=n_jobs)
 
         print("find best params...")
         best_params = defaultdict(lambda: defaultdict(lambda: 0))
-        for column, measures in results.items():
-            for measure_name, measure_results in measures.items():
-                x, y, error = measure_results
+        for column, kernels_results in results.items():
+            for kernel_name, kernel_results in kernels_results.items():
+                x, y, error = kernel_results
                 best_idx = np.argmax(y)
-                print('{}\t{}\t{:0.2f} ({:0.2f})'.format(column, measure_name.ljust(8, ' '), x[best_idx], y[best_idx]))
-                best_params[column][measure_name] = x[best_idx]
+                print('{}\t{}\t{:0.2f} ({:0.2f})'.format(column, kernel_name.ljust(8, ' '), x[best_idx], y[best_idx]))
+                best_params[column][kernel_name[:-2]] = x[best_idx]
 
-        self.best_params = ddict2dict(best_params)
+        self._best_params = ddict2dict(best_params)
         return results
 
-    def _reject_curve(self, K, y_true):
+    @staticmethod
+    def _reject_curve(K, y_true, need_shuffle):
         pairs = [(K[a, b], y_true[a] == y_true[b])
                  for a, b in combinations(range(K.shape[0]), 2) if a != b and not np.isnan(K[a, b])]
-        shuffle(pairs)
+        if need_shuffle:
+            shuffle(pairs)
         pairs = sorted(pairs, key=lambda x: x[0])
         tpr, fpr = [0], [0]
         for _, same_class in pairs:
@@ -195,20 +198,17 @@ class RejectCurve:
             fpr.append(fpr[-1] + increment[1])
         return np.array(fpr, dtype=np.float) / fpr[-1], np.array(tpr, dtype=np.float) / tpr[-1]
 
-    def perform(self, n_graphs):
+    def perform(self, n_graphs, need_shuffle=True):
         results = defaultdict(lambda: defaultdict(lambda: list()))
-        for column in tqdm(self.best_params.keys()):
+        for column in tqdm(self._best_params.keys()):
             n_nodes, n_classes, p_in, p_out = column
-            graphs, info = self.generator_class(n_nodes, n_classes, p_in, p_out).generate_graphs(n_graphs)
+            graphs, info = self.generator_class(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
             for edges, nodes in graphs:
                 for distance_class in self.distances:
-                    try:
-                        param_flat = self.best_params[column][distance_class.name + ' H']
-                    except:
-                        param_flat = self.best_params[column][distance_class.name + ' K']
-                    kernel = distance_class(edges)
-                    best_param = kernel.scaler.scale(param_flat)
-                    K = kernel.get_D(best_param)
-                    tpr, fpr = self._reject_curve(K, nodes)
+                    param_flat = self._best_params[column][distance_class.name]
+                    distance = distance_class(edges)
+                    best_param = distance.scaler.scale(param_flat)
+                    D = distance.get_D(best_param)
+                    tpr, fpr = self._reject_curve(D, nodes, need_shuffle=need_shuffle)
                     results[column][distance_class.name].append((tpr, fpr))
         return results
