@@ -10,8 +10,7 @@ from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
 from pygraphs.cluster import KernelKMeans
-from pygraphs.graphs import sample
-from pygraphs.graphs.dataset import news_2cl_3, news_2cl_2, news_2cl_1
+from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
 
@@ -22,7 +21,7 @@ class TestFigure2Comparison(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
-        self.graph = sample.triangle_graph
+        self.graph = Samples.triangle_graph
 
     def _comparison(self, name, D, true_value, atol=0.02):
         div = D[0, 1] / D[1, 2]
@@ -83,10 +82,11 @@ class TestTable2(unittest.TestCase):
             'news_5cl_2': (64.0, 64.6, 58.7, 59.6, 60.4),
             'news_5cl_3': (61.2, 61.6, 57.3, 47.8, 57.3),
         }
+        self.datasets = Datasets()
 
     def _newsgroup_results(self, measure_class, best_param, idx):
         results = []
-        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3]:
+        for graphs, info in [self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3']]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)

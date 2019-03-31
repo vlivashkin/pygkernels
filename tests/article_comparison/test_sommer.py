@@ -11,7 +11,7 @@ from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
 from pygraphs.cluster import KernelKMeans
-from pygraphs.graphs.dataset import news_2cl_1, news_2cl_2, news_2cl_3, football
+from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
 
@@ -35,10 +35,12 @@ class TestTable3(unittest.TestCase):
             'polblogs': (0.5525, 0.5813, 0.5811, 0.5815, 0.5757, 0.5605),
             'zachary': (1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000)
         }
+        self.datasets = Datasets()
 
     def _dataset_results(self, measure_class, best_param, idx):
         results = []
-        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3, football]:  # , polblogs
+        for graphs, info in [self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
+                             self.datasets['football']]:  # , polblogs
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)

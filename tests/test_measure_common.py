@@ -1,7 +1,7 @@
 import unittest
 
 from pygraphs import util
-from pygraphs.graphs import sample
+from pygraphs.graphs import Samples
 from pygraphs.measure import *
 from pygraphs.measure import distances
 from pygraphs.measure.shortcuts import *
@@ -50,7 +50,7 @@ class TestMeasureCommon(unittest.TestCase):
     def test_chain_all_distances_more_than_zero(self):
         start, end, n_params = 0.1, 0.6, 30
         for distance in distances:
-            distance = distance(sample.chain_graph)
+            distance = distance(Samples.chain_graph)
             for idx, param in enumerate(distance.scaler.scale_list(np.linspace(start, end, n_params))):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
@@ -61,7 +61,7 @@ class TestMeasureCommon(unittest.TestCase):
     def test_chain_all_distances_symmetry_matrix(self):
         start, end, n_params = 0.1, 0.6, 30
         for distance in distances:
-            distance = distance(sample.chain_graph)
+            distance = distance(Samples.chain_graph)
             for param in distance.scaler.scale_list(np.linspace(start, end, n_params)):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
@@ -72,7 +72,7 @@ class TestMeasureCommon(unittest.TestCase):
     def test_chain_all_distances_main_diagonal_zero(self):
         start, end, n_params = 0.0001, 0.5, 30
         for distance in distances:
-            distance = distance(sample.chain_graph)
+            distance = distance(Samples.chain_graph)
             for param in np.linspace(start, end, n_params):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
@@ -81,9 +81,9 @@ class TestMeasureCommon(unittest.TestCase):
     @unittest.skip
     def test_full_graph_SP_logFor_Walk_equality(self):
         param = 0.00001
-        DSP = normalize(SP(sample.chain_graph).get_D(-1))
-        DlogFor = normalize(logFor(sample.chain_graph).get_D(param))
-        DWalk = normalize(Walk(sample.chain_graph).get_D(param))
+        DSP = normalize(SP(Samples.chain_graph).get_D(-1))
+        DlogFor = normalize(logFor(Samples.chain_graph).get_D(param))
+        DWalk = normalize(Walk(Samples.chain_graph).get_D(param))
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
         self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))

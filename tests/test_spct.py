@@ -4,8 +4,7 @@ from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
 from pygraphs.cluster import KernelKMeans
-from pygraphs.graphs import sample, dataset
-from pygraphs.graphs.generator import StochasticBlockModel
+from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
 
@@ -24,42 +23,42 @@ class TestSPCT(unittest.TestCase):
         self.get_SP = lambda A: SPCT(A).get_D(1)
 
     def test_SPCT_order(self):
-        A = sample.diploma_matrix
+        A = Samples.diploma_matrix
         D_SP, D_CT = SP(A).get_D(-1), 2 * H_to_D(CT_H(A).get_K(-1))
         self.assertTrue(np.allclose(D_SP, self.get_SP(A)))
         self.assertTrue(np.allclose(D_CT, self.get_CT(A)))
 
     def test_tree_SPCT_inequality(self):
-        A = sample.diploma_matrix
+        A = Samples.diploma_matrix
         D_SP, D_CT = self.get_SP(A), self.get_CT(A)
         self.assertFalse(np.allclose(D_SP, D_CT))
 
     def test_chain_SPCT_equality(self):
-        A = sample.chain_graph
+        A = Samples.chain_graph
         D_SP, D_CT = self.get_SP(A), self.get_CT(A)
         self.assertTrue(np.allclose(D_SP, D_CT))
 
     def test_big_chain_SPCT_equality(self):
-        A = sample.big_chain
+        A = Samples.big_chain
         D_SP, D_CT = self.get_SP(A), self.get_CT(A)
         self.assertTrue(np.allclose(D_SP, D_CT))
 
     def test_full_graph_SPCT_equality(self):
-        A = sample.full_graph
+        A = Samples.full_graph
         sp_normed = normalize(self.get_SP(A))
         ct_normed = normalize(self.get_CT(A))
         self.assertTrue(np.allclose(sp_normed, ct_normed))
 
     def test_tree_SPCT_equality(self):
-        A = sample.tree_matrix
+        A = Samples.tree_matrix
         D_SP, D_CT = self.get_SP(A), self.get_CT(A)
         self.assertTrue(np.allclose(D_SP, D_CT))
 
     @unittest.skip
     def test_weighted_graph_SP(self):
         with np.errstate(divide='ignore', invalid='ignore'):
-            A = np.divide(1., sample.weighted, where=sample.weighted != 0)
-        true_SP = sample.weighted_sp
+            A = np.divide(1., Samples.weighted, where=Samples.weighted != 0)
+        true_SP = Samples.weighted_sp
         self.assertTrue(np.allclose(self.get_SP(A), true_SP))
 
     # def test_compare_clustering_quality(self):
@@ -107,7 +106,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
 
-        graph, info = dataset.zachary
+        graph, info = Datasets().zachary
         self.graph, self.y_true = graph[0]
 
     def call_and_print(self, name, K):

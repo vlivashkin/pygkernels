@@ -2,7 +2,7 @@ import logging
 import unittest
 
 from pygraphs import util
-from pygraphs.graphs import sample
+from pygraphs.graphs import Samples
 from pygraphs.measure import *
 from pygraphs.measure.scaler import AlphaToT, Linear
 from pygraphs.measure.shortcuts import *
@@ -16,7 +16,7 @@ class TestFigure1Comparison(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.graph = sample.chain_graph
+        self.graph = Samples.chain_graph
         util.configure_logging()
 
     def _comparison(self, name, D, true_values, atol=0.001):
@@ -82,7 +82,7 @@ class TestTable1Comparison(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.graph = sample.chain_graph
+        self.graph = Samples.chain_graph
         util.configure_logging()
 
     def _comparison(self, name, D, true_values, atol=0.01):

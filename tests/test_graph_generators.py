@@ -3,7 +3,7 @@ from collections import Counter
 
 import numpy as np
 
-from pygraphs.graphs.generator import StochasticBlockModel, RubanovModel
+from pygraphs.graphs import StochasticBlockModel, RubanovModel
 
 
 class TestGraphGenerators(unittest.TestCase):

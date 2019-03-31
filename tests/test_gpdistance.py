@@ -10,7 +10,7 @@ import unittest
 import numpy as np
 
 from pygraphs import util
-from pygraphs.graphs import dataset
+from pygraphs.graphs import Datasets
 from pygraphs.measure import RSP_vanilla, FE_vanilla, FE, RSP, CT, CT_H
 from pygraphs.measure.shortcuts import get_L, H_to_D
 
@@ -65,7 +65,7 @@ class TestGPDistance(unittest.TestCase):
         self.assertTrue(np.array_equal(L_test, L_true))
 
     def test_compare_CT_and_Resistance(self):
-        graphs, info = dataset.news_2cl_1
+        graphs, info = Datasets().news_2cl_1
         A, y_true = graphs[0]
         D_CT = CT(A).get_D(-1)
         D_R = H_to_D(CT_H(A).get_K(-1))

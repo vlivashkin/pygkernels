@@ -17,8 +17,7 @@ from tqdm import tqdm
 
 from pygraphs import util
 from pygraphs.cluster import SpectralClustering
-from pygraphs.graphs import sample
-from pygraphs.graphs.generator import RubanovModel
+from pygraphs.graphs import Samples, RubanovModel
 from pygraphs.measure import *
 from pygraphs.measure import scaler
 from pygraphs.measure.shortcuts import *
@@ -29,7 +28,7 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
-        self.graph = sample.diploma_matrix
+        self.graph = Samples.diploma_matrix
 
     def test_katz(self):
         walk = Walk_H(self.graph)
@@ -119,7 +118,7 @@ class BalancedModel(TestCompetition):
 
         folder = os.path.dirname(os.path.abspath(__file__))
 
-        with open(pj(folder, "Grahs_g100_100x100.json"), "r") as fp:
+        with open(pj(folder, "sample_graphs/Graphs_g100_100x100.json"), "r") as fp:
             DATA = json.load(fp)
 
         R_COMMS = cls.real_comms(sizes)

@@ -2,6 +2,8 @@ import os
 from os.path import join as pj
 
 import numpy as np
+from collections import namedtuple
+Car = namedtuple('Car' , 'color mileage')
 
 ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
 
@@ -120,6 +122,22 @@ class Datasets:
 
     _loaded_datasets = {}
 
+    @property
+    def newsgroup(self):
+        newsgroup_names = ['news_2cl_1', 'news_2cl_2', 'news_2cl_3',
+                           'news_3cl_1', 'news_3cl_2', 'news_3cl_3',
+                           'news_5cl_1', 'news_5cl_2', 'news_5cl_3']
+        return [self[x] for x in newsgroup_names]
+
+    @property
+    def webkb(self):
+        webkb_names = ['webkb_cornel', 'webkb_texas', 'webkb_washington', 'webkb_wisconsin']
+        return [self[x] for x in webkb_names]
+
+    @property
+    def all(self):
+        return [self[x] for x in self._lazy_datasets.keys()]
+
     @staticmethod
     def load_polbooks_or_football(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
@@ -155,3 +173,6 @@ class Datasets:
         if item not in self._loaded_datasets:
             self._loaded_datasets[item] = self._lazy_datasets[item]()
         return self._loaded_datasets[item]
+
+    def __getattr__(self, name):
+        return self[name]

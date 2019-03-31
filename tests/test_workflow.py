@@ -7,8 +7,7 @@ from sklearn.metrics import adjusted_rand_score
 from pygraphs import util
 from pygraphs.cluster import KernelKMeans, SpectralClustering
 from pygraphs.cluster.ward import Ward
-from pygraphs.graphs import dataset
-from pygraphs.graphs import sample
+from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import H_kernels_plus_RSP_FE, R_kernels
 from pygraphs.measure.shortcuts import *
 
@@ -19,11 +18,11 @@ class TestEstimators(unittest.TestCase):
         util.configure_logging()
 
     def test_simple_Ward(self):
-        y_pred = Ward(2).predict(sample.diploma_matrix)
+        y_pred = Ward(2).predict(Samples.diploma_matrix)
         logging.info(y_pred)
 
     def test_all_estimators(self):
-        K = sample.diploma_matrix  # this is not kernel but who cares
+        K = Samples.diploma_matrix  # this is not kernel but who cares
 
         y_pred_kmeans = KernelKMeans(n_clusters=2, max_iter=100, random_state=0).fit_predict(K)
         y_pred_ward = Ward(n_clusters=2).fit_predict(K)
@@ -34,8 +33,12 @@ class TestEstimators(unittest.TestCase):
 
 
 class TestWorkflow(unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.datasets = Datasets()
+
     def test_ward_clustering(self):
-        graphs, info = dataset.polbooks
+        graphs, info = self.datasets.polbooks
         for measure in H_kernels_plus_RSP_FE:
             measureparamdict = {}
             mean = []
@@ -54,7 +57,7 @@ class TestWorkflow(unittest.TestCase):
             logging.info("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))
 
     def test_ward_clustering_new_kernels(self):
-        graphs, info = dataset.polbooks
+        graphs, info = self.datasets.polbooks
         for measure in R_kernels:
             measureparamdict = {}
             mean = []

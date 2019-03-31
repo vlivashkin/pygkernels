@@ -11,7 +11,7 @@ from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
 from pygraphs.cluster import VanillaKernelKMeans
-from pygraphs.graphs.dataset import news_2cl_3, news_2cl_2, news_2cl_1
+from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 from pygraphs.scorer import rand_index
 
@@ -34,10 +34,11 @@ class Table1Tests(unittest.TestCase):
             'news_5cl_2': (74.8, 0.77, 78.4, 0.79, 64.4, 0.69, 67.7, 0.72),
             'news_5cl_3': (76.4, 0.75, 80.1, 0.79, 64.9, 0.69, 64.0, 0.72),
         }
+        self.datasets = Datasets()
 
     def _newsgroup_results(self, name, kernel_func, scorer_func, result_idx, atol):
         results = []
-        for graphs, info in [news_2cl_1, news_2cl_2, news_2cl_3]:
+        for graphs, info in [self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3']]:
             A, labels_true = graphs[0]
             K = kernel_func(A)
             labels_pred = VanillaKernelKMeans(n_clusters=info['k']).fit_predict(K)
