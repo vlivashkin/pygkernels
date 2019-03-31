@@ -2,6 +2,7 @@ import itertools
 from collections import defaultdict
 
 import numpy as np
+from scipy.stats import rankdata
 
 
 def max_accuracy(y_true, y_pred):
@@ -21,6 +22,47 @@ def rand_index(y_true, y_pred):
                 good += 1
             all += 1
     return good / all
+
+
+def triplet_measure(y_true, D_pred):
+    good, all = 0, 0
+    for i in range(len(y_true)):
+        for j in range(i + 1, len(y_true)):
+            for k in range(j + 1, len(y_true)):
+                items_by_class = defaultdict(list)
+                for item in [i, j, k]:
+                    items_by_class[y_true[item]].append(item)
+                if len(items_by_class.keys()) == 2:  # seems to two items in one class
+                    key1, key2 = items_by_class.keys()
+                    if len(items_by_class[key1]) == 2:
+                        same_class_pair, another_class_item = items_by_class[key1], items_by_class[key2][0]
+                    else:
+                        same_class_pair, another_class_item = items_by_class[key2], items_by_class[key1][0]
+                    # check d(s1, s2) < d(s1, a) and d(s1, s2) < d(s2, a)
+                    d_s1_s2 = D_pred[same_class_pair[0], same_class_pair[1]]
+                    d_s1_a = D_pred[same_class_pair[0], another_class_item]
+                    d_s2_a = D_pred[same_class_pair[1], another_class_item]
+                    if d_s1_s2 < d_s1_a:
+                        good += 1
+                    if d_s1_s2 < d_s2_a:
+                        good += 1
+                    all += 2
+    return good / all
+
+
+def ranking(measure1_ari, measure2_ari):
+    assert measure1_ari.shape == measure2_ari.shape
+    n = measure1_ari.shape[0]
+
+    # 1. генерируем ранги
+    measure1_rank = rankdata(-measure1_ari)
+    measure2_rank = rankdata(-measure2_ari)
+
+    # 2. Для каждой пары мер считаем сумму квадратов разностей
+    sum_sq_delta = np.sum(np.power(measure1_rank - measure2_rank, 2))
+
+    # 3. По формуле Спирмена считаем элементы матрицы корреляций
+    return 1 - (6 * sum_sq_delta) / ((n - 1) * n * (n + 1))
 
 
 def copeland(results):

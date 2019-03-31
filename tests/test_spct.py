@@ -5,6 +5,7 @@ from sklearn.metrics import adjusted_rand_score
 from pygraphs import util
 from pygraphs.cluster import KernelKMeans
 from pygraphs.graphs import sample, dataset
+from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
 
@@ -106,7 +107,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
 
-        graph, info = dataset.news_2cl_1
+        graph, info = dataset.zachary
         self.graph, self.y_true = graph[0]
 
     def call_and_print(self, name, K):
