@@ -8,7 +8,7 @@ from pygraphs import util
 from pygraphs.cluster import KernelKMeans, SpectralClustering
 from pygraphs.cluster.ward import Ward
 from pygraphs.graphs import Samples, Datasets
-from pygraphs.measure import H_kernels_plus_RSP_FE, R_kernels
+from pygraphs.measure import kernels
 from pygraphs.measure.shortcuts import *
 
 
@@ -39,7 +39,7 @@ class TestWorkflow(unittest.TestCase):
 
     def test_ward_clustering(self):
         graphs, info = self.datasets.polbooks
-        for measure in H_kernels_plus_RSP_FE:
+        for measure in kernels:
             measureparamdict = {}
             mean = []
             for edges, nodes in graphs:
@@ -49,28 +49,6 @@ class TestWorkflow(unittest.TestCase):
                 y_pred = Ward(len(list(set(graphs[0][1])))).predict(D)
                 ari = adjusted_rand_score(nodes, y_pred)
                 mean.append(ari)
-            mean = [m for m in mean if m is not None and m == m]
-            score = np.array(mean).mean()
-            if score is not None and score == score:
-                measureparamdict[0.5] = score
-            maxparam = max(measureparamdict.items(), key=operator.itemgetter(1))[0]
-            logging.info("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))
-
-    def test_ward_clustering_new_kernels(self):
-        graphs, info = self.datasets.polbooks
-        for measure in R_kernels:
-            measureparamdict = {}
-            mean = []
-            for edges, nodes in graphs:
-                measure_o = measure(edges)
-                param = list(measure_o.scaler.scale_list([0.5]))[0]
-                D = measure_o.get_K(param)
-                if D is not None:
-                    y_pred = Ward(len(list(set(graphs[0][1])))).predict(D, )
-                    ari = adjusted_rand_score(nodes, y_pred)
-                    mean.append(ari)
-                else:
-                    mean.append(None)
             mean = [m for m in mean if m is not None and m == m]
             score = np.array(mean).mean()
             if score is not None and score == score:
