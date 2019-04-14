@@ -84,7 +84,7 @@ class ImportedGraphBuilder:
 
 class Datasets:
     _lazy_datasets = {
-        'citeseer': lambda: Datasets.load_webkb('citeseer', 'citeseer/citeseer.nodes', 'citeseer/citeseer.edges'),
+        # 'citeseer': lambda: Datasets.load_webkb('citeseer', 'citeseer/citeseer.nodes', 'citeseer/citeseer.edges'),
         'cora': lambda: Datasets.load_webkb('cora', 'cora/cora.nodes', 'cora/cora.edges'),
         'football': lambda: Datasets.load_polbooks_or_football('football', 'football_nodes.csv',
                                                                'football_edges.csv'),

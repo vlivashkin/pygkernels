@@ -46,9 +46,9 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
 
     def test_heat(self):
         heat = logHeat_H(self.graph)
-        heat_new = Heat_R(self.graph)
+        heat_rubanov = Heat_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
-            self.assertTrue(np.allclose(heat.get_K(param).ravel(), heat_new.get_K(param).ravel(), atol=0.0001),
+            self.assertTrue(np.allclose(heat.get_K(param).ravel(), heat_rubanov.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
 
     def test_regularized_laplacian(self):
@@ -56,6 +56,27 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
         reg_laplacian = RegularizedLaplacian_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.9, 50)):
             self.assertTrue(np.allclose(forest.get_K(param).ravel(), reg_laplacian.get_K(param).ravel(), atol=0.0001),
+                            'error in param={:0.3f}'.format(param))
+
+    def test_logPPR(self):
+        logppr = logPPR_H(self.graph)
+        ppr_rubanov = logPPR_R(self.graph)
+        for param in scaler.Linear().scale_list(np.linspace(0.0, 1.0, 50)):
+            self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
+                            'error in param={:0.3f}'.format(param))
+
+    def test_logModifPPR(self):
+        logppr = logModifPPR_H(self.graph)
+        ppr_rubanov = logModifPPR_R(self.graph)
+        for param in scaler.Linear().scale_list(np.linspace(0.0, 0.9, 50)):
+            self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
+                            'error in param={:0.3f}'.format(param))
+
+    def test_logHeatPPR(self):
+        logppr = logHeatPPR_H(self.graph)
+        ppr_rubanov = logHeatPPR_R(self.graph)
+        for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
+            self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
                             'error in param={:0.3f}'.format(param))
 
 
@@ -148,13 +169,13 @@ class BalancedModel(TestCompetition):
         self._compare(RegularizedLaplacian_R, np.linspace(0, 20, 101)[1:-1], 0.0072)
 
     def test_personalizedPageRank(self):
-        self._compare(PPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0073)
+        self._compare(logPPR_R, np.linspace(0, 1, 101)[1:-1], 0.0073)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0072)
+        self._compare(logModifPPR_R, np.linspace(0, 1, 101)[1:-1], 0.0072)
 
     def test_heatPageRank(self):
-        self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0074)
+        self._compare(logHeatPPR_R, np.linspace(0, 20, 101)[1:-1], 0.0074)
 
 
 @unittest.skip
@@ -185,13 +206,13 @@ class TestUnbalancedModel(TestCompetition):
         self._compare(RegularizedLaplacian_R, np.linspace(0, 20, 101)[1:-1], 0.0026)
 
     def test_personalizedPageRank(self):
-        self._compare(PPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0021)
+        self._compare(logPPR_R, np.linspace(0, 1, 101)[1:-1], 0.0021)
 
     def test_modifiedPageRank(self):
-        self._compare(ModifiedPPageRank_R, np.linspace(0, 1, 101)[1:-1], 0.0022)
+        self._compare(logModifPPR_R, np.linspace(0, 1, 101)[1:-1], 0.0022)
 
     def test_heatPageRank(self):
-        self._compare(HeatPPageRank_R, np.linspace(0, 20, 101)[1:-1], 0.0021)
+        self._compare(logHeatPPR_R, np.linspace(0, 20, 101)[1:-1], 0.0021)
 
 
 if __name__ == "__main__":

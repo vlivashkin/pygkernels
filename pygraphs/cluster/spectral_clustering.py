@@ -4,6 +4,8 @@ from sklearn.base import ClusterMixin, BaseEstimator
 
 
 class SpectralClustering(ClusterMixin, BaseEstimator):
+    name = 'SpectralClustering'
+
     def __init__(self, n_clusters):
         self.n_clusters = n_clusters
 

@@ -4,6 +4,8 @@ from sklearn.cluster.k_means_ import k_means
 
 
 class KernelKMeansSklearn(BaseEstimator, ClusterMixin):
+    name = 'KernelKMeansSklearn'
+
     def __init__(self, n_clusters):
         self.n_clusters = n_clusters
 
@@ -17,6 +19,8 @@ class KernelKMeansSklearn(BaseEstimator, ClusterMixin):
 
 
 class KernelWardSklearn(BaseEstimator, ClusterMixin):
+    name = 'KernelWardSklearn'
+
     def __init__(self, n_clusters):
         self.n_clusters = n_clusters
 

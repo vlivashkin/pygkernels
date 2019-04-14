@@ -74,19 +74,19 @@ class Table1Tests(unittest.TestCase):
                                 adjusted_rand_score, 1, 0.01)
 
     def test_CT_100RI(self):
-        self._newsgroup_results('CT 100RI', lambda A: CT(A).get_D(-1),
+        self._newsgroup_results('CT 100RI', lambda A: CT_D(A).get_D(-1),
                                 lambda x, y: 100 * rand_index(x, y), 0, 10)
 
     def test_CT_ARI(self):
-        self._newsgroup_results('CT ARI', lambda A: CT(A).get_D(-1),
+        self._newsgroup_results('CT ARI', lambda A: CT_D(A).get_D(-1),
                                 adjusted_rand_score, 1, 0.01)
 
     def test_SP_100RI(self):
-        self._newsgroup_results('SP 100RI', lambda A: SP(A).get_D(-1),
+        self._newsgroup_results('SP 100RI', lambda A: SP_D(A).get_D(-1),
                                 lambda x, y: 100 * rand_index(x, y), 0, 10)
 
     def test_SP_ARI(self):
-        self._newsgroup_results('SP ARI', lambda A: SP(A).get_D(-1),
+        self._newsgroup_results('SP ARI', lambda A: SP_D(A).get_D(-1),
                                 adjusted_rand_score, 1, 0.01)
 
 

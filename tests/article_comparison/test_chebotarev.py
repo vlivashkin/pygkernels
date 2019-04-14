@@ -32,44 +32,44 @@ class TestFigure1Comparison(unittest.TestCase):
                             "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(d, t, np.abs(d - t)))
 
     def test_chain_SP(self):
-        D = SP(self.graph).get_D(-1)
+        D = SP_D(self.graph).get_D(-1)
         self._comparison('SP', D, [1.000, 1.000, 2.000, 3.000])
 
     def test_chain_R(self):
-        D = CT(self.graph).get_D(-1)
+        D = CT_D(self.graph).get_D(-1)
         self._comparison('R', D, [1.000, 1.000, 2.000, 3.000])
 
     def test_chain_Walk(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = Walk(self.graph).get_D(parameter)
+        D = Walk_D(self.graph).get_D(parameter)
         self._comparison('Walk', D, [1.025, 0.950, 1.975, 3.000])
 
     def test_chain_logFor(self):
         parameter = Linear(self.graph).scale(2.0)
-        D = logFor(self.graph).get_D(parameter)
+        D = logFor_D(self.graph).get_D(parameter)
         self._comparison('logFor', D, [0.959, 1.081, 2.040, 3.000])
 
     def test_chain_For(self):
         parameter = Linear(self.graph).scale(1.0)
-        D = For(self.graph).get_D(parameter)
+        D = For_D(self.graph).get_D(parameter)
         self._comparison('For', D, [1.026, 0.947, 1.500, 1.895])
 
     def test_chain_SqResistance(self):
-        D = np.sqrt(CT(self.graph).get_D(-1))
+        D = np.sqrt(CT_D(self.graph).get_D(-1))
         self._comparison('SqResistance', D, [1.000, 1.000, 1.414, 1.732])
 
     def test_chain_Comm(self):
-        D = Comm(self.graph).get_D(1.0)
+        D = Comm_D(self.graph).get_D(1.0)
         self._comparison('Comm', D, [0.964, 1.072, 1.492, 1.564])
 
     def test_chain_pWalk_45(self):
         parameter = AlphaToT(self.graph).scale(4.5)
-        D = pWalk(self.graph).get_D(parameter)
+        D = pWalk_D(self.graph).get_D(parameter)
         self._comparison('pWalk 4.5', D, [1.025, 0.950, 1.541, 1.466])
 
     def test_chain_pWalk_1(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = pWalk(self.graph).get_D(parameter)
+        D = pWalk_D(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.988, 1.025, 1.379, 1.416])
 
 
@@ -101,36 +101,36 @@ class TestTable1Comparison(unittest.TestCase):
                             "Test {:0.2f} != True {:0.2f}, diff={:0.2f}".format(d, t, np.abs(d - t)))
 
     def test_chain_SP(self):
-        D = SP(self.graph).get_D(-1)
+        D = SP_D(self.graph).get_D(-1)
         self._comparison('SP', D, [1., 1., 1.5])
 
     def test_chain_R(self):
-        D = CT(self.graph).get_D(-1)
+        D = CT_D(self.graph).get_D(-1)
         self._comparison('R', D, [1., 1., 1.5])
 
     def test_chain_Walk(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = Walk(self.graph).get_D(parameter)
+        D = Walk_D(self.graph).get_D(parameter)
         self._comparison('Walk', D, [1.08, 1., 1.52])
 
     def test_chain_logFor(self):
         parameter = Linear(self.graph).scale(2.0)
-        D = logFor(self.graph).get_D(parameter)
+        D = logFor_D(self.graph).get_D(parameter)
         self._comparison('logFor', D, [0.89, 1., 1.47])
 
     def test_chain_For(self):
         parameter = Linear(self.graph).scale(1.0)
-        D = For(self.graph).get_D(parameter)
+        D = For_D(self.graph).get_D(parameter)
         self._comparison('For', D, [1.08, 1.32, 1.26])
 
     def test_chain_pWalk_45(self):
         parameter = AlphaToT(self.graph).scale(4.5)
-        D = pWalk(self.graph).get_D(parameter)
+        D = pWalk_D(self.graph).get_D(parameter)
         self._comparison('pWalk 4.5', D, [1.08, 1.28, 0.95])
 
     def test_chain_pWalk_1(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = pWalk(self.graph).get_D(parameter)
+        D = pWalk_D(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.96, 1.46, 1.03])
 
 

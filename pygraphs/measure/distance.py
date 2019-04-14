@@ -1,9 +1,11 @@
 from abc import ABC
 
+import numpy as np
 from scipy.sparse.csgraph import shortest_path
+from sklearn.utils import deprecated
 
 from pygraphs.measure import scaler
-from pygraphs.measure.shortcuts import *
+from pygraphs.measure.shortcuts import get_D_1, get_L, H_to_D
 
 
 class Distance(ABC):
@@ -27,7 +29,7 @@ class Distance(ABC):
         return results
 
 
-class SP(Distance):
+class SP_D(Distance):
     name, default_scaler = 'SP', scaler.Linear
 
     def get_D(self, param):
@@ -36,7 +38,7 @@ class SP(Distance):
         return np.array(shortest_path(A, directed=False), dtype=np.float64)
 
 
-class CT(Distance):
+class CT_D(Distance):
     name, default_scaler = 'CT', scaler.Linear
 
     def commute_distance(self):
@@ -61,6 +63,7 @@ class CT(Distance):
         return self.commute_distance()
 
 
+@deprecated()
 class RSP_vanilla_like(Distance, ABC):
     def __init__(self, A, C=None):
         """
@@ -91,7 +94,7 @@ class RSP_vanilla_like(Distance, ABC):
 
 
 @deprecated()
-class RSP_vanilla(RSP_vanilla_like):
+class RSP_vanilla_D(RSP_vanilla_like):
     name, default_scaler = 'RSP vanilla', scaler.FractionReversed
 
     def get_D(self, beta):
@@ -111,7 +114,7 @@ class RSP_vanilla(RSP_vanilla_like):
 
 
 @deprecated()
-class FE_vanilla(RSP_vanilla_like):
+class FE_vanilla_D(RSP_vanilla_like):
     name, default_scaler = 'FE vanilla', scaler.FractionReversed
 
     def get_D(self, beta):
@@ -132,7 +135,7 @@ class FE_vanilla(RSP_vanilla_like):
 
 
 # From https://github.com/jmmcd/GPDistance
-class RSP_like(Distance, ABC):
+class _RSP_like(Distance, ABC):
     def __init__(self, A):
         super().__init__(A)
 
@@ -173,7 +176,7 @@ class RSP_like(Distance, ABC):
         return W, Z
 
 
-class RSP(RSP_like):
+class RSP_D(_RSP_like):
     name, default_scaler = 'RSP', scaler.FractionReversed
 
     def get_D(self, beta):
@@ -207,7 +210,7 @@ class RSP(RSP_like):
         return D_RSP
 
 
-class FE(RSP_like):
+class FE_D(_RSP_like):
     name, default_scaler = 'FE', scaler.FractionReversed
 
     def get_D(self, beta):

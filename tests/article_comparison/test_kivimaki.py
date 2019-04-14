@@ -34,35 +34,35 @@ class TestFigure2Comparison(unittest.TestCase):
                         "{}: {:0.3f} != {:0.3f}, diff={:0.3f}".format(name, div, true_value, div - true_value))
 
     def test_boundaries_left_CT(self):
-        D = SPCT(self.graph).get_D(0)
+        D = SPCT_D(self.graph).get_D(0)
         self._comparison('CT', D, 1.5)
 
     def test_boundaries_left_logFor(self):
-        D = logFor(self.graph).get_D(500.0)
+        D = logFor_D(self.graph).get_D(500.0)
         self._comparison('logFor 500.0', D, 1.5)
 
     def test_boundaries_left_RSP(self):
-        D = RSP(self.graph).get_D(0.0001)
+        D = RSP_D(self.graph).get_D(0.0001)
         self._comparison('RSP 0.0001', D, 1.5)
 
     def test_boundaries_left_FE(self):
-        D = FE(self.graph).get_D(0.0001)
+        D = FE_D(self.graph).get_D(0.0001)
         self._comparison('FE 0.0001', D, 1.5)
 
     def test_boundaries_right_SP(self):
-        D = SPCT(self.graph).get_D(1)
+        D = SPCT_D(self.graph).get_D(1)
         self._comparison('SP', D, 1.0)
 
     def test_boundaries_right_logFor(self):
-        D = logFor(self.graph).get_D(0.01)
+        D = logFor_D(self.graph).get_D(0.01)
         self._comparison('logFor 0.01', D, 1.0)
 
     def test_boundaries_right_RSP(self):
-        D = RSP(self.graph).get_D(20.0)
+        D = RSP_D(self.graph).get_D(20.0)
         self._comparison('RSP 20.0', D, 1.0)
 
     def test_boundaries_right_FE(self):
-        D = FE(self.graph).get_D(20.0)
+        D = FE_D(self.graph).get_D(20.0)
         self._comparison('FE 20.0', D, 1.0)
 
 

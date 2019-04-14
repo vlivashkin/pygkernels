@@ -41,28 +41,29 @@ def d3():
         idx = (idx + 2) % 20
 
 
-d3_right_order = []
-for i in range(6):
-    d3_right_order.extend([d3_category20[2 * i + 1], d3_category20[2 * i]])
-d3_right_order.append(d3_category20[12])
-
 measures_right_order = [
-    'pWalk H',
-    'Walk H',
-    'For H',
-    'logFor H',
-    'Comm H',
-    'logComm H',
-    'Heat H',
-    'logHeat H',
+    'pWalk',
+    'Walk',
+    'For',
+    'logFor',
+    'Comm',
+    'logComm',
+    'Heat',
+    'logHeat',
+    'NHeat'
+    'logNHeat'
     'SCT H',
     'SCCT H',
     'RSP K',
     'FE K',
     'SP-CT H',
-    'SP K',
-    'CT H'
+    'NormalizedHeat R',
+    'PersonalizedPageRank R',
+    'ModifiedPersonalizedPageRank R',
+    'HeatPersonalizedPageRank R'
 ]
+d3_instance = d3()
+d3_right_order = [d3_instance.__next__() for x in range(len(measures_right_order))]
 
 
 class ParallelByGraphs:

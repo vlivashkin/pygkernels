@@ -81,9 +81,9 @@ class TestMeasureCommon(unittest.TestCase):
     @unittest.skip
     def test_full_graph_SP_logFor_Walk_equality(self):
         param = 0.00001
-        DSP = normalize(SP(Samples.chain_graph).get_D(-1))
-        DlogFor = normalize(logFor(Samples.chain_graph).get_D(param))
-        DWalk = normalize(Walk(Samples.chain_graph).get_D(param))
+        DSP = normalize(SP_D(Samples.chain_graph).get_D(-1))
+        DlogFor = normalize(logFor_D(Samples.chain_graph).get_D(param))
+        DWalk = normalize(Walk_D(Samples.chain_graph).get_D(param))
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
         self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))

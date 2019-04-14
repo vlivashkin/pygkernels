@@ -2,6 +2,7 @@ from abc import ABC
 
 import numpy as np
 import numpy.matlib
+from sklearn.utils import deprecated
 
 from . import scaler
 from .kernel import Kernel
@@ -11,7 +12,7 @@ from .shortcuts import get_D, get_L
 # Avrachenkov: Kernels on Graphs as Proximity Measures
 # Implementation by Dmytro Rubanov
 
-class KernelNew(Kernel, ABC):
+class _KernelNew(Kernel, ABC):
     name, default_scaler = None, None
 
     @staticmethod
@@ -24,7 +25,8 @@ class KernelNew(Kernel, ABC):
         return R
 
 
-class Katz_R(KernelNew):
+@deprecated()
+class Katz_R(_KernelNew):
     name, default_scaler = 'Katz R', scaler.Rho
 
     def __init__(self, A):
@@ -41,15 +43,17 @@ class Katz_R(KernelNew):
         return np.array(np.log(K))
 
 
-class Estrada_R(KernelNew):
+@deprecated()
+class Estrada_R(_KernelNew):
     name, default_scaler = 'Estrada R', scaler.Fraction
 
     def get_K(self, t):
-        K = KernelNew.mat_exp(t * self.A)
+        K = _KernelNew.mat_exp(t * self.A)
         return np.array(np.log(K))
 
 
-class Heat_R(KernelNew):  # this is logHeat, actually
+@deprecated()
+class Heat_R(_KernelNew):  # this is logHeat, actually
     name, default_scaler = 'Heat R', scaler.Fraction
 
     def __init__(self, A):
@@ -57,15 +61,16 @@ class Heat_R(KernelNew):  # this is logHeat, actually
         self.L = np.matlib.array(get_L(A))
 
     def get_K(self, t):
-        K = KernelNew.mat_exp(- t * self.L, n=50)
+        K = _KernelNew.mat_exp(- t * self.L, n=50)
         if np.any(K < 0):
             # logging.info(t, "K < 0")
             return None
         return np.array(np.log(K))
 
 
-class NormalizedHeat_R(KernelNew):
-    name, default_scaler = 'NormalizedHeat R', scaler.Fraction
+@deprecated()
+class NormalizedHeat_R(_KernelNew):
+    name, default_scaler = 'logNHeat R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -75,14 +80,15 @@ class NormalizedHeat_R(KernelNew):
         self.Ll = D_12.dot(L).dot(D_12)
 
     def get_K(self, t):
-        K = KernelNew.mat_exp(-t * self.Ll, n=50)
+        K = _KernelNew.mat_exp(-t * self.Ll, n=50)
         if np.any(K < 0):
             # logging.info(t, "K < 0")
             return None
         return np.array(np.log(K))
 
 
-class RegularizedLaplacian_R(KernelNew):
+@deprecated()
+class RegularizedLaplacian_R(_KernelNew):
     name, default_scaler = 'RegularizedLaplacian R', scaler.Fraction
 
     def __init__(self, A):
@@ -98,8 +104,9 @@ class RegularizedLaplacian_R(KernelNew):
         return np.array(np.log(K))
 
 
-class PPageRank_R(KernelNew):
-    name, default_scaler = 'PersonalizedPageRank R', scaler.Fraction
+@deprecated()
+class logPPR_R(_KernelNew):
+    name, default_scaler = 'logPPR R', scaler.Linear
 
     def __init__(self, A):
         super().__init__(A)
@@ -114,8 +121,9 @@ class PPageRank_R(KernelNew):
         return np.array(np.log(K))
 
 
-class ModifiedPPageRank_R(KernelNew):
-    name, default_scaler = 'ModifiedPersonalizedPageRank R', scaler.Fraction
+@deprecated()
+class logModifPPR_R(_KernelNew):
+    name, default_scaler = 'logModifPPR R', scaler.Linear
 
     def __init__(self, A):
         super().__init__(A)
@@ -129,8 +137,9 @@ class ModifiedPPageRank_R(KernelNew):
         return np.array(np.log(K))
 
 
-class HeatPPageRank_R(KernelNew):
-    name, default_scaler = 'HeatPersonalizedPageRank R', scaler.Fraction
+@deprecated()
+class logHeatPPR_R(_KernelNew):
+    name, default_scaler = 'logHeatPPR R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -138,7 +147,7 @@ class HeatPPageRank_R(KernelNew):
         self.P = np.linalg.inv(self.D).dot(A)
 
     def get_K(self, t):
-        K = KernelNew.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
+        K = _KernelNew.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
         if np.any(K < 0):
             # logging.info(t, "K < 0")
             return None

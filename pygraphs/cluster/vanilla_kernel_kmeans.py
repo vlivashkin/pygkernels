@@ -9,6 +9,8 @@ from pygraphs.graphs import dataset
 # Algorithms and Models for Network Data and Link Analysis
 # Algorithm 7.2
 class VanillaKernelKMeans(BaseEstimator, ClusterMixin):
+    name = 'VanillaKernelKMeans'
+
     def __init__(self, n_clusters=3, max_iter=100, random_state=0):
         self.m = n_clusters
         self.max_iter = max_iter

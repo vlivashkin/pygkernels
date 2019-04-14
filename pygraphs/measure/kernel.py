@@ -1,10 +1,11 @@
 from abc import ABC
 
 import networkx as nx
+import numpy as np
 from scipy.linalg import expm
 
 from pygraphs.measure import scaler
-from pygraphs.measure.shortcuts import *
+from pygraphs.measure.shortcuts import get_D, get_L, get_normalized_L, D_to_K, H0_to_H
 
 
 class Kernel(ABC):
@@ -32,7 +33,7 @@ class Kernel(ABC):
 
 
 class CT_H(Kernel):
-    name, default_scaler = 'CT H', scaler.Linear
+    name, default_scaler = 'CT', scaler.Linear
 
     def CT(self):
         """
@@ -67,7 +68,7 @@ class CT_H(Kernel):
 
 
 class pWalk_H(Kernel):
-    name, default_scaler = 'pWalk H', scaler.Rho
+    name, default_scaler = 'pWalk', scaler.Rho
 
     def get_K(self, t):
         """
@@ -78,7 +79,7 @@ class pWalk_H(Kernel):
 
 
 class For_H(Kernel):
-    name, default_scaler = 'For H', scaler.Fraction
+    name, default_scaler = 'For', scaler.Fraction
 
     def get_K(self, t):
         """
@@ -89,7 +90,7 @@ class For_H(Kernel):
 
 
 class Comm_H(Kernel):
-    name, default_scaler = 'Comm H', scaler.Fraction
+    name, default_scaler = 'Comm', scaler.Fraction
 
     def get_K(self, t):
         """
@@ -99,17 +100,35 @@ class Comm_H(Kernel):
 
 
 class Heat_H(Kernel):
-    name, default_scaler = 'Heat H', scaler.Fraction
+    name, default_scaler = 'Heat', scaler.Fraction
+
+    def __init__(self, A):
+        super().__init__(A)
+        self.L = get_L(self.A)
 
     def get_K(self, t):
         """
         H0 = exp(-tL)
         """
-        return expm(-t * get_L(self.A))
+        return expm(-t * self.L)
+
+
+class NHeat_H(Kernel):
+    name, default_scaler = 'NHeat', scaler.Fraction
+
+    def __init__(self, A):
+        super().__init__(A)
+        self.nL = get_normalized_L(A)
+
+    def get_K(self, t):
+        """
+        H0 = exp(-t*nL)
+        """
+        return expm(-t * self.nL)
 
 
 class SCT_H(Kernel):
-    name, default_scaler = 'SCT H', scaler.Fraction
+    name, default_scaler = 'SCT', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -125,7 +144,7 @@ class SCT_H(Kernel):
 
 
 class SCCT_H(Kernel):
-    name, default_scaler = 'SCCT H', scaler.Fraction
+    name, default_scaler = 'SCCT', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -157,5 +176,36 @@ class SCCT_H(Kernel):
         return 1. / (1. + np.exp(-alpha * self.Kds))
 
 
-class H_kernels_plus_RSP_FE(object):
-    pass
+class PPR_H(Kernel):
+    name, default_scaler = 'PPR', scaler.Linear
+
+    def __init__(self, A):
+        super().__init__(A)
+        self.I = np.eye(A.shape[0])
+        self.P = np.linalg.inv(get_D(A)).dot(A)
+
+    def get_K(self, alpha):
+        return np.linalg.inv(self.I - alpha * self.P)
+
+
+class ModifPPR_H(Kernel):
+    name, default_scaler = 'ModifPPR', scaler.Linear
+
+    def __init__(self, A):
+        super().__init__(A)
+        self.D = get_D(A)
+
+    def get_K(self, alpha):
+        return np.linalg.inv(self.D - alpha * self.A)
+
+
+class HeatPPR_H(Kernel):
+    name, default_scaler = 'HeatPPR', scaler.Fraction
+
+    def __init__(self, A):
+        super().__init__(A)
+        self.I = np.eye(A.shape[0])
+        self.P = np.linalg.inv(get_D(A)).dot(A)
+
+    def get_K(self, t):
+        return expm(-t * (self.I - self.P))

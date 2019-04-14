@@ -11,7 +11,7 @@ import numpy as np
 
 from pygraphs import util
 from pygraphs.graphs import Datasets
-from pygraphs.measure import RSP_vanilla, FE_vanilla, FE, RSP, CT, CT_H
+from pygraphs.measure import RSP_vanilla_D, FE_vanilla_D, FE_D, RSP_D, CT_D, CT_H
 from pygraphs.measure.shortcuts import get_L, H_to_D
 
 
@@ -67,7 +67,7 @@ class TestGPDistance(unittest.TestCase):
     def test_compare_CT_and_Resistance(self):
         graphs, info = Datasets().news_2cl_1
         A, y_true = graphs[0]
-        D_CT = CT(A).get_D(-1)
+        D_CT = CT_D(A).get_D(-1)
         D_R = H_to_D(CT_H(A).get_K(-1))
         D_CT /= np.average(D_CT)
         D_R /= np.average(D_R)
@@ -85,32 +85,32 @@ class TestGPDistance(unittest.TestCase):
 
     def test_1_RSP_GPD(self):
         A, D_RSP_true = self.test1['A'], self.test1['RSP_true']
-        D_RSP_test = RSP(A).get_D(1)
+        D_RSP_test = RSP_D(A).get_D(1)
         self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001, equal_nan=True))
 
     def test_1_FE_GPD(self):
         A, D_FE_true = self.test1['A'], self.test1['FE_true']
-        D_FE_test = FE(A).get_D(1)
+        D_FE_test = FE_D(A).get_D(1)
         self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001, equal_nan=True))
 
     def test_2_RSP_vanilla(self):
         A, D_RSP_true = self.test2['A'], self.test2['RSP_true']
-        D_RSP_test = RSP_vanilla(A).get_D(1)
+        D_RSP_test = RSP_vanilla_D(A).get_D(1)
         self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001))
 
     def test_2_FE_vanilla(self):
         A, D_FE_true = self.test2['A'], self.test2['FE_true']
-        D_FE_test = FE_vanilla(A).get_D(1)
+        D_FE_test = FE_vanilla_D(A).get_D(1)
         self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001))
 
     def test_2_RSP_GPD(self):
         A, D_RSP_true = self.test2['A'], self.test2['RSP_true']
-        D_RSP_test = RSP(A).get_D(1)
+        D_RSP_test = RSP_D(A).get_D(1)
         self.assertTrue(np.allclose(D_RSP_test, D_RSP_true, atol=0.00001))
 
     def test_2_FE_GPD(self):
         A, D_FE_true = self.test2['A'], self.test2['FE_true']
-        D_FE_test = FE(A).get_D(1)
+        D_FE_test = FE_D(A).get_D(1)
         self.assertTrue(np.allclose(D_FE_test, D_FE_true, atol=0.00001))
 
     # def test_compare_RSP_versions(self):

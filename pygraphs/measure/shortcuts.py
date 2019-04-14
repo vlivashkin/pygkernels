@@ -22,11 +22,20 @@ def get_L(A):
     return get_D(A) - A
 
 
+def get_normalized_L(A):
+    D = get_D(A)
+    L = get_L(A)
+    D_12 = np.linalg.inv(np.sqrt(D))
+    return D_12.dot(L).dot(D_12)
+
+
 def H0_to_H(H0):
     """
     H = element - wise log(H0)
     """
-    return np.log(H0)
+    H = np.log(H0)
+    H[np.isnan(H)] = 0
+    return H
 
 
 def H_to_D(H):
