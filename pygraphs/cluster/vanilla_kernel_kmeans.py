@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, deprecated
 
 from pygraphs.graphs import dataset
 
@@ -8,6 +8,7 @@ from pygraphs.graphs import dataset
 # Francois Fouss, Marco Saerens, Masashi Shimbo
 # Algorithms and Models for Network Data and Link Analysis
 # Algorithm 7.2
+@deprecated()
 class VanillaKernelKMeans(BaseEstimator, ClusterMixin):
     name = 'VanillaKernelKMeans'
 

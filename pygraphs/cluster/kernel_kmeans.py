@@ -7,9 +7,10 @@ import logging
 
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, deprecated
 
 
+@deprecated()
 class KernelKMeans(BaseEstimator, ClusterMixin):
     """
     Kernel K-means

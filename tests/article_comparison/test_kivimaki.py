@@ -9,7 +9,7 @@ import unittest
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KernelKMeans
+from pygraphs.cluster import KernelKMeansSklearn
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
@@ -90,7 +90,7 @@ class TestTable2(unittest.TestCase):
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
-            labels_pred = KernelKMeans(n_clusters=info['k'], max_iter=5000, random_state=8).fit_predict(K)
+            labels_pred = KernelKMeansSklearn(n_clusters=info['k']).fit_predict(K)
             test_nmi = 100 * normalized_mutual_info_score(labels_true, labels_pred)
 
             true_nmi = self.etalon[info['name']][idx]

@@ -127,17 +127,22 @@ class ParallelByGraphs:
 
 def plot_ax(ax, name, x, y, error, color1, color2):
     ax.plot(x, y, color=color1, label=name)
-    ax.fill_between(x, y - error, y + error,
+    low_error = y - error
+    low_error[low_error < 0] = 0
+    high_error = y + error
+    high_error[high_error > 1] = 1
+    ax.fill_between(x, low_error, high_error,
                     alpha=0.2, edgecolor=color1, facecolor=color2,
                     linewidth=1, antialiased=True)
 
 
-def plot_results(ax, toplot, xlim=(0, 1), ylim=(-0.01, 1.01)):
+def plot_results(ax, toplot, xlim=(0, 1), ylim=(-0.01, 1.01), nolegend=False):
     for (name, x, y, error), (color1, color2) in zip(toplot, d3()):
         plot_ax(ax, name, x, y, error, color1, color2)
     ax.set_xlim(*xlim)
     ax.set_ylim(*ylim)
-    ax.legend()
+    if not nolegend:
+        ax.legend()
 
 
 class RejectCurve:

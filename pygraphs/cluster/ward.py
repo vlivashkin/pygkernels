@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 from sklearn.base import ClusterMixin, BaseEstimator
+from sklearn.utils import deprecated
 
 
 class Cluster:
@@ -26,6 +27,7 @@ class Cluster:
         return currentΔJ
 
 
+@deprecated()
 class Ward(ClusterMixin, BaseEstimator):
     name = 'Ward'
 
