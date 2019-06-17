@@ -5,7 +5,7 @@ from sklearn.base import ClusterMixin, BaseEstimator
 from sklearn.utils import deprecated
 
 
-class Cluster:
+class KWardCluster:
     def __init__(self, nodes, all_nodes_count):
         self.nodes = nodes
         self.n = len(nodes)
@@ -29,7 +29,7 @@ class Cluster:
 
 @deprecated()
 class KWard(ClusterMixin, BaseEstimator):
-    name = 'Ward'
+    name = 'KernelWard'
 
     def __init__(self, n_clusters):
         self.n_clusters = n_clusters
@@ -39,7 +39,7 @@ class KWard(ClusterMixin, BaseEstimator):
         return self
 
     def predict(self, K):
-        clusters = [Cluster([i], K.shape[0]) for i in range(K.shape[0])]
+        clusters = [KWardCluster([i], K.shape[0]) for i in range(K.shape[0])]
         for i in range(K.shape[0] - self.n_clusters):
             self._iteration(K, clusters)
 
@@ -62,4 +62,4 @@ class KWard(ClusterMixin, BaseEstimator):
         union = Ck.nodes + Cl.nodes
         clusters.remove(Ck)
         clusters.remove(Cl)
-        clusters.append(Cluster(union, K.shape[0]))
+        clusters.append(KWardCluster(union, K.shape[0]))
