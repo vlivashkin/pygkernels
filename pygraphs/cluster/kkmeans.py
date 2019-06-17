@@ -87,6 +87,8 @@ class KKMeans(BaseEstimator, ClusterMixin):
       http://www.cs.utexas.edu/users/inderjit/public_papers/kdd_spectral_kernelkmeans.pdf
     """
 
+    name = 'Kernel KMeans'
+
     def __init__(self, n_clusters=3, max_iter=300, tol=1e-3, n_init=10,
                  kernel='linear', gamma='auto', degree=3, coef0=1.0,
                  kernel_params=None, random_state=None, verbose=0):
