@@ -15,8 +15,9 @@ setup(
         'networkx',
         'numpy',
         'orange3',
+        'pandas',
         'scikit-learn',
         'scipy',
-        'tqdm'
+        'tqdm',
     ]
 )

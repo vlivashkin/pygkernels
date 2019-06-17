@@ -1,12 +1,7 @@
 import os
-from collections import namedtuple
 from os.path import join as pj
 
 import numpy as np
-
-Car = namedtuple('Car', 'color mileage')
-
-ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
 
 
 class ImportedGraphBuilder:
@@ -84,6 +79,8 @@ class ImportedGraphBuilder:
 
 
 class Datasets:
+    DATASETS_ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
+
     _lazy_datasets = {
         'football': lambda: Datasets._load_polbooks_or_football('football', 'football_nodes.csv',
                                                                 'football_edges.csv'),
@@ -147,31 +144,31 @@ class Datasets:
     def _load_polbooks_or_football(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes(pj(ROOT_PATH, nodes_path), name_col_idx='idx', class_col_idx=2) \
-            .import_edges(pj(ROOT_PATH, edges_path)) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, nodes_path), name_col_idx='idx', class_col_idx=2) \
+            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, edges_path)) \
             .build()
 
     @staticmethod
     def _load_polblogs_or_zachary(name, graph_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes_and_edges(pj(ROOT_PATH, graph_path)) \
+            .import_nodes_and_edges(pj(Datasets.DATASETS_ROOT_PATH, graph_path)) \
             .build()
 
     @staticmethod
     def _load_newsgroup(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes(pj(ROOT_PATH, nodes_path), name_col_idx='idx', class_col_idx=0) \
-            .import_adjacency_matrix(pj(ROOT_PATH, edges_path)) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, nodes_path), name_col_idx='idx', class_col_idx=0) \
+            .import_adjacency_matrix(pj(Datasets.DATASETS_ROOT_PATH, edges_path)) \
             .build()
 
     @staticmethod
     def _load_webkb(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes(pj(ROOT_PATH, nodes_path), startline=2, name_col_idx=0, class_col_idx=-1) \
-            .import_edges(pj(ROOT_PATH, edges_path), startline=3, node1_col_idx=1, node2_col_idx=3) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, nodes_path), startline=2, name_col_idx=0, class_col_idx=-1) \
+            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, edges_path), startline=3, node1_col_idx=1, node2_col_idx=3) \
             .build()
 
     def __getitem__(self, item):
