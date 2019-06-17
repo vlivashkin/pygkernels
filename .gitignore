@@ -31,3 +31,4 @@ __pycache__/
 *.pkl
 *.xlsx
 *.png
+.Rproj.user

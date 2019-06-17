@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.utils import check_random_state, deprecated
 
-from pygraphs.graphs import dataset
+from pygraphs.graphs import Datasets
 
 
 # Francois Fouss, Marco Saerens, Masashi Shimbo
@@ -47,7 +47,7 @@ class VanillaKernelKMeans(BaseEstimator, ClusterMixin):
 
 
 if __name__ == '__main__':
-    graph, info = dataset.news_2cl_1
+    graph, info = Datasets.news_2cl_1
     X, y = graph[0]
 
     km = VanillaKernelKMeans(n_clusters=2, max_iter=100, random_state=42)

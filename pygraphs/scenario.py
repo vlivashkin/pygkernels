@@ -41,31 +41,6 @@ def d3():
         idx = (idx + 2) % 20
 
 
-measures_right_order = [
-    'pWalk',
-    'Walk',
-    'For',
-    'logFor',
-    'Comm',
-    'logComm',
-    'Heat',
-    'logHeat',
-    'NHeat'
-    'logNHeat'
-    'SCT H',
-    'SCCT H',
-    'RSP K',
-    'FE K',
-    'SP-CT H',
-    'NormalizedHeat R',
-    'PersonalizedPageRank R',
-    'ModifiedPersonalizedPageRank R',
-    'HeatPersonalizedPageRank R'
-]
-d3_instance = d3()
-d3_right_order = [d3_instance.__next__() for x in range(len(measures_right_order))]
-
-
 class ParallelByGraphs:
     """
     High-level class for calculate quality vs. param graphs
