@@ -21,7 +21,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import FLOAT_DTYPES
 
 
-class KernelKMeans(BaseEstimator, ClusterMixin):
+class KKMeans(BaseEstimator, ClusterMixin):
     """
     Parameters
     ----------

@@ -9,7 +9,7 @@ from pygraphs.graphs import Datasets
 # Algorithms and Models for Network Data and Link Analysis
 # Algorithm 7.2
 @deprecated()
-class VanillaKernelKMeans(BaseEstimator, ClusterMixin):
+class KKMeansVanilla(BaseEstimator, ClusterMixin):
     name = 'VanillaKernelKMeans'
 
     def __init__(self, n_clusters=3, max_iter=100, random_state=0):
@@ -50,6 +50,6 @@ if __name__ == '__main__':
     graph, info = Datasets.news_2cl_1
     X, y = graph[0]
 
-    km = VanillaKernelKMeans(n_clusters=2, max_iter=100, random_state=42)
+    km = KKMeansVanilla(n_clusters=2, max_iter=100, random_state=42)
     print(km.fit_predict(X))
     print(km.predict(X))

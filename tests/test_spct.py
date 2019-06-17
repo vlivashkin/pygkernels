@@ -3,7 +3,7 @@ import unittest
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KernelKMeansSklearn
+from pygraphs.cluster import KKMeansSklearn
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
@@ -110,7 +110,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         self.graph, self.y_true = graph[0]
 
     def call_and_print(self, name, K):
-        ari = adjusted_rand_score(KernelKMeansSklearn(2).fit_predict(K), self.y_true)
+        ari = adjusted_rand_score(KKMeansSklearn(2).fit_predict(K), self.y_true)
         print('{}\t{:0.3f}'.format(name, ari))
 
     def test_CT(self):

@@ -1,12 +1,14 @@
-from .kkmeans import KernelKMeans
-from .sklearn_wrappers import KernelKMeansSklearn, KernelWardSklearn
+from .kkmeans import KKMeans
+from .kkmeans_kernlab import KKMeansKernlab
+from .kkmeans_vanilla import KKMeansVanilla
+from .kward import KWard
+from .sklearn_wrappers import KKMeansSklearn, KWardSklearn
 from .spectral_clustering import SpectralClustering
-from .kkmeans_vanilla import VanillaKernelKMeans
-from .ward import Ward
 
-__all__ = ['KernelKMeans',
-           'VanillaKernelKMeans',
-           'Ward',
-           'SpectralClustering',
-           'KernelKMeansSklearn',
-           'KernelWardSklearn']
+__all__ = ['SpectralClustering',
+           'KKMeans',
+           'KKMeansVanilla',
+           'KKMeansSklearn',
+           'KKMeansKernlab',
+           'KWard',
+           'KWardSklearn']

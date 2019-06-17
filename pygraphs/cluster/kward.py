@@ -28,7 +28,7 @@ class Cluster:
 
 
 @deprecated()
-class Ward(ClusterMixin, BaseEstimator):
+class KWard(ClusterMixin, BaseEstimator):
     name = 'Ward'
 
     def __init__(self, n_clusters):

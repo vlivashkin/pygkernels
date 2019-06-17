@@ -9,8 +9,8 @@ from sklearn.base import BaseEstimator, ClusterMixin
 from pygraphs.graphs import Datasets
 
 
-class KernelKMeansRBinding(BaseEstimator, ClusterMixin):
-    name = 'VanillaKernelKMeans'
+class KKMeansKernlab(BaseEstimator, ClusterMixin):
+    name = 'KernelKMeansKernlab'
 
     def __init__(self, n_clusters=3):
         self.m = n_clusters
@@ -33,6 +33,6 @@ if __name__ == '__main__':
     graph, info = Datasets().news_2cl_1
     X, y = graph[0]
 
-    km = KernelKMeansRBinding(n_clusters=2)
+    km = KKMeansKernlab(n_clusters=2)
     print(km.fit_predict(X))
     print(km.predict(X))
