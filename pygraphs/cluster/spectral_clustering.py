@@ -2,7 +2,6 @@ import numpy as np
 import sklearn.cluster
 
 from pygraphs.cluster.base import KernelEstimator
-from pygraphs.graphs import Datasets
 
 
 class SpectralClustering_rubanov(KernelEstimator):

@@ -16,8 +16,8 @@ class TestEstimators(unittest.TestCase):
             SpectralClustering_rubanov,
             KMeans_sklearn,
             Ward_sklearn,
-            # KKMeansKernlab,
-            # SpectralClusteringKernlab
+            # KKMeans_kernlab,
+            # SpectralClustering_kernlab
         ]
 
     def test_estimators_news_2cl(self):
