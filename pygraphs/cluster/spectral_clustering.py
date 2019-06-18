@@ -7,13 +7,6 @@ from pygraphs.cluster.base import KernelEstimator
 class SpectralClustering_rubanov(KernelEstimator):
     name = 'SpectralClustering_rubanov'
 
-    def predict(self, K):
-        X = self._max_ort(K)
-        X = self._sign_flip(X)
-        cls = sklearn.cluster.KMeans(n_clusters=self.n_clusters)
-        prd = cls.fit_predict(X)
-        return prd
-
     def _max_ort(self, M):
         val, vec = np.linalg.eig(M)
         ind = np.argpartition(val, -self.n_clusters)[-self.n_clusters:]
@@ -25,3 +18,10 @@ class SpectralClustering_rubanov(KernelEstimator):
         sgns = np.sign(np.asarray(X)[max_pos, range(X.shape[1])])
         S = np.asmatrix(np.diag(sgns))
         return np.asmatrix(X) * S
+
+    def predict(self, K):
+        X = self._max_ort(K)
+        X = self._sign_flip(X)
+        cls = sklearn.cluster.KMeans(n_clusters=self.n_clusters)
+        prd = cls.fit_predict(X)
+        return prd

@@ -42,8 +42,24 @@ class TestGraphGenerators(unittest.TestCase):
         self.assertTrue(np.isclose(whole_in_stat, p_in, atol=0.001))
         self.assertTrue(np.isclose(whole_out_stat, p_out, atol=0.001))
 
-    def test_stochasticblockmodel(self):
+    def test_stochasticblockmodel_pinpout(self):
         model = StochasticBlockModel(self.n_nodes, 2, p_in=self.p_in, p_out=self.p_out)
+        graphs, _ = model.generate_graphs(1000)
+        self._check_shapes(graphs, self.n_nodes, self.n_classes)
+        self._check_probabilities(graphs, self.p_in, self.p_out)
+
+    def test_stochasticblockmodel_pmatrix(self):
+        model = StochasticBlockModel(self.n_nodes, 2, probability_matrix=np.array([
+            [self.p_in, self.p_out],
+            [self.p_out, self.p_in]
+        ]))
+        graphs, _ = model.generate_graphs(1000)
+        self._check_shapes(graphs, self.n_nodes, self.n_classes)
+        self._check_probabilities(graphs, self.p_in, self.p_out)
+
+    def test_stochasticblockmodel_clustersizes(self):
+        model = StochasticBlockModel(self.n_nodes, 2, cluster_sizes=[self.n_nodes//2, self.n_nodes//2],
+                                     p_in=self.p_in, p_out=self.p_out)
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)

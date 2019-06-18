@@ -1,6 +1,7 @@
 import unittest
 
-from pygraphs.cluster import KKMeans, KKMeans_vanilla, KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn
+from pygraphs.cluster import KKMeans, KKMeans_vanilla, KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn, \
+    SpectralClustering_kernlab, SpectralClustering_sklearn, KKMeans_kernlab
 from pygraphs.graphs import Datasets
 from pygraphs.measure import logComm_K
 
@@ -12,12 +13,13 @@ class TestEstimators(unittest.TestCase):
         self.estimators = [
             KKMeans,
             KKMeans_vanilla,
+            # KKMeans_kernlab,
             KWard,
             SpectralClustering_rubanov,
+            # SpectralClustering_sklearn,
+            # SpectralClustering_kernlab,
             KMeans_sklearn,
             Ward_sklearn,
-            # KKMeans_kernlab,
-            # SpectralClustering_kernlab
         ]
 
     def test_estimators_news_2cl(self):

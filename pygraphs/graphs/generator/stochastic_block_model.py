@@ -73,8 +73,3 @@ class StochasticBlockModel:
             })
         graphs = [self.generate_graph() for _ in range(n_graphs)]
         return graphs, info
-
-
-if __name__ == "__main__":
-    model = StochasticBlockModel(100, 2, 0.3, 0.1)
-    model.generate_graph()

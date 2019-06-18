@@ -50,8 +50,3 @@ class RubanovModel():
             graphs.append((self.generate_graph(), y_true))
 
         return graphs, {}
-
-
-if __name__ == '__main__':
-    model = RubanovModel(np.array([50, 50]), np.array([[0.3, 0.1], [0.1, 0.3]]))
-    model.generate_graph()

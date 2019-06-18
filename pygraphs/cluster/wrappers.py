@@ -1,22 +1,31 @@
-from sklearn.cluster import AgglomerativeClustering, k_means
+from sklearn.cluster import AgglomerativeClustering, k_means, SpectralClustering
+from sklearn.utils import deprecated
 
 from pygraphs.cluster.base import KernelEstimator, REstimatorWrapper
 
 
+@deprecated("This is not a kernel method!")
 class KMeans_sklearn(KernelEstimator):
     name = 'KMeans_sklearn'
 
     def predict(self, K):
-        _, prediction, _ = k_means(K, n_clusters=self.n_clusters, precompute_distances=True, random_state=0)
-        return prediction
+        _, pred, _ = k_means(K, n_clusters=self.n_clusters, precompute_distances=True, random_state=0)
+        return pred
 
 
+@deprecated("This is not a kernel method!")
 class Ward_sklearn(KernelEstimator):
     name = 'Ward_sklearn'
 
     def predict(self, K):
-        prediction = AgglomerativeClustering(n_clusters=self.n_clusters, linkage='ward').fit_predict(K)
-        return prediction
+        return AgglomerativeClustering(n_clusters=self.n_clusters, linkage='ward').fit_predict(K)
+
+
+class SpectralClustering_sklearn(KernelEstimator):
+    name = 'SpectralClustering_sklearn'
+
+    def predict(self, K):
+        return SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed').fit_predict(K)
 
 
 class KKMeans_kernlab(REstimatorWrapper):
