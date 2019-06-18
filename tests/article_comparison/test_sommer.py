@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeansSklearn
+from pygraphs.cluster import KMeans_sklearn
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
@@ -46,7 +46,7 @@ class TestTable3(unittest.TestCase):
             K = measure.get_K(best_param)
 
             try:
-                labels_pred = KKMeansSklearn(n_clusters=info['k']).fit_predict(K)
+                labels_pred = KMeans_sklearn(n_clusters=info['k']).fit_predict(K)
                 test_nmi = normalized_mutual_info_score(labels_true, labels_pred)
 
                 true_nmi = self.etalon[info['name']][idx]

@@ -1,29 +1,67 @@
-"""Kernel K-means clustering
-Reference
----------
-Kernel k-means, Spectral Clustering and Normalized Cuts.
-Inderjit S. Dhillon, Yuqiang Guan, Brian Kulis.
-KDD 2004.
-Author: Mathieu Blondel <mathieu@mblondel.org>,
-        Ishank Gulati <gulati.ishank@gmail.com>
-License: BSD 3 clause
-"""
-
 from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.metrics.pairwise import pairwise_kernels
 from sklearn.utils import check_array
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import FLOAT_DTYPES
 
-from pygraphs.graphs import Datasets
+from pygraphs.cluster.base import KernelEstimator
 
 
-class KKMeans(BaseEstimator, ClusterMixin):
-    """
+# Francois Fouss, Marco Saerens, Masashi Shimbo
+# Algorithms and Models for Network Data and Link Analysis
+# Algorithm 7.2
+class KKMeans_vanilla(KernelEstimator):
+    name = 'KernelKMeans_vanilla'
+
+    def __init__(self, n_clusters, max_iter=100, random_state=0):
+        super().__init__(n_clusters)
+        self.max_iter = max_iter
+        self.random_state = random_state
+
+    def fit(self, K, y=None, sample_weight=None):
+        self.labels_ = self.predict(K)
+        return self
+
+    def predict(self, K):
+        n = K.shape[0]
+        U = np.zeros((n, self.n_clusters))
+
+        # initialization
+        rs = check_random_state(self.random_state)
+        q_idx = rs.randint(0, n, size=(self.n_clusters,))
+        h = np.zeros((self.n_clusters, n))
+        for i in range(self.n_clusters):
+            h[i][q_idx[i]] = 1
+        e = np.eye(n)
+        nn = np.zeros((self.n_clusters,))
+
+        for i in range(100):
+            U = np.zeros((n, self.n_clusters))
+            for i in range(0, n):
+                ka = np.argmin(
+                    [(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T) for k in range(0, self.n_clusters)])
+                U[i][ka] = 1
+            for k in range(0, self.n_clusters):
+                nn[k] = np.sum([U[i][k] for i in range(0, n)])
+                h[k] = U[:, k] / nn[k]
+
+        return np.argmax(U, axis=1)
+
+
+class KKMeans(KernelEstimator):
+    """Kernel K-means clustering
+    Reference
+    ---------
+    Kernel k-means, Spectral Clustering and Normalized Cuts.
+    Inderjit S. Dhillon, Yuqiang Guan, Brian Kulis.
+    KDD 2004.
+    Author: Mathieu Blondel <mathieu@mblondel.org>,
+            Ishank Gulati <gulati.ishank@gmail.com>
+    License: BSD 3 clause
+
     Parameters
     ----------
     n_clusters : int, optional (default=3)
@@ -88,12 +126,12 @@ class KKMeans(BaseEstimator, ClusterMixin):
       http://www.cs.utexas.edu/users/inderjit/public_papers/kdd_spectral_kernelkmeans.pdf
     """
 
-    name = 'Kernel KMeans'
+    name = 'KernelKMeans'
 
-    def __init__(self, n_clusters=3, max_iter=300, tol=1e-3, n_init=10,
+    def __init__(self, n_clusters, max_iter=300, tol=1e-3, n_init=10,
                  kernel='precomputed', gamma='auto', degree=3, coef0=1.0,
                  kernel_params=None, random_state=None, verbose=0):
-        self.n_clusters = n_clusters
+        super().__init__(n_clusters)
         self.max_iter = max_iter
         self.tol = tol
         self.n_init = n_init
@@ -276,13 +314,3 @@ class KKMeans(BaseEstimator, ClusterMixin):
         self._compute_dist(K, dist, self.within_distances_,
                            update_within=False)
         return dist.argmin(axis=1)
-
-
-if __name__ == '__main__':
-    graph, info = Datasets().news_2cl_1
-    X, y = graph[0]
-    print(y)
-
-    km = KKMeans(n_clusters=2)
-    print(km.fit_predict(X))
-    print(km.predict(X))

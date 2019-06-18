@@ -16,7 +16,7 @@ import networkx.readwrite.json_graph as jg
 from tqdm import tqdm
 
 from pygraphs import util
-from pygraphs.cluster import SpectralClustering
+from pygraphs.cluster import SpectralClustering_rubanov
 from pygraphs.graphs import Samples, RubanovModel
 from pygraphs.measure import *
 from pygraphs.measure import scaler
@@ -99,7 +99,7 @@ class TestCompetition(unittest.TestCase, ABC):
                 try:
                     count += 1
                     K = mg.get_K(param)
-                    y_pred = SpectralClustering(2).fit_predict(K)
+                    y_pred = SpectralClustering_rubanov(2).fit_predict(K)
                     results[graph_idx].append(FC(y_true, y_pred))
                     passes += 1
                 except:

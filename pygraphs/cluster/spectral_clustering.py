@@ -1,19 +1,12 @@
 import numpy as np
 import sklearn.cluster
-from sklearn.base import ClusterMixin, BaseEstimator
 
+from pygraphs.cluster.base import KernelEstimator
 from pygraphs.graphs import Datasets
 
 
-class SpectralClustering(ClusterMixin, BaseEstimator):
-    name = 'SpectralClustering'
-
-    def __init__(self, n_clusters):
-        self.n_clusters = n_clusters
-
-    def fit(self, K, y=None, sample_weight=None):
-        self.labels_ = self.predict(K)
-        return self
+class SpectralClustering_rubanov(KernelEstimator):
+    name = 'SpectralClustering_rubanov'
 
     def predict(self, K):
         X = self._max_ort(K)
@@ -33,13 +26,3 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         sgns = np.sign(np.asarray(X)[max_pos, range(X.shape[1])])
         S = np.asmatrix(np.diag(sgns))
         return np.asmatrix(X) * S
-
-
-if __name__ == '__main__':
-    graph, info = Datasets().news_2cl_1
-    X, y = graph[0]
-    print(y)
-
-    km = SpectralClustering(n_clusters=2)
-    print(km.fit_predict(X))
-    print(km.predict(X))

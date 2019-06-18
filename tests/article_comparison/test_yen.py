@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeansSklearn
+from pygraphs.cluster import KMeans_sklearn
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 from pygraphs.scorer import rand_index
@@ -41,7 +41,7 @@ class Table1Tests(unittest.TestCase):
         for graphs, info in [self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3']]:
             A, labels_true = graphs[0]
             K = kernel_func(A)
-            labels_pred = KKMeansSklearn(n_clusters=info['k']).fit_predict(K)
+            labels_pred = KMeans_sklearn(n_clusters=info['k']).fit_predict(K)
             test_nmi = scorer_func(labels_true, labels_pred)
 
             true_nmi = self.etalon[info['name']][result_idx]

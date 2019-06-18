@@ -1,10 +1,8 @@
 import sys
 
 import numpy as np
-from sklearn.base import ClusterMixin, BaseEstimator
-from sklearn.utils import deprecated
 
-from pygraphs.graphs import Datasets
+from pygraphs.cluster.base import KernelEstimator
 
 
 class KWardCluster:
@@ -29,12 +27,8 @@ class KWardCluster:
         return currentΔJ
 
 
-@deprecated()
-class KWard(ClusterMixin, BaseEstimator):
+class KWard(KernelEstimator):
     name = 'KernelWard'
-
-    def __init__(self, n_clusters):
-        self.n_clusters = n_clusters
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)
@@ -65,13 +59,3 @@ class KWard(ClusterMixin, BaseEstimator):
         clusters.remove(Ck)
         clusters.remove(Cl)
         clusters.append(KWardCluster(union, K.shape[0]))
-
-
-if __name__ == '__main__':
-    graph, info = Datasets().news_2cl_1
-    X, y = graph[0]
-    print(y)
-
-    km = KWard(n_clusters=2)
-    print(km.fit_predict(X))
-    print(km.predict(X))
