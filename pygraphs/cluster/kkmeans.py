@@ -8,17 +8,18 @@ Author: Mathieu Blondel <mathieu@mblondel.org>,
         Ishank Gulati <gulati.ishank@gmail.com>
 License: BSD 3 clause
 """
-from __future__ import print_function
+
 from __future__ import division
+from __future__ import print_function
 
 import numpy as np
-
 from sklearn.base import BaseEstimator, ClusterMixin
-from sklearn.metrics import adjusted_rand_score
 from sklearn.metrics.pairwise import pairwise_kernels
-from sklearn.utils import check_random_state
 from sklearn.utils import check_array
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import FLOAT_DTYPES
+
+from pygraphs.graphs import Datasets
 
 
 class KKMeans(BaseEstimator, ClusterMixin):
@@ -90,7 +91,7 @@ class KKMeans(BaseEstimator, ClusterMixin):
     name = 'Kernel KMeans'
 
     def __init__(self, n_clusters=3, max_iter=300, tol=1e-3, n_init=10,
-                 kernel='linear', gamma='auto', degree=3, coef0=1.0,
+                 kernel='precomputed', gamma='auto', degree=3, coef0=1.0,
                  kernel_params=None, random_state=None, verbose=0):
         self.n_clusters = n_clusters
         self.max_iter = max_iter
@@ -201,17 +202,13 @@ class KKMeans(BaseEstimator, ClusterMixin):
                 self.labels_ = dist.argmin(axis=1)
 
             # Computing inertia to choose the best initialization
-            inertia = np.sum([d[l]**2 for d, l in zip(dist, self.labels_)])
-            ari = adjusted_rand_score([0]*200 + [1]*200, self.labels_)
+            inertia = np.sum([d[l] ** 2 for d, l in zip(dist, self.labels_)])
 
             if self.verbose:
-                print("Initialization %2d, inertia %.3f, ari %.3f" % (i, inertia, ari))
-                # print(self.labels_)
+                print("Initialization %2d, inertia %.3f, ari %.3f" % (i, inertia))
 
             if best_inertia is None or inertia < best_inertia:
-                print('best inertia!')
                 best_inertia = inertia
-                best_ari = ari
                 n_iter = it + 1
                 best_labels = self.labels_.copy()
                 best_distances = self.within_distances_.copy()
@@ -220,8 +217,6 @@ class KKMeans(BaseEstimator, ClusterMixin):
         self.within_distances_ = best_distances.copy()
         self.n_iter_ = n_iter
         self.X_fit_ = X
-
-        print('best inertia', best_inertia, 'ari', best_ari)
 
         return self
 
@@ -281,3 +276,13 @@ class KKMeans(BaseEstimator, ClusterMixin):
         self._compute_dist(K, dist, self.within_distances_,
                            update_within=False)
         return dist.argmin(axis=1)
+
+
+if __name__ == '__main__':
+    graph, info = Datasets().news_2cl_1
+    X, y = graph[0]
+    print(y)
+
+    km = KKMeans(n_clusters=2)
+    print(km.fit_predict(X))
+    print(km.predict(X))

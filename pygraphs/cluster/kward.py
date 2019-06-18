@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.base import ClusterMixin, BaseEstimator
 from sklearn.utils import deprecated
 
+from pygraphs.graphs import Datasets
+
 
 class KWardCluster:
     def __init__(self, nodes, all_nodes_count):
@@ -63,3 +65,13 @@ class KWard(ClusterMixin, BaseEstimator):
         clusters.remove(Ck)
         clusters.remove(Cl)
         clusters.append(KWardCluster(union, K.shape[0]))
+
+
+if __name__ == '__main__':
+    graph, info = Datasets().news_2cl_1
+    X, y = graph[0]
+    print(y)
+
+    km = KWard(n_clusters=2)
+    print(km.fit_predict(X))
+    print(km.predict(X))

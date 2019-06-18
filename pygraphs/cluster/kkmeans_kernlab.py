@@ -36,6 +36,7 @@ class KKMeansKernlab(BaseEstimator, ClusterMixin):
 if __name__ == '__main__':
     graph, info = Datasets().news_2cl_1
     X, y = graph[0]
+    print(y)
 
     km = KKMeansKernlab(n_clusters=2)
     print(km.fit_predict(X))

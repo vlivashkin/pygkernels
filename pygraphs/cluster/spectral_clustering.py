@@ -2,6 +2,8 @@ import numpy as np
 import sklearn.cluster
 from sklearn.base import ClusterMixin, BaseEstimator
 
+from pygraphs.graphs import Datasets
+
 
 class SpectralClustering(ClusterMixin, BaseEstimator):
     name = 'SpectralClustering'
@@ -31,3 +33,13 @@ class SpectralClustering(ClusterMixin, BaseEstimator):
         sgns = np.sign(np.asarray(X)[max_pos, range(X.shape[1])])
         S = np.asmatrix(np.diag(sgns))
         return np.asmatrix(X) * S
+
+
+if __name__ == '__main__':
+    graph, info = Datasets().news_2cl_1
+    X, y = graph[0]
+    print(y)
+
+    km = SpectralClustering(n_clusters=2)
+    print(km.fit_predict(X))
+    print(km.predict(X))

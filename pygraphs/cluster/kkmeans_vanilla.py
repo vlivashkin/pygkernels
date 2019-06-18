@@ -47,8 +47,9 @@ class KKMeansVanilla(BaseEstimator, ClusterMixin):
 
 
 if __name__ == '__main__':
-    graph, info = Datasets.news_2cl_1
+    graph, info = Datasets().news_2cl_1
     X, y = graph[0]
+    print(y)
 
     km = KKMeansVanilla(n_clusters=2, max_iter=100, random_state=42)
     print(km.fit_predict(X))
