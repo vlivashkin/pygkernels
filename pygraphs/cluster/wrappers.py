@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.cluster import AgglomerativeClustering, k_means, SpectralClustering
 from sklearn.utils import deprecated
 
@@ -25,7 +26,7 @@ class SpectralClustering_sklearn(KernelEstimator):
     name = 'SpectralClustering_sklearn'
 
     def predict(self, K):
-        return SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed').fit_predict(K)
+        return SpectralClustering(n_clusters=self.n_clusters, affinity='precomputed').fit_predict(K - np.nanmin(K))
 
 
 class KKMeans_kernlab(REstimatorWrapper):
@@ -36,7 +37,14 @@ class KKMeans_kernlab(REstimatorWrapper):
 
 
 class SpectralClustering_kernlab(REstimatorWrapper):
-    name = 'SpectralClustering_kernlab'
+    name = 'SpectralClustering_kernlab_-min'
 
     def predict(self, K):
-        return self._predict(K, 'spectral_clustering.r')
+        return self._predict(K - np.nanmin(K), 'spectral_clustering.r')
+
+
+class SpectralClustering_kernlab_100(REstimatorWrapper):
+    name = 'SpectralClustering_kernlab_+100'
+
+    def predict(self, K):
+        return self._predict(K + 100, 'spectral_clustering.r')

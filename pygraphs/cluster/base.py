@@ -31,7 +31,7 @@ class REstimatorWrapper(KernelEstimator, ABC):
         try:
             subprocess.check_output(
                 ["Rscript", "--vanilla", pj(REstimatorWrapper.RSCRIPT_ROOT_PATH, script_name),
-                 temp_name, str(self.n_clusters)])
+                 temp_name, str(self.n_clusters)], timeout=60)
             result = list(pd.read_csv(temp_name + '_result.csv')['x'])
         finally:
             os.remove(temp_name)
