@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm_notebook as tqdm
 
+from pygraphs.measure import *
 from pygraphs.util import ddict2dict
 
 d3_category20 = [
@@ -30,7 +31,8 @@ d3_category20 = [
     '#bcbd22',
     '#dbdb8d',
     '#17becf',
-    '#9edae5'
+    '#9edae5',
+    '#cccccc'
 ]
 
 
@@ -39,6 +41,31 @@ def d3():
     while True:
         yield d3_category20[idx], d3_category20[idx + 1]
         idx = (idx + 2) % 20
+
+
+d3_colors = {
+    pWalk_H: d3_category20[0],
+    Walk_H: d3_category20[1],
+    For_H: d3_category20[2],
+    logFor_H: d3_category20[3],
+    Comm_H: d3_category20[4],
+    logComm_H: d3_category20[5],
+    Heat_H: d3_category20[6],
+    logHeat_H: d3_category20[7],
+    NHeat_H: d3_category20[8],
+    logNHeat_H: d3_category20[9],
+    SCT_H: d3_category20[10],
+    SCCT_H: d3_category20[11],
+    RSP_K: d3_category20[12],
+    FE_K: d3_category20[13],
+    PPR_H: d3_category20[14],
+    logPPR_H: d3_category20[15],
+    ModifPPR_H: d3_category20[16],
+    logModifPPR_H: d3_category20[17],
+    HeatPPR_H: d3_category20[18],
+    logHeatPPR_H: d3_category20[19],
+    SPCT_H: d3_category20[20]
+}
 
 
 class ParallelByGraphs:
@@ -76,11 +103,13 @@ class ParallelByGraphs:
         if self.progressbar:
             graphs = tqdm(graphs, desc=kernel_class.name)
         if n_jobs == 1:  # not parallel
+            # logging.info('n_jobs == 1, run NOT in parallel')
             for graph_idx, graph in enumerate(graphs):
                 graph_results = self._calc_graph(graph, kernel_class, clf, graph_idx)
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
         else:
+            # logging.info(f'n_jobs == {n_jobs}, run in parallel!')
             all_graph_results = Parallel(n_jobs=n_jobs)(
                 delayed(self._calc_graph)(graph, kernel_class, clf, graph_idx) for graph_idx, graph in
                 enumerate(graphs))
