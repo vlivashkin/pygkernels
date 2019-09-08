@@ -110,9 +110,8 @@ class ParallelByGraphs:
                     raw_param_dict[param_flat].append(ari)
         else:
             # logging.info(f'n_jobs == {n_jobs}, run in parallel!')
-            all_graph_results = Parallel(n_jobs=n_jobs)(
-                delayed(self._calc_graph)(graph, kernel_class, clf, graph_idx) for graph_idx, graph in
-                enumerate(graphs))
+            all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(graph, kernel_class, clf, graph_idx)
+                                                        for graph_idx, graph in enumerate(graphs))
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
