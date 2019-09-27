@@ -2,7 +2,7 @@ import itertools
 from collections import defaultdict
 
 import numpy as np
-from scipy.stats import rankdata
+from scipy import stats
 
 
 def max_accuracy(y_true, y_pred):
@@ -55,8 +55,8 @@ def ranking(measure1_ari, measure2_ari):
     n = measure1_ari.shape[0]
 
     # 1. генерируем ранги
-    measure1_rank = rankdata(-measure1_ari)
-    measure2_rank = rankdata(-measure2_ari)
+    measure1_rank = stats.rankdata(-measure1_ari)
+    measure2_rank = stats.rankdata(-measure2_ari)
 
     # 2. Для каждой пары мер считаем сумму квадратов разностей
     sum_sq_delta = np.sum(np.power(measure1_rank - measure2_rank, 2))

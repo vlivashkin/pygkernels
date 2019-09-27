@@ -8,7 +8,6 @@ from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm_notebook as tqdm
 
-from pygraphs.measure import *
 from pygraphs.util import ddict2dict
 
 d3_category20 = [
@@ -44,27 +43,27 @@ def d3():
 
 
 d3_colors = {
-    pWalk_H: d3_category20[0],
-    Walk_H: d3_category20[1],
-    For_H: d3_category20[2],
-    logFor_H: d3_category20[3],
-    Comm_H: d3_category20[4],
-    logComm_H: d3_category20[5],
-    Heat_H: d3_category20[6],
-    logHeat_H: d3_category20[7],
-    NHeat_H: d3_category20[8],
-    logNHeat_H: d3_category20[9],
-    SCT_H: d3_category20[10],
-    SCCT_H: d3_category20[11],
-    RSP_K: d3_category20[12],
-    FE_K: d3_category20[13],
-    PPR_H: d3_category20[14],
-    logPPR_H: d3_category20[15],
-    ModifPPR_H: d3_category20[16],
-    logModifPPR_H: d3_category20[17],
-    HeatPPR_H: d3_category20[18],
-    logHeatPPR_H: d3_category20[19],
-    SPCT_H: d3_category20[20]
+    'pWalk': d3_category20[0],
+    'Walk': d3_category20[1],
+    'For': d3_category20[2],
+    'logFor': d3_category20[3],
+    'Comm': d3_category20[4],
+    'logComm': d3_category20[5],
+    'Heat': d3_category20[6],
+    'logHeat': d3_category20[7],
+    'NHeat': d3_category20[8],
+    'logNHeat': d3_category20[9],
+    'SCT': d3_category20[10],
+    'SCCT': d3_category20[11],
+    'RSP': d3_category20[12],
+    'FE': d3_category20[13],
+    'PPR': d3_category20[14],
+    'logPPR': d3_category20[15],
+    'ModifPPR': d3_category20[16],
+    'logModifPPR': d3_category20[17],
+    'HeatPPR': d3_category20[18],
+    'logHeatPPR': d3_category20[19],
+    'SP-CT': d3_category20[20]
 }
 
 
