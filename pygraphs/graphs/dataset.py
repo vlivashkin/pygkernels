@@ -82,44 +82,32 @@ class Datasets:
     DATASETS_ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
 
     _lazy_datasets = {
-        'football': lambda: Datasets._load_polbooks_or_football('football', 'football_nodes.csv',
-                                                                'football_edges.csv'),
-        'polbooks': lambda: Datasets._load_polbooks_or_football('polbooks', 'polbooks_nodes.csv',
-                                                                'polbooks_edges.csv'),
-        'polblogs': lambda: Datasets._load_polblogs_or_zachary('polblogs', 'polblogs.net'),
-        'zachary': lambda: Datasets._load_polblogs_or_zachary('zachary', 'zachary.net'),
-
-        # Newsgroup
-        'news_2cl_1': lambda: Datasets._load_newsgroup('news_2cl_1', 'newsgroup/news_2cl_1_classeo.csv',
-                                                       'newsgroup/news_2cl_1_Docr.csv'),
-        'news_2cl_2': lambda: Datasets._load_newsgroup('news_2cl_2', 'newsgroup/news_2cl_2_classeo.csv',
-                                                       'newsgroup/news_2cl_2_Docr.csv'),
-        'news_2cl_3': lambda: Datasets._load_newsgroup('news_2cl_3', 'newsgroup/news_2cl_3_classeo.csv',
-                                                       'newsgroup/news_2cl_3_Docr.csv'),
-        'news_3cl_1': lambda: Datasets._load_newsgroup('news_3cl_1', 'newsgroup/news_3cl_1_classeo.csv',
-                                                       'newsgroup/news_3cl_1_Docr.csv'),
-        'news_3cl_2': lambda: Datasets._load_newsgroup('news_3cl_2', 'newsgroup/news_3cl_2_classeo.csv',
-                                                       'newsgroup/news_3cl_2_Docr.csv'),
-        'news_3cl_3': lambda: Datasets._load_newsgroup('news_3cl_3', 'newsgroup/news_3cl_3_classeo.csv',
-                                                       'newsgroup/news_3cl_3_Docr.csv'),
-        'news_5cl_1': lambda: Datasets._load_newsgroup('news_5cl_1', 'newsgroup/news_5cl_1_classeo.csv',
-                                                       'newsgroup/news_5cl_1_Docr.csv'),
-        'news_5cl_2': lambda: Datasets._load_newsgroup('news_5cl_2', 'newsgroup/news_5cl_2_classeo.csv',
-                                                       'newsgroup/news_5cl_2_Docr.csv'),
-        'news_5cl_3': lambda: Datasets._load_newsgroup('news_5cl_3', 'newsgroup/news_5cl_3_classeo.csv',
-                                                       'newsgroup/news_5cl_3_Docr.csv'),
-        # 'citeseer': lambda: Datasets.load_webkb('citeseer', 'citeseer/citeseer.nodes', 'citeseer/citeseer.edges'),
-        'cora': lambda: Datasets._load_webkb('cora', 'cora/cora.nodes', 'cora/cora.edges'),
-
-        # WebKB
-        'webkb_cornel': lambda: Datasets._load_webkb('webkb_cornell', 'webKB/cornell/webkb-cornell.nodes',
-                                                     'webKB/cornell/webkb-cornell.edges'),
-        'webkb_texas': lambda: Datasets._load_webkb('webkb_texas', 'webKB/texas/webkb-texas.nodes',
-                                                    'webKB/texas/webkb-texas.edges'),
-        'webkb_washington': lambda: Datasets._load_webkb('webkb_washington', 'webKB/washington/webkb-washington.nodes',
-                                                         'webKB/washington/webkb-washington.edges'),
-        'webkb_wisconsin': lambda: Datasets._load_webkb('webkb_wisconsin', 'webKB/wisconsin/webkb-wisconsin.nodes',
-                                                        'webKB/wisconsin/webkb-wisconsin.edges')
+        # 'as': lambda: Datasets._load_altsoph('as', 'as.clusters', 'as.edges'),  # TOO BIG
+        # 'citeseer': lambda: Datasets._load_webkb_like('citeseer', 'citeseer.nodes', 'citeseer.edges'),  # BROKEN
+        # 'cora_full': lambda: Datasets._load_altsoph('cora_full', '_old.clusters', '_old.edges'),  # TOO BIG
+        'dolphins': lambda: Datasets._load_altsoph('dolphins', 'dolphins.clusters', 'dolphins.edges'),
+        'eu-core': lambda: Datasets._load_altsoph('eu-core', 'eu-core.clusters', 'eu-core.edges'),
+        'football': lambda: Datasets._load_altsoph('football', 'football.clusters', 'football.edges'),
+        'karate': lambda: Datasets._load_altsoph('karate', 'karate.clusters', 'karate.edges'),
+        'news_2cl_1': lambda: Datasets._load_newsgroup('news_2cl_1', 'news_2cl_1_classeo.csv', 'news_2cl_1_Docr.csv'),
+        'news_2cl_2': lambda: Datasets._load_newsgroup('news_2cl_2', 'news_2cl_2_classeo.csv', 'news_2cl_2_Docr.csv'),
+        'news_2cl_3': lambda: Datasets._load_newsgroup('news_2cl_3', 'news_2cl_3_classeo.csv', 'news_2cl_3_Docr.csv'),
+        'news_3cl_1': lambda: Datasets._load_newsgroup('news_3cl_1', 'news_3cl_1_classeo.csv', 'news_3cl_1_Docr.csv'),
+        'news_3cl_2': lambda: Datasets._load_newsgroup('news_3cl_2', 'news_3cl_2_classeo.csv', 'news_3cl_2_Docr.csv'),
+        'news_3cl_3': lambda: Datasets._load_newsgroup('news_3cl_3', 'news_3cl_3_classeo.csv', 'news_3cl_3_Docr.csv'),
+        'news_5cl_1': lambda: Datasets._load_newsgroup('news_5cl_1', 'news_5cl_1_classeo.csv', 'news_5cl_1_Docr.csv'),
+        'news_5cl_2': lambda: Datasets._load_newsgroup('news_5cl_2', 'news_5cl_2_classeo.csv', 'news_5cl_2_Docr.csv'),
+        'news_5cl_3': lambda: Datasets._load_newsgroup('news_5cl_3', 'news_5cl_3_classeo.csv', 'news_5cl_3_Docr.csv'),
+        'polblogs': lambda: Datasets._load_altsoph('polblogs', 'polblogs.clusters', 'polblogs.edges'),
+        'polbooks': lambda: Datasets._load_altsoph('polbooks', 'polbooks.clusters', 'polbooks.edges'),
+        'webkb_cornel': lambda: Datasets._load_webkb('webkb_cornell', 'cornell/webkb-cornell.nodes',
+                                                     'cornell/webkb-cornell.edges'),  # POSSIBLY BROKEN
+        'webkb_texas': lambda: Datasets._load_webkb('webkb_texas', 'texas/webkb-texas.nodes',
+                                                    'texas/webkb-texas.edges'),  # POSSIBLY BROKEN
+        'webkb_washington': lambda: Datasets._load_webkb('webkb_washington', 'washington/webkb-washington.nodes',
+                                                         'washington/webkb-washington.edges'),  # POSSIBLY BROKEN
+        'webkb_wisconsin': lambda: Datasets._load_webkb('webkb_wisconsin', 'wisconsin/webkb-wisconsin.nodes',
+                                                        'wisconsin/webkb-wisconsin.edges')  # POSSIBLY BROKEN
     }
 
     _loaded_datasets = {}
@@ -141,34 +129,55 @@ class Datasets:
         return [self[x] for x in self._lazy_datasets.keys()]
 
     @staticmethod
+    def _load_altsoph(name, nodes_path, edges_path):
+        return ImportedGraphBuilder() \
+            .set_name(name) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, name, nodes_path)) \
+            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path)) \
+            .build()
+
+    @staticmethod
     def _load_polbooks_or_football(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, nodes_path), name_col_idx='idx', class_col_idx=2) \
-            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, edges_path)) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, name, nodes_path), name_col_idx='idx', class_col_idx=2) \
+            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path)) \
             .build()
 
     @staticmethod
     def _load_polblogs_or_zachary(name, graph_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes_and_edges(pj(Datasets.DATASETS_ROOT_PATH, graph_path)) \
+            .import_nodes_and_edges(pj(Datasets.DATASETS_ROOT_PATH, name, graph_path)) \
             .build()
 
     @staticmethod
     def _load_newsgroup(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, nodes_path), name_col_idx='idx', class_col_idx=0) \
-            .import_adjacency_matrix(pj(Datasets.DATASETS_ROOT_PATH, edges_path)) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup', nodes_path),
+                          name_col_idx='idx', class_col_idx=0) \
+            .import_adjacency_matrix(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup',edges_path)) \
             .build()
 
     @staticmethod
     def _load_webkb(name, nodes_path, edges_path):
         return ImportedGraphBuilder() \
             .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, nodes_path), startline=2, name_col_idx=0, class_col_idx=-1) \
-            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, edges_path), startline=3, node1_col_idx=1, node2_col_idx=3) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, 'webkb', nodes_path),
+                          startline=2, name_col_idx=0, class_col_idx=-1) \
+            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, 'webkb', edges_path),
+                          startline=3, node1_col_idx=1, node2_col_idx=3) \
+            .build()
+
+    @staticmethod
+    def _load_webkb_like(name, nodes_path, edges_path):
+        return ImportedGraphBuilder() \
+            .set_name(name) \
+            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, name, nodes_path),
+                          startline=2, name_col_idx=0, class_col_idx=-1) \
+            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path),
+                          startline=3, node1_col_idx=1, node2_col_idx=3) \
             .build()
 
     def __getitem__(self, item):
