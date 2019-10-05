@@ -98,16 +98,16 @@ class Datasets:
         'news_5cl_1': lambda: Datasets._load_newsgroup('news_5cl_1', 'news_5cl_1_classeo.csv', 'news_5cl_1_Docr.csv'),
         'news_5cl_2': lambda: Datasets._load_newsgroup('news_5cl_2', 'news_5cl_2_classeo.csv', 'news_5cl_2_Docr.csv'),
         'news_5cl_3': lambda: Datasets._load_newsgroup('news_5cl_3', 'news_5cl_3_classeo.csv', 'news_5cl_3_Docr.csv'),
-        'polblogs': lambda: Datasets._load_altsoph('polblogs', 'polblogs.clusters', 'polblogs.edges'),
+        # 'polblogs': lambda: Datasets._load_altsoph('polblogs', 'polblogs.clusters', 'polblogs.edges'),  # TOO BIG
         'polbooks': lambda: Datasets._load_altsoph('polbooks', 'polbooks.clusters', 'polbooks.edges'),
-        'webkb_cornel': lambda: Datasets._load_webkb('webkb_cornell', 'cornell/webkb-cornell.nodes',
-                                                     'cornell/webkb-cornell.edges'),  # POSSIBLY BROKEN
-        'webkb_texas': lambda: Datasets._load_webkb('webkb_texas', 'texas/webkb-texas.nodes',
-                                                    'texas/webkb-texas.edges'),  # POSSIBLY BROKEN
-        'webkb_washington': lambda: Datasets._load_webkb('webkb_washington', 'washington/webkb-washington.nodes',
-                                                         'washington/webkb-washington.edges'),  # POSSIBLY BROKEN
-        'webkb_wisconsin': lambda: Datasets._load_webkb('webkb_wisconsin', 'wisconsin/webkb-wisconsin.nodes',
-                                                        'wisconsin/webkb-wisconsin.edges')  # POSSIBLY BROKEN
+        # 'webkb_cornel': lambda: Datasets._load_webkb('webkb_cornell', 'cornell/webkb-cornell.nodes',
+        #                                              'cornell/webkb-cornell.edges'),  # POSSIBLY BROKEN
+        # 'webkb_texas': lambda: Datasets._load_webkb('webkb_texas', 'texas/webkb-texas.nodes',
+        #                                             'texas/webkb-texas.edges'),  # POSSIBLY BROKEN
+        # 'webkb_washington': lambda: Datasets._load_webkb('webkb_washington', 'washington/webkb-washington.nodes',
+        #                                                  'washington/webkb-washington.edges'),  # POSSIBLY BROKEN
+        # 'webkb_wisconsin': lambda: Datasets._load_webkb('webkb_wisconsin', 'wisconsin/webkb-wisconsin.nodes',
+        #                                                 'wisconsin/webkb-wisconsin.edges')  # POSSIBLY BROKEN
     }
 
     _loaded_datasets = {}
