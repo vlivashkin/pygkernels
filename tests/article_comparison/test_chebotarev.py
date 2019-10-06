@@ -26,6 +26,9 @@ class TestFigure1Comparison(unittest.TestCase):
         logging.info('{}\tD_12\tD_23\tD_13\tD_14'.format(name))
         logging.info("True\t{:0.5f}\t{:0.5f}\t{:0.5f}\t{:0.5f}".format(*true_values))
         logging.info("Test\t{:0.5f}\t{:0.5f}\t{:0.5f}\t{:0.5f}".format(D[0, 1], D[1, 2], D[0, 2], D[0, 3]))
+        logging.info("{:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f}" \
+                     .format(true_values[0], D[0, 1], true_values[1], D[1, 2],
+                             true_values[2], D[0, 2], true_values[3], D[0, 3]))
 
         for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]][:len(true_values)], true_values):
             self.assertTrue(np.isclose(d, t, atol=atol),
@@ -95,6 +98,8 @@ class TestTable1Comparison(unittest.TestCase):
         logging.info('{}\tD_12/D_23\t(D_12+D_23)/D_13\tD_14/D_12'.format(name))
         logging.info("True\t{:0.4f}\t{:0.4f}\t{:0.4f}".format(*true_values))
         logging.info("Test\t{:0.4f}\t{:0.4f}\t{:0.4f}".format(r1, r2, r3))
+        logging.info("{:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f}" \
+                     .format(true_values[0], r1, true_values[1], r2,  true_values[2], r3))
 
         for d, t in zip([r1, r2, r3], true_values):
             self.assertTrue(np.isclose(d, t, atol=atol),

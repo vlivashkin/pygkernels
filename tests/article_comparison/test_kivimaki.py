@@ -9,7 +9,7 @@ import unittest
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KMeans_sklearn
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
@@ -90,16 +90,16 @@ class TestTable2(unittest.TestCase):
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
-            labels_pred = KMeans_sklearn(n_clusters=info['k']).fit_predict(K)
+            labels_pred = KKMeans(n_clusters=info['k']).fit_predict(K)
             test_nmi = 100 * normalized_mutual_info_score(labels_true, labels_pred)
 
             true_nmi = self.etalon[info['name']][idx]
             diff = np.abs(test_nmi - true_nmi)
 
             # logging results for report
-            logging.info('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
+            logging.info('measure\tgraph\ttrue nmi\ttest nmi\tdiff')
             logging.info(
-                '{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], test_nmi, true_nmi, diff))
+                '{}\t{} & {:0.3f} & {:0.3f} & {:0.3f}'.format(measure.name, info['name'], true_nmi, test_nmi, diff))
 
             results.append({
                 'measure_name': measure.name,
