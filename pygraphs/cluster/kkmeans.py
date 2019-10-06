@@ -2,9 +2,11 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+from sklearn.cluster.k_means_ import _labels_inertia, _check_sample_weight
 from sklearn.metrics.pairwise import pairwise_kernels
 from sklearn.utils import check_array
 from sklearn.utils import check_random_state
+from sklearn.utils.extmath import row_norms
 from sklearn.utils.validation import FLOAT_DTYPES
 
 from pygraphs.cluster.base import KernelEstimator
@@ -130,7 +132,7 @@ class KKMeans(KernelEstimator):
 
     def __init__(self, n_clusters, max_iter=300, tol=1e-3, n_init=10,
                  kernel='precomputed', gamma='auto', degree=3, coef0=1.0,
-                 kernel_params=None, random_state=None, verbose=0):
+                 kernel_params=None, random_state=None, verbose=0, sklearn_inertia=True):
         super().__init__(n_clusters)
         self.max_iter = max_iter
         self.tol = tol
@@ -142,6 +144,8 @@ class KKMeans(KernelEstimator):
         self.coef0 = coef0
         self.kernel_params = kernel_params
         self.verbose = verbose
+
+        self.sklearn_inertia = sklearn_inertia
 
     def _check_fit_data(self, X):
         """Verify that the number of samples given is larger than k"""
@@ -239,8 +243,15 @@ class KKMeans(KernelEstimator):
                                    update_within=False)
                 self.labels_ = dist.argmin(axis=1)
 
-            # Computing inertia to choose the best initialization
-            inertia = np.sum([d[l] ** 2 for d, l in zip(dist, self.labels_)])
+            if self.sklearn_inertia:
+                # Keep only the best cluster centers across independent inits on
+                # the common validation set
+                sample_weight = _check_sample_weight(X, None)
+                x_squared_norms = row_norms(X, squared=True)
+                _, inertia = _labels_inertia(X, sample_weight, x_squared_norms, dist.transpose((1, 0)))
+            else:
+                # Computing inertia to choose the best initialization
+                inertia = np.sum([d[l] ** 2 for d, l in zip(dist, self.labels_)])
 
             if self.verbose:
                 print("Initialization %2d, inertia %.3f, ari %.3f" % (i, inertia))
