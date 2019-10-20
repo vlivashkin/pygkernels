@@ -10,14 +10,14 @@ class SpectralClustering_rubanov(KernelEstimator):
     def _max_ort(self, M):
         val, vec = np.linalg.eig(M)
         ind = np.argpartition(val, -self.n_clusters)[-self.n_clusters:]
-        X = np.asmatrix(vec[:, ind])
+        X = np.asarray(vec[:, ind])
         return X
 
     def _sign_flip(self, X):
         max_pos = np.argmax(np.abs(np.asarray(X)), axis=0)
         sgns = np.sign(np.asarray(X)[max_pos, range(X.shape[1])])
-        S = np.asmatrix(np.diag(sgns))
-        return np.asmatrix(X) * S
+        S = np.asarray(np.diag(sgns))
+        return np.asarray(X) * S
 
     def predict(self, K):
         X = self._max_ort(K)

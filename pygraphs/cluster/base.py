@@ -21,6 +21,10 @@ class KernelEstimator(BaseEstimator, ClusterMixin, ABC):
     def predict(self, K):
         pass
 
+    def fit_predict(self, X, y=None):
+        self.fit(X, y)
+        return self.labels_
+
 
 class REstimatorWrapper(KernelEstimator, ABC):
     RSCRIPT_ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'r')

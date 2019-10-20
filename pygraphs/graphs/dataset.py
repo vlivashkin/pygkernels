@@ -88,6 +88,8 @@ class Datasets:
         'dolphins': lambda: Datasets._load_altsoph('dolphins', 'dolphins.clusters', 'dolphins.edges'),
         'eu-core': lambda: Datasets._load_altsoph('eu-core', 'eu-core.clusters', 'eu-core.edges'),
         'football': lambda: Datasets._load_altsoph('football', 'football.clusters', 'football.edges'),
+        'football_old': lambda: Datasets._load_polbooks_or_football('football/_old', 'football_nodes.csv',
+                                                                    'football_edges.csv'),
         'karate': lambda: Datasets._load_altsoph('karate', 'karate.clusters', 'karate.edges'),
         'news_2cl_1': lambda: Datasets._load_newsgroup('news_2cl_1', 'news_2cl_1_classeo.csv', 'news_2cl_1_Docr.csv'),
         'news_2cl_2': lambda: Datasets._load_newsgroup('news_2cl_2', 'news_2cl_2_classeo.csv', 'news_2cl_2_Docr.csv'),
@@ -157,7 +159,7 @@ class Datasets:
             .set_name(name) \
             .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup', nodes_path),
                           name_col_idx='idx', class_col_idx=0) \
-            .import_adjacency_matrix(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup',edges_path)) \
+            .import_adjacency_matrix(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup', edges_path)) \
             .build()
 
     @staticmethod

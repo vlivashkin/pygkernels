@@ -1,12 +1,8 @@
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
-from sklearn.cluster.k_means_ import _labels_inertia, _check_sample_weight
+from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
 from sklearn.metrics.pairwise import pairwise_kernels
 from sklearn.utils import check_array
 from sklearn.utils import check_random_state
-from sklearn.utils.extmath import row_norms
 from sklearn.utils.validation import FLOAT_DTYPES
 
 from pygraphs.cluster.base import KernelEstimator
@@ -73,6 +69,8 @@ class KKMeans(KernelEstimator):
         Maximum number of iterations of algorithm for a single run.
     n_init : int, optional (default=10)
         Number of random initializations.
+    init_choose_strategy : str, optional (default='median')
+        Strategy of choosing best initialization: 'min', 'median', 'max'
     tol : float, optional (default=1e-3)
         Tolerance for stopping criterion.
     kernel : string, optional (default='linear')
@@ -130,13 +128,16 @@ class KKMeans(KernelEstimator):
 
     name = 'KernelKMeans'
 
-    def __init__(self, n_clusters, max_iter=300, tol=1e-3, n_init=10,
-                 kernel='precomputed', gamma='auto', degree=3, coef0=1.0,
-                 kernel_params=None, random_state=None, verbose=0, sklearn_inertia=True):
+    def __init__(self, n_clusters, max_iter=300, tol=1e-4, n_init=10, init_choose_objective='inertia',
+                 init_choose_strategy='max', dist_compensation_strategy='+40', kernel='precomputed', gamma='auto',
+                 degree=3, coef0=1.0, kernel_params=None, random_state=None, verbose=0):
         super().__init__(n_clusters)
         self.max_iter = max_iter
         self.tol = tol
         self.n_init = n_init
+        self.init_choose_objective = init_choose_objective
+        self.init_choose_strategy = init_choose_strategy
+        self.dist_compensation_strategy = dist_compensation_strategy
         self.random_state = random_state
         self.kernel = kernel
         self.gamma = gamma
@@ -144,8 +145,6 @@ class KKMeans(KernelEstimator):
         self.coef0 = coef0
         self.kernel_params = kernel_params
         self.verbose = verbose
-
-        self.sklearn_inertia = sklearn_inertia
 
     def _check_fit_data(self, X):
         """Verify that the number of samples given is larger than k"""
@@ -199,33 +198,24 @@ class KKMeans(KernelEstimator):
         n_samples = X.shape[0]
 
         if self.n_init <= 0:
-            raise ValueError("Invalid number of initializations."
-                             " n_init=%d must be bigger than zero."
-                             % self.n_init)
+            raise ValueError(f"Invalid number of initializations. n_init={self.n_init} must be bigger than zero.")
 
         if self.max_iter <= 0:
-            raise ValueError("Invalid iteration bound."
-                             " max_iter=%d must be greater than zero."
-                             % self.max_iter)
+            raise ValueError(f"Invalid iteration bound. max_iter={self.max_iter} must be greater than zero.")
 
-        best_labels, best_inertia, best_distances = None, None, None
-
+        self.sample_weight_ = sample_weight if sample_weight is not None else np.ones(n_samples)
         K = self._get_kernel(X)
-
         rs = check_random_state(self.random_state)
 
-        sw = sample_weight if sample_weight is not None else np.ones(n_samples)
-        self.sample_weight_ = sw
+        results = []
         for i in range(self.n_init):
-            self.labels_ = rs.randint(self.n_clusters, size=n_samples)
-
             dist = np.zeros((n_samples, self.n_clusters))
+            self.labels_ = rs.randint(self.n_clusters, size=n_samples)
             self.within_distances_ = np.zeros(self.n_clusters)
 
             for it in range(self.max_iter):
                 dist.fill(0)
-                self._compute_dist(K, dist, self.within_distances_,
-                                   update_within=True)
+                self._compute_dist(K, dist, update_within=True)
                 labels_old = self.labels_
                 self.labels_ = dist.argmin(axis=1)
 
@@ -234,44 +224,58 @@ class KKMeans(KernelEstimator):
                 n_same = np.sum((self.labels_ - labels_old) == 0).astype(np.float)
                 if 1 - (n_same / n_samples) < self.tol:
                     if self.verbose:
-                        print("Converged at iteration", it + 1)
+                        print(f"Converged at iteration {it + 1}, tol={1 - (n_same / n_samples)}")
                     break
 
-            if 1 - (n_same / n_samples) > 0:
-                dist.fill(0)
-                self._compute_dist(K, dist, self.within_distances_,
-                                   update_within=False)
-                self.labels_ = dist.argmin(axis=1)
-
-            if self.sklearn_inertia:
-                # Keep only the best cluster centers across independent inits on
-                # the common validation set
-                sample_weight = _check_sample_weight(X, None)
-                x_squared_norms = row_norms(X, squared=True)
-                _, inertia = _labels_inertia(X, sample_weight, x_squared_norms, dist.transpose((1, 0)))
+            # Computing inertia to choose the best initialization
+            if self.dist_compensation_strategy == '+40':
+                dist += 40
+            elif self.dist_compensation_strategy == '<0->0':
+                dist[dist < 0] = 0
+            elif self.dist_compensation_strategy == '-min':
+                dist -= np.min(dist)
             else:
-                # Computing inertia to choose the best initialization
-                inertia = np.sum([d[l] ** 2 for d, l in zip(dist, self.labels_)])
+                raise NotImplemented()
+            assert np.all(dist >= 0)
+
+            inertia = np.sum([d[l] ** 2 for d, l in zip(dist, self.labels_)])
 
             if self.verbose:
-                print("Initialization %2d, inertia %.3f, ari %.3f" % (i, inertia))
+                labels_pred = self.labels_
+                labels_true = y
+                test_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+                print("Initialization %2d, inertia %.3f, nmi %.3f" % (i, inertia, test_nmi))
 
-            if best_inertia is None or inertia < best_inertia:
-                best_inertia = inertia
-                n_iter = it + 1
-                best_labels = self.labels_.copy()
-                best_distances = self.within_distances_.copy()
+            result = {
+                'inertia': inertia,
+                'n_iter': it + 1,
+                'labels': self.labels_.copy(),
+                'distances': self.within_distances_.copy()
+            }
+            if y is not None:
+                result['nmi'] = normalized_mutual_info_score(y, self.labels_, average_method='geometric')
+                result['ari'] = adjusted_rand_score(y, self.labels_)
+            results.append(result)
 
-        self.labels_ = best_labels.copy()
-        self.within_distances_ = best_distances.copy()
-        self.n_iter_ = n_iter
+        results.sort(key=lambda x: x[self.init_choose_objective])
+        if self.init_choose_strategy == 'max':
+            result = results[-1]
+        elif self.init_choose_strategy == 'min':
+            result = results[0]
+        elif self.init_choose_strategy == 'median':
+            result = results[len(results) // 2]
+        else:
+            raise NotImplemented()
+
+        self.labels_ = result['labels']
+        self.within_distances_ = result['distances']
+        self.n_iter_ = result['n_iter']
         self.X_fit_ = X
 
         return self
 
-    def _compute_dist(self, K, dist, within_distances, update_within):
-        """Compute a n_samples x n_clusters distance matrix using the
-        kernel trick.
+    def _compute_dist(self, K, dist, update_within):
+        """Compute a n_samples x n_clusters distance matrix using the kernel trick.
         Parameters
         ----------
         K : Kernel matrix
@@ -300,10 +304,10 @@ class KKMeans(KernelEstimator):
             if update_within:
                 KK = K[mask][:, mask]  # K[mask, mask] does not work.
                 dist_j = np.sum(np.outer(sw[mask], sw[mask]) * KK / denomsq)
-                within_distances[j] = dist_j
+                self.within_distances_[j] = dist_j
                 dist[:, j] += dist_j
             else:
-                dist[:, j] += within_distances[j]
+                dist[:, j] += self.within_distances_[j]
 
             dist[:, j] -= 2 * np.sum(sw[mask] * K[:, mask], axis=1) / denom
 
@@ -322,6 +326,5 @@ class KKMeans(KernelEstimator):
         K = self._get_kernel(X, self.X_fit_)
         n_samples = X.shape[0]
         dist = np.zeros((n_samples, self.n_clusters))
-        self._compute_dist(K, dist, self.within_distances_,
-                           update_within=False)
+        self._compute_dist(K, dist, update_within=False)
         return dist.argmin(axis=1)

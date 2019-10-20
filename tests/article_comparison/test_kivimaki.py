@@ -86,20 +86,32 @@ class TestTable2(unittest.TestCase):
 
     def _newsgroup_results(self, measure_class, best_param, idx):
         results = []
-        for graphs, info in [self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3']]:
+        for graphs, info in [
+            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
+            self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
+            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+        ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
-            labels_pred = KKMeans(n_clusters=info['k']).fit_predict(K)
-            test_nmi = 100 * normalized_mutual_info_score(labels_true, labels_pred)
 
-            true_nmi = self.etalon[info['name']][idx]
-            diff = np.abs(test_nmi - true_nmi)
+            # labels_pred = KKMeans(n_clusters=info['k'], init_choose_objective='nmi', init_choose_strategy='max').fit_predict(K, y=labels_true)
+
+            n_init = 20
+            init_nmi = []
+            for _ in range(n_init):
+                labels_pred = KKMeans(n_clusters=info['k'], n_init=1).fit_predict(K)
+                test_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+                init_nmi.append(test_nmi)
+            test_nmi = np.mean(init_nmi)
+
+            true_nmi = self.etalon[info['name']][idx] / 100
+            diff = true_nmi - test_nmi
 
             # logging results for report
-            logging.info('measure\tgraph\ttrue nmi\ttest nmi\tdiff')
+            # logging.info('measure\tgraph\ttrue nmi\ttest nmi\tdiff')
             logging.info(
-                '{}\t{} & {:0.3f} & {:0.3f} & {:0.3f}'.format(measure.name, info['name'], true_nmi, test_nmi, diff))
+                '{}\t{}\t{:0.3f}\t{:0.3f}\t{:0.3f}'.format(measure.name, info['name'], true_nmi, test_nmi, diff))
 
             results.append({
                 'measure_name': measure.name,

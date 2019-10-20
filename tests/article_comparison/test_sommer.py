@@ -5,8 +5,10 @@ no known link to paper
 
 import logging
 import unittest
+from abc import ABC
 
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
@@ -15,7 +17,7 @@ from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
 
-class TestTable3(unittest.TestCase):
+class TestTable3(ABC):
     """Table 3 with optimal parameters from Table 2"""
 
     def __init__(self, *args, **kwargs):
@@ -23,6 +25,7 @@ class TestTable3(unittest.TestCase):
         util.configure_logging()
         self.etalon = {  # CCT, FE, logFor, RSP, SCT, SP
             'football': (0.7928, 0.9061, 0.9028, 0.9092, 0.8115, 0.8575),
+            'football/_old': (0.7928, 0.9061, 0.9028, 0.9092, 0.8115, 0.8575),
             'news_2cl_1': (0.7944, 0.8050, 0.8381, 0.7966, 0.8174, 0.6540),
             'news_2cl_2': (0.5819, 0.5909, 0.5844, 0.5797, 0.5523, 0.5159),
             'news_2cl_3': (0.7577, 0.8107, 0.7482, 0.7962, 0.7857, 0.8592),
@@ -37,68 +40,104 @@ class TestTable3(unittest.TestCase):
         }
         self.datasets = Datasets()
 
-    def _dataset_results(self, measure_class, best_param, idx):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=100, init_choose_strategy='min',
+                                     dist_compensation_strategy='+40')
+
+    def _dataset_results(self, measure_class, best_param, idx, n_init=100, init_choose_strategy='min',
+                         dist_compensation_strategy='+40', parallel=True):
         results = []
         for graphs, info in [
-#            self.datasets['football'], self.datasets['karate'],
-#            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
+            self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
+            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
             self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-#            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3'],
+            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
-            try:
-                labels_pred = KKMeans(n_clusters=info['k']).fit_predict(K)
-                test_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+            def kkmeans_nmi(n_clusters, n_init, init_choose_strategy, dist_compensation_strategy, K):
+                labels_pred = KKMeans(n_clusters=n_clusters, n_init=n_init, init_choose_strategy=init_choose_strategy,
+                                      dist_compensation_strategy=dist_compensation_strategy).fit_predict(K)
+                return normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
 
-                true_nmi = self.etalon[info['name']][idx]
-                diff = np.abs(test_nmi - true_nmi)
+            mean_runs = 30
+            if parallel:
+                init_nmi = Parallel(n_jobs=12)(
+                    delayed(kkmeans_nmi)(info['k'], n_init, init_choose_strategy, dist_compensation_strategy, K)
+                    for _ in range(mean_runs))
+            else:
+                init_nmi = []
+                for _ in range(mean_runs):
+                    labels_pred = KKMeans(n_clusters=info['k'], n_init=n_init,
+                                          init_choose_strategy=init_choose_strategy,
+                                          dist_compensation_strategy=dist_compensation_strategy).fit_predict(K)
+                    item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+                    init_nmi.append(item_nmi)
+            test_nmi = np.mean(init_nmi)
 
-                # logging results for report
-                logging.info('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
-                logging.info(
-                    '{}\t{}\n{:0.3f}\n{:0.3f}\n{:0.3f}'.format(measure.name, info['name'], true_nmi, test_nmi, diff))
+            true_nmi = self.etalon[info['name']][idx]
+            diff = true_nmi - test_nmi
 
-                results.append({
-                    'measure_name': measure.name,
-                    'graph_name': info['name'],
-                    'test_nmi': test_nmi,
-                    'true_nmi': true_nmi,
-                    'diff': diff
-                })
-            except Exception as e:
-                logging.error(e)
+            # logging results for report
+            # logging.info('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
+            logging.info(f'{measure.name}\t{info["name"]}\t{true_nmi:0.3f}\t{test_nmi:0.3f}\t{diff:0.3f}')
+
+            results.append({
+                'measure_name': measure.name,
+                'graph_name': info['name'],
+                'test_nmi': test_nmi,
+                'true_nmi': true_nmi,
+                'diff': diff
+            })
 
         for result in results:
-            # TODO: this is for travis
-            if (result['graph_name'] == 'football' and result['measure_name'] == 'CCT H') or \
-                    (result['graph_name'] == 'zachary' and result['measure_name'] == 'SP-CT H'):
-                continue
+            # # TODO: this is for travis
+            # if (result['graph_name'] == 'football' and result['measure_name'] == 'CCT H') or \
+            #         (result['graph_name'] == 'zachary' and result['measure_name'] == 'SP-CT H'):
+            #     continue
 
-            # self.assertTrue(np.isclose(result['test_nmi'], result['true_nmi'], atol=.08),
-            #                 "{}, {}: {:0.4f} != {:0.4f}, diff:{:0.4f}".format(
-            #                     result['graph_name'], result['measure_name'], result['test_nmi'],
-            #                     result['true_nmi'], result['diff']))
+            self.assertTrue(np.isclose(result['test_nmi'], result['true_nmi'], atol=.11),
+                            "{}, {}: {:0.4f} != {:0.4f}, diff:{:0.4f}".format(
+                                result['graph_name'], result['measure_name'], result['test_nmi'],
+                                result['true_nmi'], result['diff']))
 
     def test_CCT(self):
-        self._dataset_results(SCCT_H, 26, 0)
+        self.dataset_results(SCCT_H, 26, 0)
 
     def test_FE(self):
-        self._dataset_results(FE_K, 0.1, 1)
+        self.dataset_results(FE_K, 0.1, 1)
 
     def test_logFor(self):
-        self._dataset_results(logFor_H, 1, 2)
+        self.dataset_results(logFor_H, 1, 2)
 
     def test_RSP(self):
-        self._dataset_results(RSP_K, 0.03, 3)
+        self.dataset_results(RSP_K, 0.03, 3)
 
     def test_SCT(self):
-        self._dataset_results(SCT_H, 22, 4)
+        self.dataset_results(SCT_H, 22, 4)
 
     def test_SP(self):
-        self._dataset_results(SPCT_H, 1, 5)
+        self.dataset_results(SPCT_H, 1, 5)
+
+
+class TestTable3_ninit10_mininertia_distplus40(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=10, init_choose_strategy='min',
+                                     dist_compensation_strategy='+40')
+
+
+class TestTable3_ninit10_mininertia_distto0(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=10, init_choose_strategy='min',
+                                     dist_compensation_strategy='<0->0')
+
+
+class TestTable3_ninit10_mininertia_minusmin(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=10, init_choose_strategy='min',
+                                     dist_compensation_strategy='-min')
 
 
 if __name__ == "__main__":
