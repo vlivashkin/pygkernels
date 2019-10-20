@@ -1,8 +1,6 @@
 import numpy as np
-from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
-from sklearn.metrics.pairwise import pairwise_kernels
-from sklearn.utils import check_array
-from sklearn.utils import check_random_state
+from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score, pairwise_kernels
+from sklearn.utils import check_random_state, check_array
 from sklearn.utils.validation import FLOAT_DTYPES
 
 from pygraphs.cluster.base import KernelEstimator
@@ -14,39 +12,91 @@ from pygraphs.cluster.base import KernelEstimator
 class KKMeans_vanilla(KernelEstimator):
     name = 'KernelKMeans_vanilla'
 
-    def __init__(self, n_clusters, max_iter=100, random_state=0):
+    def __init__(self, n_clusters, n_init=10, max_iter=100, random_state=0):
         super().__init__(n_clusters)
+        self.n_init = n_init
         self.max_iter = max_iter
+        self.max_rerun = 10
         self.random_state = random_state
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)
         return self
 
-    def predict(self, K):
+    def _init_h(self, K: np.array, rs: np.random.RandomState):
         n = K.shape[0]
-        U = np.zeros((n, self.n_clusters))
 
-        # initialization
-        rs = check_random_state(self.random_state)
-        q_idx = rs.randint(0, n, size=(self.n_clusters,))
+        # initialization: choose one node for each cluster
+        q_idx = np.arange(n)
+        rs.shuffle(q_idx)
+        q_idx = q_idx[:self.n_clusters]
+        assert len(list(set(q_idx))) == self.n_clusters
+
+        # initialization: h
         h = np.zeros((self.n_clusters, n))
         for i in range(self.n_clusters):
             h[i][q_idx[i]] = 1
+
+        return h
+
+    def _predict_once(self, K: np.array, rs: np.random.RandomState):
+        n = K.shape[0]
         e = np.eye(n)
-        nn = np.zeros((self.n_clusters,))
 
-        for i in range(100):
-            U = np.zeros((n, self.n_clusters))
+        U = np.zeros((n, self.n_clusters))
+        n_nodes_in_cluster = np.ones((self.n_clusters,))
+        h = self._init_h(K, rs)
+
+        labels = [0] * n
+        n_rerun = 0
+        for iter in range(self.max_iter):
+            U[:] = 0
+
+            # fix h, update U
             for i in range(0, n):
-                ka = np.argmin(
-                    [(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T) for k in range(0, self.n_clusters)])
+                ka = np.argmin([(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
+                                for k in range(0, self.n_clusters)])
                 U[i][ka] = 1
-            for k in range(0, self.n_clusters):
-                nn[k] = np.sum([U[i][k] for i in range(0, n)])
-                h[k] = U[:, k] / nn[k]
 
-        return np.argmax(U, axis=1)
+            # fix U, update h
+            for k in range(0, self.n_clusters):
+                n_nodes_in_cluster[k] = np.sum([U[i][k] for i in range(0, n)])
+                if n_nodes_in_cluster[k] == 0:
+                    break
+                h[k] = U[:, k] / n_nodes_in_cluster[k]
+
+            # check all clusters used
+            if np.any(n_nodes_in_cluster == 0) and n_rerun < self.max_rerun:
+                # print('one cluster is empty! rerun')
+                h = self._init_h(K, rs)  # rerun
+                n_rerun += 1
+                continue
+
+            # early stop
+            if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
+                # print(f'early stop at {iter}')
+                break
+
+            labels = np.argmax(U, axis=1)
+
+        if iter == self.max_iter - 1:
+            # print('n iter exceeded')
+            pass
+
+        labels = np.argmax(U, axis=1)
+        inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T) for i in range(0, n)])
+
+        return labels, inertia
+
+    def predict(self, K):
+        rs = check_random_state(self.random_state)
+        best_labels, best_inertia = [], float('+inf')
+        for i in range(self.n_init):
+            labels, inertia = self._predict_once(K, rs)
+            if inertia < best_inertia:
+                best_labels = labels
+
+        return best_labels
 
 
 class KKMeans(KernelEstimator):
@@ -59,7 +109,6 @@ class KKMeans(KernelEstimator):
     Author: Mathieu Blondel <mathieu@mblondel.org>,
             Ishank Gulati <gulati.ishank@gmail.com>
     License: BSD 3 clause
-
     Parameters
     ----------
     n_clusters : int, optional (default=3)
@@ -226,6 +275,9 @@ class KKMeans(KernelEstimator):
                     if self.verbose:
                         print(f"Converged at iteration {it + 1}, tol={1 - (n_same / n_samples)}")
                     break
+
+            if it == self.max_iter - 1:
+                print('n iter exceeded')
 
             # Computing inertia to choose the best initialization
             if self.dist_compensation_strategy == '+40':
