@@ -6,10 +6,15 @@ from sklearn.utils.validation import FLOAT_DTYPES
 from pygraphs.cluster.base import KernelEstimator
 
 
-# Francois Fouss, Marco Saerens, Masashi Shimbo
-# Algorithms and Models for Network Data and Link Analysis
-# Algorithm 7.2
 class KKMeans_vanilla(KernelEstimator):
+    """Kernel K-means clustering
+    Reference
+    ---------
+    Francois Fouss, Marco Saerens, Masashi Shimbo
+    Algorithms and Models for Network Data and Link Analysis
+    Algorithm 7.2: Simple kernel k-means clustering of nodes
+    """
+
     name = 'KernelKMeans_vanilla'
 
     def __init__(self, n_clusters, n_init=10, max_iter=100, random_state=0):
@@ -98,6 +103,65 @@ class KKMeans_vanilla(KernelEstimator):
 
         return best_labels
 
+
+class KKMeans_iterative(KernelEstimator):
+    """Kernel K-means clustering
+    Reference
+    ---------
+    Francois Fouss, Marco Saerens, Masashi Shimbo
+    Algorithms and Models for Network Data and Link Analysis
+    Algorithm 7.3: Simple iterative kernel k-means clustering of nodes
+    """
+
+    name = 'KernelKMeans_iterative'
+
+    def __init__(self, n_clusters, max_iter=100, random_state=0):
+        super().__init__(n_clusters)
+        self.max_iter = max_iter
+        self.random_state = random_state
+
+    def fit(self, K, y=None, sample_weight=None):
+        self.labels_ = self.predict(K)
+        return self
+
+    def predict(self, K):
+        n = K.shape[0]
+        U = np.zeros((n, self.n_clusters))
+        l = np.zeros((n, ))
+
+        # initialization
+        rs = check_random_state(self.random_state)
+        q_idx = rs.randint(0, n, size=(self.n_clusters,))
+        h = np.zeros((self.n_clusters, n))
+        for i in range(self.n_clusters):
+            h[i][q_idx[i]] = 1
+        e = np.eye(n)
+        nn = np.zeros((self.n_clusters,))
+
+        for i in range(0, n):
+            k_star = np.argmin([(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
+                                for k in range(0, self.n_clusters)])
+            l[i] = k_star; U[i][k_star] = 1
+        for k in range(0, self.n_clusters):
+            nn[k] = np.sum([U[i][k] for i in range(0, n)])
+            h[k] = U[:, k] / nn[k]
+
+        # main cycle
+        for iter in range(100):
+            for i in range(n):  # for each node
+                ΔJ = np.zeros((self.n_clusters,))
+                for k in range(self.n_clusters):
+                    ΔJ[k] = nn[k] / (nn[k] + 1) * (h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T) - \
+                            nn[l[i]] / (nn[l[i]] - 1) * (h[l[i]] - e[i])[None].dot(K).dot((h[l[i]] - e[i]))
+                k_star = np.argmin(ΔJ)
+                if ΔJ[k_star] < 0:
+                    h[l[i]] = 1. / (nn[l[i]] - 1) * (nn[l[i]] * h[l[i]] - e[i])
+                    h[k_star] = 1. / (nn[k_star] + 1) * (nn[k_star] * h[k_star] + e[i])
+                    nn[k_star] += 1; nn[l[i]] -= 1
+                    U[i, l[i]] = 0; U[i, k_star] = 1
+                    l[i] = k_star
+
+        return np.argmax(U, axis=1)
 
 class KKMeans(KernelEstimator):
     """Kernel K-means clustering

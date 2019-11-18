@@ -1,4 +1,4 @@
-from .kkmeans import KKMeans, KKMeans_vanilla
+from .kkmeans import KKMeans, KKMeans_vanilla, KKMeans_iterative
 from .kward import KWard
 from .spectral_clustering import SpectralClustering_rubanov
 from .wrappers import KMeans_sklearn, Ward_sklearn, SpectralClustering_sklearn, KKMeans_kernlab, \
@@ -6,6 +6,7 @@ from .wrappers import KMeans_sklearn, Ward_sklearn, SpectralClustering_sklearn, 
 
 __all__ = ['KKMeans',
            'KKMeans_vanilla',
+           'KKMeans_iterative',
            'KKMeans_kernlab',
            'KWard',
            'SpectralClustering_rubanov',
