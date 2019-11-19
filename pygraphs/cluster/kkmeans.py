@@ -8,12 +8,12 @@ from sklearn.utils.validation import FLOAT_DTYPES
 from pygraphs.cluster.base import KernelEstimator
 
 
-class KMeans_Fouss(ABC, KernelEstimator):
+class KMeans_Fouss(KernelEstimator, ABC):
     def __init__(self, n_clusters, n_init=10, max_iter=100, random_state=0):
         super().__init__(n_clusters)
         self.n_init = n_init
         self.max_iter = max_iter
-        self.max_rerun = 10
+        self.max_rerun = 20
         self.random_state = random_state
 
     def fit(self, K, y=None, sample_weight=None):
@@ -89,11 +89,14 @@ class KKMeans_vanilla(KMeans_Fouss):
                 h[k] = U[:, k] / nn[k]
 
             # check all clusters used
-            if np.any(nn == 0) and n_rerun < self.max_rerun:
-                # print('one cluster is empty! rerun')
-                h = self._init_h(K, rs)  # rerun
-                n_rerun += 1
-                continue
+            if np.any(nn == 0):
+                if n_rerun < self.max_rerun:
+                    # print('one cluster is empty! rerun')
+                    h = self._init_h(K, rs)  # rerun
+                    n_rerun += 1
+                    continue
+                else:
+                    break
 
             # early stop
             if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
@@ -102,13 +105,7 @@ class KKMeans_vanilla(KMeans_Fouss):
 
             labels = np.argmax(U, axis=1)
 
-        if iter == self.max_iter - 1:
-            # print('n iter exceeded')
-            pass
-
-        labels = np.argmax(U, axis=1)
         inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T) for i in range(0, n)])
-
         return labels, inertia
 
 
@@ -123,39 +120,72 @@ class KKMeans_iterative(KMeans_Fouss):
 
     name = 'KernelKMeans_iterative'
 
+    def _init_l_U_nn_h(self, n, K, e, rs):
+        nn = np.zeros((self.n_clusters,), dtype=np.uint8)
+        while np.any(nn == 0): # check all clusters used
+            l = np.zeros((n,), dtype=np.uint8)
+            U = np.zeros((n, self.n_clusters), dtype=np.uint8)
+            nn = np.zeros((self.n_clusters,), dtype=np.uint8)
+            h = self._init_h(K, rs)
+
+            for i in range(0, n):
+                k_star = np.argmin([(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
+                                    for k in range(0, self.n_clusters)])
+                l[i] = k_star; U[i][k_star] = 1
+            for k in range(0, self.n_clusters):
+                nn[k] = np.sum([U[i][k] for i in range(0, n)])
+                h[k] = U[:, k] / nn[k]
+
+        return l, U, nn, h
+
+
     def _predict_once(self, K: np.array, rs: np.random.RandomState):
         n = K.shape[0]
         e = np.eye(n)
+        eps = 10**-16
 
-        U = np.zeros((n, self.n_clusters))
-        nn = np.zeros((self.n_clusters,))
-        l = np.zeros((n,))
-        h = self._init_h(K, rs)
+        l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)
 
-        for i in range(0, n):
-            k_star = np.argmin([(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
-                                for k in range(0, self.n_clusters)])
-            l[i] = k_star; U[i][k_star] = 1
-        for k in range(0, self.n_clusters):
-            nn[k] = np.sum([U[i][k] for i in range(0, n)])
-            h[k] = U[:, k] / nn[k]
-
-        # main cycle
+        labels = [0] * n
+        n_rerun = 0
         for iter in range(100):
+            need_rerun = False
             for i in range(n):  # for each node
                 ΔJ = np.zeros((self.n_clusters,))
                 for k in range(self.n_clusters):
                     ΔJ[k] = nn[k] / (nn[k] + 1) * (h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T) - \
-                            nn[l[i]] / (nn[l[i]] - 1) * (h[l[i]] - e[i])[None].dot(K).dot((h[l[i]] - e[i]))
+                            nn[l[i]] / (nn[l[i]] - 1 + eps) * (h[l[i]] - e[i])[None].dot(K).dot((h[l[i]] - e[i])[None].T)
                 k_star = np.argmin(ΔJ)
                 if ΔJ[k_star] < 0:
-                    h[l[i]] = 1. / (nn[l[i]] - 1) * (nn[l[i]] * h[l[i]] - e[i])
+                    h[l[i]] = 1. / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
                     h[k_star] = 1. / (nn[k_star] + 1) * (nn[k_star] * h[k_star] + e[i])
                     nn[k_star] += 1; nn[l[i]] -= 1
+                    if nn[l[i]] == 0:  # empty cluster!
+                        need_rerun = True
+                        break
                     U[i, l[i]] = 0; U[i, k_star] = 1
                     l[i] = k_star
 
-        return np.argmax(U, axis=1)
+            # check all clusters used
+            if need_rerun:
+                if n_rerun < self.max_rerun:
+                    # print('one cluster is empty! rerun')
+                    l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)
+                    n_rerun += 1
+                    continue
+                else:
+                    print('reruns exceeded!')
+                    break
+
+            # early stop
+            if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
+                # print(f'early stop at {iter}')
+                break
+
+            labels = np.argmax(U, axis=1)
+
+        inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T) for i in range(0, n)])
+        return np.argmax(U, axis=1), inertia
 
 
 class KKMeans(KernelEstimator):

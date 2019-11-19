@@ -9,13 +9,13 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 import logging
 import unittest
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import numpy as np
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans
+from pygraphs.cluster import KKMeans_iterative as KKmeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
@@ -43,40 +43,43 @@ class TestTable3(ABC):
         }
         self.datasets = Datasets()
 
+    @abstractmethod
     def dataset_results(self, measure_class, best_param, idx):
-        return self._dataset_results(measure_class, best_param, idx, n_init=100, init_choose_strategy='min',
-                                     dist_compensation_strategy='+40')
+        pass
 
-    def _dataset_results(self, measure_class, best_param, idx, n_init=100, init_choose_strategy='min',
-                         dist_compensation_strategy='+40', parallel=False):
+    def _dataset_results(self, measure_class, best_param, idx, n_init=100):
         results = []
         for graphs, info in [
             self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
-            # self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
+            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
+            self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
             # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
-            mean_runs = 1
+            mean_runs = 10
             init_nmi = []
-            for _ in range(mean_runs):
-                labels_pred = KKMeans(n_clusters=info['k'], n_init=n_init).fit_predict(K)
+            kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=42)
+            for i_run in range(mean_runs):
+                labels_pred = kkmeans.fit_predict(K)
                 item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                 init_nmi.append(item_nmi)
-            test_nmi = np.mean(init_nmi)
+            test_nmi_mean = np.mean(init_nmi)
+            test_nmi_median = np.median(init_nmi)
+            test_nmi_std = np.std(init_nmi)
 
             true_nmi = self.etalon[info['name']][idx]
-            diff = true_nmi - test_nmi
+            diff = true_nmi - test_nmi_mean
 
-            logging.info(f'{measure.name}\t{info["name"]}\t{true_nmi:0.3f}\t{test_nmi:0.3f}\t{diff:0.3f}')
+            logging.info(f'{measure.name}\t{true_nmi:0.3f}\t{test_nmi_mean:0.3f}\t{diff:0.3f}\t{info["name"]}')
+            # logging.info(f'{measure.name}\t{info["name"]}\t{test_nmi_median:0.3f}\t{test_nmi_std:0.3f}')
 
             results.append({
                 'measure_name': measure.name,
                 'graph_name': info['name'],
-                'test_nmi': test_nmi,
+                'test_nmi': test_nmi_mean,
                 'true_nmi': true_nmi,
                 'diff': diff
             })
@@ -106,23 +109,19 @@ class TestTable3(ABC):
         self.dataset_results(SPCT_H, 1, 5)
 
 
-class TestTable3_ninit10_mininertia_distplus40(TestTable3, unittest.TestCase):
+class TestTable3_ninit100(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, idx):
-        return self._dataset_results(measure_class, best_param, idx, n_init=10, init_choose_strategy='min',
-                                     dist_compensation_strategy='+40')
+        return self._dataset_results(measure_class, best_param, idx, n_init=100)
 
 
-#
-# class TestTable3_ninit10_mininertia_distto0(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, idx):
-#         return self._dataset_results(measure_class, best_param, idx, n_init=10, init_choose_strategy='min',
-#                                      dist_compensation_strategy='<0->0')
-#
-#
-# class TestTable3_ninit10_mininertia_minusmin(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, idx):
-#         return self._dataset_results(measure_class, best_param, idx, n_init=10, init_choose_strategy='min',
-#                                      dist_compensation_strategy='-min')
+class TestTable3_ninit10(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=10)
+
+
+class TestTable3_ninit1(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=1)
 
 
 if __name__ == "__main__":
