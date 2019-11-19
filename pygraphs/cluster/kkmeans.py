@@ -9,11 +9,11 @@ from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=10, max_iter=100, random_state=0):
+    def __init__(self, n_clusters, n_init=10, max_rerun=10, max_iter=100, random_state=0):
         super().__init__(n_clusters)
         self.n_init = n_init
+        self.max_rerun = max_rerun
         self.max_iter = max_iter
-        self.max_rerun = 20
         self.random_state = random_state
 
     def fit(self, K, y=None, sample_weight=None):
@@ -36,6 +36,13 @@ class KMeans_Fouss(KernelEstimator, ABC):
 
         return h
 
+    def _predict_successful_once(self, K: np.array, rs: np.random.RandomState):
+        for i in range(self.max_rerun):
+            labels, inertia, success = self._predict_once(K, rs)
+            if success:
+                return labels, inertia
+        return labels, inertia
+
     @abstractmethod
     def _predict_once(self, K: np.array, rs: np.random.RandomState):
         pass
@@ -44,7 +51,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         rs = check_random_state(self.random_state)
         best_labels, best_inertia = [], float('+inf')
         for i in range(self.n_init):
-            labels, inertia = self._predict_once(K, rs)
+            labels, inertia = self._predict_successful_once(K, rs)
             if inertia < best_inertia:
                 best_labels = labels
 
@@ -70,9 +77,8 @@ class KKMeans_vanilla(KMeans_Fouss):
         nn = np.ones((self.n_clusters,))
         h = self._init_h(K, rs)
 
-        labels = [0] * n
-        n_rerun = 0
-        for iter in range(self.max_iter):
+        labels, inertia = [0] * n, float('+inf')
+        for _ in range(self.max_iter):
             U[:] = 0
 
             # fix h, update U
@@ -84,29 +90,19 @@ class KKMeans_vanilla(KMeans_Fouss):
             # fix U, update h
             for k in range(0, self.n_clusters):
                 nn[k] = np.sum([U[i][k] for i in range(0, n)])
-                if nn[k] == 0:
-                    break
+                if nn[k] == 0:  # empty cluster! exit with success=False
+                    return labels, inertia, False
                 h[k] = U[:, k] / nn[k]
-
-            # check all clusters used
-            if np.any(nn == 0):
-                if n_rerun < self.max_rerun:
-                    # print('one cluster is empty! rerun')
-                    h = self._init_h(K, rs)  # rerun
-                    n_rerun += 1
-                    continue
-                else:
-                    break
 
             # early stop
             if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
-                # print(f'early stop at {iter}')
                 break
 
             labels = np.argmax(U, axis=1)
+            inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T)
+                              for i in range(0, n)])
 
-        inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T) for i in range(0, n)])
-        return labels, inertia
+        return labels, inertia, True
 
 
 class KKMeans_iterative(KMeans_Fouss):
@@ -122,7 +118,7 @@ class KKMeans_iterative(KMeans_Fouss):
 
     def _init_l_U_nn_h(self, n, K, e, rs):
         nn = np.zeros((self.n_clusters,), dtype=np.uint8)
-        while np.any(nn == 0): # check all clusters used
+        while np.any(nn == 0):  # check all clusters used
             l = np.zeros((n,), dtype=np.uint8)
             U = np.zeros((n, self.n_clusters), dtype=np.uint8)
             nn = np.zeros((self.n_clusters,), dtype=np.uint8)
@@ -138,18 +134,23 @@ class KKMeans_iterative(KMeans_Fouss):
 
         return l, U, nn, h
 
+    def _predict_successful_once(self, K: np.array, rs: np.random.RandomState):
+        for i in range(self.max_rerun):
+            labels, inertia, success = self._predict_once(K, rs)
+            if success:
+                return labels, inertia
+        print('reruns exceeded, take last result')
+        return labels, inertia
 
     def _predict_once(self, K: np.array, rs: np.random.RandomState):
         n = K.shape[0]
         e = np.eye(n)
-        eps = 10**-16
+        eps = 10 ** -16
 
         l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)
 
-        labels = [0] * n
-        n_rerun = 0
-        for iter in range(100):
-            need_rerun = False
+        labels, inertia = [0] * n, float('+inf')
+        for _ in range(100):
             for i in range(n):  # for each node
                 ΔJ = np.zeros((self.n_clusters,))
                 for k in range(self.n_clusters):
@@ -160,32 +161,20 @@ class KKMeans_iterative(KMeans_Fouss):
                     h[l[i]] = 1. / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
                     h[k_star] = 1. / (nn[k_star] + 1) * (nn[k_star] * h[k_star] + e[i])
                     nn[k_star] += 1; nn[l[i]] -= 1
-                    if nn[l[i]] == 0:  # empty cluster!
-                        need_rerun = True
-                        break
+                    if nn[l[i]] == 0:  # empty cluster! exit with success=False
+                        return labels, inertia, False
                     U[i, l[i]] = 0; U[i, k_star] = 1
                     l[i] = k_star
 
-            # check all clusters used
-            if need_rerun:
-                if n_rerun < self.max_rerun:
-                    # print('one cluster is empty! rerun')
-                    l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)
-                    n_rerun += 1
-                    continue
-                else:
-                    print('reruns exceeded!')
-                    break
-
             # early stop
             if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
-                # print(f'early stop at {iter}')
                 break
 
             labels = np.argmax(U, axis=1)
+            inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T)
+                              for i in range(0, n)])
 
-        inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T) for i in range(0, n)])
-        return np.argmax(U, axis=1), inertia
+        return labels, inertia, True
 
 
 class KKMeans(KernelEstimator):
