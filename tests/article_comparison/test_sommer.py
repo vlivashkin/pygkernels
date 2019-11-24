@@ -46,31 +46,31 @@ class TestTable3(ABC):
     def _dataset_results(self, measure_class, best_param, idx, n_init=100):
         results = []
         for graphs, info in [
-            # self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
+            self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
             self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
+            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
-            mean_runs = 10
-            init_nmi = []
-            for i_run in range(mean_runs):
-                kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run + 42)
-                labels_pred = kkmeans.fit_predict(K)
-                item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
-                init_nmi.append(item_nmi)
-
-            # def whole_kmeans_run(i_run):
-            #     kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run)
+            # mean_runs = 10
+            # init_nmi = []
+            # for i_run in range(mean_runs):
+            #     kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run + 42)
             #     labels_pred = kkmeans.fit_predict(K)
             #     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
-            #     return item_nmi
-            #
-            # mean_runs = 10
-            # init_nmi = Parallel(n_jobs=-1)(delayed(whole_kmeans_run)(i) for i in range(mean_runs))
+            #     init_nmi.append(item_nmi)
+
+            def whole_kmeans_run(i_run):
+                kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run)
+                labels_pred = kkmeans.fit_predict(K)
+                item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+                return item_nmi
+
+            mean_runs = 10
+            init_nmi = Parallel(n_jobs=-1)(delayed(whole_kmeans_run)(i) for i in range(mean_runs))
 
             test_nmi_mean = np.mean(init_nmi)
             test_nmi_median = np.median(init_nmi)

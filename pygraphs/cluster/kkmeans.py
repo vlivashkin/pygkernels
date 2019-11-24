@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score, pairwise_kernels
 from sklearn.utils import check_random_state, check_array
 from sklearn.utils.validation import FLOAT_DTYPES
+from random import shuffle
 
 from pygraphs.cluster.base import KernelEstimator
 
@@ -125,7 +126,8 @@ class KKMeans_iterative(KMeans_Fouss):
             l = np.zeros((n,), dtype=np.uint8)
             for i in range(n):
                 k_star = np.argmin([self._hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
-                l[i] = k_star; U[i][k_star] = 1
+                U[i][k_star] = 1
+                l[i] = k_star
             nn = np.sum(U, axis=0)
             if np.any(nn == 0):  # bad start, rerun
                 continue
@@ -143,7 +145,9 @@ class KKMeans_iterative(KMeans_Fouss):
         old_labels, old_inertia = labels, inertia
 
         for _ in range(self.max_iter):
-            for i in range(n):  # for each node
+            node_order = list(range(n))
+            shuffle(node_order)
+            for i in node_order:  # for each node
                 minΔJ, k_star = float('+inf'), -1
                 for k in range(self.n_clusters):
                     ΔJ1 = nn[k] / (nn[k] + 1 + self.eps) * self._hKh(h[k], e[i], K)
