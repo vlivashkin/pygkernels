@@ -3,10 +3,6 @@ Sommer: Comparison of Graph Node Distances on Clustering Tasks
 no known link to paper
 """
 
-import os
-
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-
 import logging
 import unittest
 from abc import ABC, abstractmethod
@@ -18,7 +14,7 @@ from pygraphs import util
 from pygraphs.cluster import KKMeans_iterative as KKmeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
-
+from joblib import Parallel, delayed
 
 class TestTable3(ABC):
     """Table 3 with optimal parameters from Table 2"""
@@ -50,10 +46,10 @@ class TestTable3(ABC):
     def _dataset_results(self, measure_class, best_param, idx, n_init=100):
         results = []
         for graphs, info in [
-            self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
+            # self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
             self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
+            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
@@ -62,10 +58,20 @@ class TestTable3(ABC):
             mean_runs = 10
             init_nmi = []
             for i_run in range(mean_runs):
-                kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run)
+                kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run + 42)
                 labels_pred = kkmeans.fit_predict(K)
                 item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                 init_nmi.append(item_nmi)
+
+            # def whole_kmeans_run(i_run):
+            #     kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run)
+            #     labels_pred = kkmeans.fit_predict(K)
+            #     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+            #     return item_nmi
+            #
+            # mean_runs = 10
+            # init_nmi = Parallel(n_jobs=-1)(delayed(whole_kmeans_run)(i) for i in range(mean_runs))
+
             test_nmi_mean = np.mean(init_nmi)
             test_nmi_median = np.median(init_nmi)
             test_nmi_std = np.std(init_nmi)
@@ -73,8 +79,8 @@ class TestTable3(ABC):
             true_nmi = self.etalon[info['name']][idx]
             diff = true_nmi - test_nmi_mean
 
-            logging.info(f'{measure.name}\t{true_nmi:0.3f}\t{test_nmi_mean:0.3f}\t{diff:0.3f}\t{info["name"]}')
-            # logging.info(f'{measure.name}\t{info["name"]}\t{test_nmi_median:0.3f}\t{test_nmi_std:0.3f}')
+            logging.info(f'{measure.name}\t{true_nmi:0.3f}\t{test_nmi_mean:0.3f}\t{diff:0.3f}\t'
+                         f'{test_nmi_median:0.3f}\t{test_nmi_std:0.3f}\t{info["name"]}')
 
             results.append({
                 'measure_name': measure.name,
@@ -90,38 +96,38 @@ class TestTable3(ABC):
                                 result['graph_name'], result['measure_name'], result['test_nmi'],
                                 result['true_nmi'], result['diff']))
 
-    def test_CCT(self):
-        self.dataset_results(SCCT_H, 26, 0)
-
-    def test_FE(self):
-        self.dataset_results(FE_K, 0.1, 1)
+    # def test_CCT(self):
+    #     self.dataset_results(SCCT_H, 26, 0)
+    #
+    # def test_FE(self):
+    #     self.dataset_results(FE_K, 0.1, 1)
 
     def test_logFor(self):
         self.dataset_results(logFor_H, 1, 2)
 
-    def test_RSP(self):
-        self.dataset_results(RSP_K, 0.03, 3)
-
-    def test_SCT(self):
-        self.dataset_results(SCT_H, 22, 4)
-
-    def test_SP(self):
-        self.dataset_results(SPCT_H, 1, 5)
+    # def test_RSP(self):
+    #     self.dataset_results(RSP_K, 0.03, 3)
+    #
+    # def test_SCT(self):
+    #     self.dataset_results(SCT_H, 22, 4)
+    #
+    # def test_SP(self):
+    #     self.dataset_results(SPCT_H, 1, 5)
 
 
 class TestTable3_ninit1(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, idx):
         return self._dataset_results(measure_class, best_param, idx, n_init=1)
 
-
-class TestTable3_ninit10(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, idx):
-        return self._dataset_results(measure_class, best_param, idx, n_init=10)
-
-
-class TestTable3_ninit100(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, idx):
-        return self._dataset_results(measure_class, best_param, idx, n_init=100)
+#
+# class TestTable3_ninit10(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, idx):
+#         return self._dataset_results(measure_class, best_param, idx, n_init=10)
+#
+#
+# class TestTable3_ninit100(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, idx):
+#         return self._dataset_results(measure_class, best_param, idx, n_init=100)
 
 
 if __name__ == "__main__":

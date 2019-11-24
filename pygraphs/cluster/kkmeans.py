@@ -15,6 +15,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         self.max_rerun = max_rerun
         self.max_iter = max_iter
         self.random_state = random_state
+        self.eps = 10 ** -10
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)
@@ -35,6 +36,10 @@ class KMeans_Fouss(KernelEstimator, ABC):
             h[i][q_idx[i]] = 1
 
         return h
+
+    def _hKh(self, hk, ei, K):
+        hk_ei = (hk - ei)[None].T
+        return hk_ei.T.dot(K).dot(hk_ei)
 
     def _predict_successful_once(self, K: np.array, rs: np.random.RandomState):
         for i in range(self.max_rerun):
@@ -74,34 +79,28 @@ class KKMeans_vanilla(KMeans_Fouss):
         n = K.shape[0]
         e = np.eye(n)
 
-        U = np.zeros((n, self.n_clusters))
-        nn = np.ones((self.n_clusters,))
         h = self._init_h(K, rs)
 
         labels, inertia = [0] * n, float('+inf')
-        for _ in range(self.max_iter):
-            U[:] = 0
-
+        for iter in range(self.max_iter):
             # fix h, update U
+            U = np.zeros((n, self.n_clusters))
             for i in range(0, n):
-                k_star = np.argmin([(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
-                                    for k in range(0, self.n_clusters)])
+                k_star = np.argmin([self._hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
                 U[i][k_star] = 1
 
             # fix U, update h
-            for k in range(0, self.n_clusters):
-                nn[k] = np.sum([U[i][k] for i in range(0, n)])
-                if nn[k] == 0:  # empty cluster! exit with success=False
-                    return labels, inertia, False
-                h[k] = U[:, k] / nn[k]
+            nn = np.sum(U, axis=0)
+            if np.any(nn == 0):  # empty cluster! exit with success=False
+                return labels, inertia, False
+            h = [U[:, k] / nn[k] for k in range(0, self.n_clusters)]
 
             # early stop
             if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
                 break
 
             labels = np.argmax(U, axis=1)
-            inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T)
-                              for i in range(0, n)])
+            inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(0, n)])
 
         return labels, inertia, True
 
@@ -126,8 +125,7 @@ class KKMeans_iterative(KMeans_Fouss):
             h = self._init_h(K, rs)
 
             for i in range(0, n):
-                k_star = np.argmin([(h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
-                                    for k in range(0, self.n_clusters)])
+                k_star = np.argmin([self._hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
                 l[i] = k_star; U[i][k_star] = 1
             for k in range(0, self.n_clusters):
                 nn[k] = np.sum([U[i][k] for i in range(0, n)])
@@ -141,25 +139,23 @@ class KKMeans_iterative(KMeans_Fouss):
     def _predict_once(self, K: np.array, rs: np.random.RandomState):
         n = K.shape[0]
         e = np.eye(n)
-        eps = 10 ** -10
 
         l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)  # init and first step
         labels = np.argmax(U, axis=1)
-        inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T)
-                          for i in range(0, n)])
+        inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(0, n)])
         old_labels, old_inertia = labels, inertia
 
-        for _ in range(100):
+        for _ in range(self.max_iter):
             for i in range(n):  # for each node
                 ΔJ = np.zeros((self.n_clusters,))
                 for k in range(self.n_clusters):
-                    ΔJ1 = nn[k] / (nn[k] + 1 + eps) * (h[k] - e[i])[None].dot(K).dot((h[k] - e[i])[None].T)
-                    ΔJ2 = nn[l[i]] / (nn[l[i]] - 1 + eps) * (h[l[i]] - e[i])[None].dot(K).dot((h[l[i]] - e[i])[None].T)
+                    ΔJ1 = nn[k] / (nn[k] + 1 + self.eps) * self._hKh(h[k], e[i], K)
+                    ΔJ2 = nn[l[i]] / (nn[l[i]] - 1 + self.eps) * self._hKh(h[l[i]], e[i], K)
                     ΔJ[k] = ΔJ1 - ΔJ2
                 k_star = np.argmin(ΔJ)
                 if ΔJ[k_star] < 0:
-                    h[l[i]] = 1. / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
-                    h[k_star] = 1. / (nn[k_star] + 1 + eps) * (nn[k_star] * h[k_star] + e[i])
+                    h[l[i]] = 1. / (nn[l[i]] - 1 + self.eps) * (nn[l[i]] * h[l[i]] - e[i])
+                    h[k_star] = 1. / (nn[k_star] + 1 + self.eps) * (nn[k_star] * h[k_star] + e[i])
                     nn[k_star] += 1; nn[l[i]] -= 1
                     if nn[l[i]] == 0:  # empty cluster! exit with success=False
                         return labels, inertia, False
@@ -167,8 +163,7 @@ class KKMeans_iterative(KMeans_Fouss):
                     l[i] = k_star
 
             labels = np.argmax(U, axis=1)
-            inertia = np.sum([(h[labels[i]] - e[i])[None].dot(K).dot((h[labels[i]] - e[i])[None].T)
-                              for i in range(0, n)])
+            inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(0, n)])
 
             # early stop
             if np.all(labels == old_labels):  # nothing changed
