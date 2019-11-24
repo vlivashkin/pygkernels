@@ -84,8 +84,8 @@ class KKMeans_vanilla(KMeans_Fouss):
         labels, inertia = [0] * n, float('+inf')
         for iter in range(self.max_iter):
             # fix h, update U
-            U = np.zeros((n, self.n_clusters))
-            for i in range(0, n):
+            U = np.zeros((n, self.n_clusters), dtype=np.uint8)
+            for i in range(n):
                 k_star = np.argmin([self._hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
                 U[i][k_star] = 1
 
@@ -93,7 +93,7 @@ class KKMeans_vanilla(KMeans_Fouss):
             nn = np.sum(U, axis=0)
             if np.any(nn == 0):  # empty cluster! exit with success=False
                 return labels, inertia, False
-            h = [U[:, k] / nn[k] for k in range(0, self.n_clusters)]
+            h = (U / nn[None]).T
 
             # early stop
             if np.all(labels == np.argmax(U, axis=1)):  # nothing changed
@@ -119,20 +119,17 @@ class KKMeans_iterative(KMeans_Fouss):
     def _init_l_U_nn_h(self, n, K, e, rs):
         nn = np.zeros((self.n_clusters,), dtype=np.uint8)
         while np.any(nn == 0):  # check all clusters used
-            l = np.zeros((n,), dtype=np.uint8)
-            U = np.zeros((n, self.n_clusters), dtype=np.uint8)
-            nn = np.zeros((self.n_clusters,), dtype=np.uint8)
             h = self._init_h(K, rs)
 
-            for i in range(0, n):
+            U = np.zeros((n, self.n_clusters), dtype=np.uint8)
+            l = np.zeros((n,), dtype=np.uint8)
+            for i in range(n):
                 k_star = np.argmin([self._hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
                 l[i] = k_star; U[i][k_star] = 1
-            for k in range(0, self.n_clusters):
-                nn[k] = np.sum([U[i][k] for i in range(0, n)])
-            if np.any(nn == 0):
+            nn = np.sum(U, axis=0)
+            if np.any(nn == 0):  # bad start, rerun
                 continue
-            for k in range(0, self.n_clusters):
-                h[k] = U[:, k] / nn[k]
+            h = (U / nn[None]).T
 
         return l, U, nn, h
 
@@ -142,28 +139,32 @@ class KKMeans_iterative(KMeans_Fouss):
 
         l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)  # init and first step
         labels = np.argmax(U, axis=1)
-        inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(0, n)])
+        inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(n)])
         old_labels, old_inertia = labels, inertia
 
         for _ in range(self.max_iter):
             for i in range(n):  # for each node
-                ΔJ = np.zeros((self.n_clusters,))
+                minΔJ, k_star = float('+inf'), -1
                 for k in range(self.n_clusters):
                     ΔJ1 = nn[k] / (nn[k] + 1 + self.eps) * self._hKh(h[k], e[i], K)
                     ΔJ2 = nn[l[i]] / (nn[l[i]] - 1 + self.eps) * self._hKh(h[l[i]], e[i], K)
-                    ΔJ[k] = ΔJ1 - ΔJ2
-                k_star = np.argmin(ΔJ)
-                if ΔJ[k_star] < 0:
-                    h[l[i]] = 1. / (nn[l[i]] - 1 + self.eps) * (nn[l[i]] * h[l[i]] - e[i])
-                    h[k_star] = 1. / (nn[k_star] + 1 + self.eps) * (nn[k_star] * h[k_star] + e[i])
-                    nn[k_star] += 1; nn[l[i]] -= 1
-                    if nn[l[i]] == 0:  # empty cluster! exit with success=False
+                    ΔJ = ΔJ1 - ΔJ2
+                    if ΔJ < minΔJ:
+                        minΔJ, k_star = ΔJ, k
+                if minΔJ < 0:
+                    if nn[l[i]] == 1:  # it will cause empty cluster! exit with success=False
                         return labels, inertia, False
-                    U[i, l[i]] = 0; U[i, k_star] = 1
+
+                    h[l[i]] = 1. / (nn[l[i]] - 1 + self.eps) * (nn[l[i]] * h[l[i]] - e[i])
+                    nn[l[i]] -= 1
+                    U[i, l[i]] = 0
+                    h[k_star] = 1. / (nn[k_star] + 1 + self.eps) * (nn[k_star] * h[k_star] + e[i])
+                    nn[k_star] += 1
+                    U[i, k_star] = 1
                     l[i] = k_star
 
             labels = np.argmax(U, axis=1)
-            inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(0, n)])
+            inertia = np.sum([self._hKh(h[labels[i]], e[i], K) for i in range(n)])
 
             # early stop
             if np.all(labels == old_labels):  # nothing changed
