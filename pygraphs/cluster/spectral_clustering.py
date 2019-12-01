@@ -1,5 +1,5 @@
 import numpy as np
-import sklearn.cluster
+from sklearn.cluster import KMeans
 
 from pygraphs.cluster.base import KernelEstimator
 
@@ -10,18 +10,17 @@ class SpectralClustering_rubanov(KernelEstimator):
     def _max_ort(self, M):
         val, vec = np.linalg.eig(M)
         ind = np.argpartition(val, -self.n_clusters)[-self.n_clusters:]
-        X = np.asarray(vec[:, ind])
-        return X
+        return vec[:, ind]
 
     def _sign_flip(self, X):
-        max_pos = np.argmax(np.abs(np.asarray(X)), axis=0)
-        sgns = np.sign(np.asarray(X)[max_pos, range(X.shape[1])])
-        S = np.asarray(np.diag(sgns))
-        return np.asarray(X) * S
+        max_pos = np.argmax(np.abs(X), axis=0)
+        sgns = np.sign(X[max_pos, range(X.shape[1])])
+        S = np.diag(sgns)
+        return X.dot(S)
 
     def predict(self, K):
         X = self._max_ort(K)
         X = self._sign_flip(X)
-        cls = sklearn.cluster.KMeans(n_clusters=self.n_clusters)
+        cls = KMeans(n_clusters=self.n_clusters)
         prd = cls.fit_predict(X)
         return prd

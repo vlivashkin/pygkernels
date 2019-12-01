@@ -2,6 +2,7 @@ from abc import ABC
 
 import numpy as np
 import numpy.matlib
+from numpy import warnings
 from sklearn.utils import deprecated
 
 from . import scaler
@@ -25,7 +26,7 @@ class _KernelR(Kernel, ABC):
         return R
 
 
-@deprecated()
+# @deprecated()
 class Katz_R(_KernelR):
     name, default_scaler = 'Katz R', scaler.Rho
 
@@ -39,20 +40,26 @@ class Katz_R(_KernelR):
         return np.max(np.abs(val))
 
     def get_K(self, t):
-        K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - t * self.A)
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - t * self.A)
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class Estrada_R(_KernelR):
     name, default_scaler = 'Estrada R', scaler.Fraction
 
     def get_K(self, t):
-        K = _KernelR.mat_exp(t * self.A)
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = _KernelR.mat_exp(t * self.A)
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class Heat_R(_KernelR):  # this is logHeat, actually
     name, default_scaler = 'Heat R', scaler.Fraction
 
@@ -61,14 +68,17 @@ class Heat_R(_KernelR):  # this is logHeat, actually
         self.L = np.matlib.array(get_L(A))
 
     def get_K(self, t):
-        K = _KernelR.mat_exp(- t * self.L, n=50)
-        if np.any(K < 0):
-            # logging.info(t, "K < 0")
-            return None
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = _KernelR.mat_exp(- t * self.L, n=50)
+            if np.any(K < 0):
+                # logging.info(t, "K < 0")
+                return None
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class NormalizedHeat_R(_KernelR):
     name, default_scaler = 'logNHeat R', scaler.Fraction
 
@@ -80,14 +90,17 @@ class NormalizedHeat_R(_KernelR):
         self.Ll = D_12.dot(L).dot(D_12)
 
     def get_K(self, t):
-        K = _KernelR.mat_exp(-t * self.Ll, n=50)
-        if np.any(K < 0):
-            # logging.info(t, "K < 0")
-            return None
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = _KernelR.mat_exp(-t * self.Ll, n=50)
+            if np.any(K < 0):
+                # logging.info(t, "K < 0")
+                return None
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class RegularizedLaplacian_R(_KernelR):
     name, default_scaler = 'RegularizedLaplacian R', scaler.Fraction
 
@@ -97,14 +110,17 @@ class RegularizedLaplacian_R(_KernelR):
         self.L = D - A
 
     def get_K(self, beta):
-        K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) + beta * self.L)
-        if np.any(K < 0):
-            # logging.info(beta, "K < 0")
-            return None
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) + beta * self.L)
+            if np.any(K < 0):
+                # logging.info(beta, "K < 0")
+                return None
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class logPPR_R(_KernelR):
     name, default_scaler = 'logPPR R', scaler.Linear
 
@@ -114,14 +130,17 @@ class logPPR_R(_KernelR):
         self.P = np.linalg.inv(D).dot(A)
 
     def get_K(self, alpha):
-        K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - alpha * self.P)
-        if np.any(K < 0):
-            # logging.info(alpha, "K < 0")
-            return None
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - alpha * self.P)
+            if np.any(K < 0):
+                # logging.info(alpha, "K < 0")
+                return None
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class logModifPPR_R(_KernelR):
     name, default_scaler = 'logModifPPR R', scaler.Linear
 
@@ -130,14 +149,17 @@ class logModifPPR_R(_KernelR):
         self.D = get_D(A)
 
     def get_K(self, alpha):
-        K = np.linalg.inv(self.D - alpha * self.A)
-        if np.any(K < 0):
-            # logging.info(alpha, "K < 0")
-            return None
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = np.linalg.inv(self.D - alpha * self.A)
+            if np.any(K < 0):
+                # logging.info(alpha, "K < 0")
+                return None
+            return np.array(np.log(K))
 
 
-@deprecated()
+# @deprecated()
 class logHeatPPR_R(_KernelR):
     name, default_scaler = 'logHeatPPR R', scaler.Fraction
 
@@ -147,8 +169,11 @@ class logHeatPPR_R(_KernelR):
         self.P = np.linalg.inv(self.D).dot(A)
 
     def get_K(self, t):
-        K = _KernelR.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
-        if np.any(K < 0):
-            # logging.info(t, "K < 0")
-            return None
-        return np.array(np.log(K))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+            K = _KernelR.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
+            if np.any(K < 0):
+                # logging.info(t, "K < 0")
+                return None
+            return np.array(np.log(K))
