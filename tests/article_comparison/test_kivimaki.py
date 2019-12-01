@@ -9,7 +9,7 @@ import unittest
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans
+from pygraphs.cluster import KKMeans_iterative as KKMeans
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *

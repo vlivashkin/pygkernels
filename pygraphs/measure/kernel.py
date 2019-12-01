@@ -86,7 +86,7 @@ class For_H(Kernel):
         H0 = (I + tL)^{-1}
         """
         size = self.A.shape[0]
-        return np.linalg.pinv(np.eye(size) + t * get_L(self.A))
+        return np.linalg.inv(np.eye(size) + t * get_L(self.A))
 
 
 class Comm_H(Kernel):

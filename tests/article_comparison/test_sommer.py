@@ -8,13 +8,14 @@ import unittest
 from abc import ABC, abstractmethod
 
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
 from pygraphs.cluster import KKMeans_iterative as KKmeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
-from joblib import Parallel, delayed
+
 
 class TestTable3(ABC):
     """Table 3 with optimal parameters from Table 2"""
@@ -96,38 +97,33 @@ class TestTable3(ABC):
                                 result['graph_name'], result['measure_name'], result['test_nmi'],
                                 result['true_nmi'], result['diff']))
 
-    # def test_CCT(self):
-    #     self.dataset_results(SCCT_H, 26, 0)
-    #
-    # def test_FE(self):
-    #     self.dataset_results(FE_K, 0.1, 1)
+    def test_CCT(self):
+        self.dataset_results(SCCT_H, 26, 0)
+
+    def test_FE(self):
+        self.dataset_results(FE_K, 0.1, 1)
 
     def test_logFor(self):
-        self.dataset_results(logFor_H, 1, 2)
+        self.dataset_results(logFor_K, 1.0, 2)
 
-    # def test_RSP(self):
-    #     self.dataset_results(RSP_K, 0.03, 3)
-    #
-    # def test_SCT(self):
-    #     self.dataset_results(SCT_H, 22, 4)
-    #
-    # def test_SP(self):
-    #     self.dataset_results(SPCT_H, 1, 5)
+    def test_RSP(self):
+        self.dataset_results(RSP_K, 0.03, 3)
+
+    def test_SCT(self):
+        self.dataset_results(SCT_H, 22, 4)
+
+    def test_SP(self):
+        self.dataset_results(SPCT_H, 1, 5)
 
 
 class TestTable3_ninit1(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, idx):
         return self._dataset_results(measure_class, best_param, idx, n_init=1)
 
-#
-# class TestTable3_ninit10(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, idx):
-#         return self._dataset_results(measure_class, best_param, idx, n_init=10)
-#
-#
-# class TestTable3_ninit100(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, idx):
-#         return self._dataset_results(measure_class, best_param, idx, n_init=100)
+
+class TestTable3_ninit10(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, idx):
+        return self._dataset_results(measure_class, best_param, idx, n_init=10)
 
 
 if __name__ == "__main__":
