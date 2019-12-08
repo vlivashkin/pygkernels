@@ -6,13 +6,14 @@ no known link to paper
 import logging
 import unittest
 from abc import ABC, abstractmethod
+from functools import partial
 
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_iterative as KKmeans
+from pygraphs.cluster import KKMeans_vanilla, KKMeans_iterative
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
@@ -41,10 +42,10 @@ class TestTable3(ABC):
         self.datasets = Datasets()
 
     @abstractmethod
-    def dataset_results(self, measure_class, best_param, idx):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
         pass
 
-    def _dataset_results(self, measure_class, best_param, idx, n_init=100):
+    def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init=10):
         results = []
         for graphs, info in [
             self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
@@ -56,28 +57,26 @@ class TestTable3(ABC):
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
-            # mean_runs = 10
             # init_nmi = []
-            # for i_run in range(mean_runs):
-            #     kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run + 42)
+            # for i_run in range(n_init):
+            #     kkmeans = estimator_class(n_clusters=info['k'])  # , n_init=n_init, random_state=i_run + 42)
             #     labels_pred = kkmeans.fit_predict(K)
             #     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
             #     init_nmi.append(item_nmi)
 
             def whole_kmeans_run(i_run):
-                kkmeans = KKmeans(n_clusters=info['k'], n_init=n_init, random_state=i_run)
+                kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init, random_state=i_run)
                 labels_pred = kkmeans.fit_predict(K)
                 item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                 return item_nmi
 
-            mean_runs = 10
-            init_nmi = Parallel(n_jobs=-1)(delayed(whole_kmeans_run)(i) for i in range(mean_runs))
+            init_nmi = Parallel(n_jobs=-1)(delayed(whole_kmeans_run)(i) for i in range(n_init))
 
             test_nmi_mean = np.mean(init_nmi)
             test_nmi_median = np.median(init_nmi)
             test_nmi_std = np.std(init_nmi)
 
-            true_nmi = self.etalon[info['name']][idx]
+            true_nmi = self.etalon[info['name']][etalon_idx]
             diff = true_nmi - test_nmi_mean
 
             logging.info(f'{measure.name}\t{true_nmi:0.3f}\t{test_nmi_mean:0.3f}\t{diff:0.3f}\t'
@@ -97,33 +96,93 @@ class TestTable3(ABC):
                                 result['graph_name'], result['measure_name'], result['test_nmi'],
                                 result['true_nmi'], result['diff']))
 
-    def test_CCT(self):
-        self.dataset_results(SCCT_H, 26, 0)
+    # def test_CCT(self):
+    #     self.dataset_results(SCCT_H, 26, 0)
+    #
+    # def test_FE(self):
+    #     self.dataset_results(FE_K, 0.1, 1)
 
-    def test_FE(self):
-        self.dataset_results(FE_K, 0.1, 1)
+    def test_logForH(self):
+        self.dataset_results(logFor_H, 1.0, 2)
 
-    def test_logFor(self):
-        self.dataset_results(logFor_K, 1.0, 2)
+    # def test_logForK(self):
+    #     self.dataset_results(logFor_K, 1.0, 2)
 
-    def test_RSP(self):
-        self.dataset_results(RSP_K, 0.03, 3)
-
-    def test_SCT(self):
-        self.dataset_results(SCT_H, 22, 4)
-
-    def test_SP(self):
-        self.dataset_results(SPCT_H, 1, 5)
-
-
-class TestTable3_ninit1(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, idx):
-        return self._dataset_results(measure_class, best_param, idx, n_init=1)
+    # def test_RSP(self):
+    #     self.dataset_results(RSP_K, 0.03, 3)
+    #
+    # def test_SCT(self):
+    #     self.dataset_results(SCT_H, 22, 4)
+    #
+    # def test_SP(self):
+    #     self.dataset_results(SPCT_H, 1, 5)
 
 
-class TestTable3_ninit10(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, idx):
-        return self._dataset_results(measure_class, best_param, idx, n_init=10)
+class TestTable3_KKMeans_vanilla__init_one(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        estimator = partial(KKMeans_vanilla, init='one')
+        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
+
+
+class TestTable3_KKMeans_vanilla__init_all(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        estimator = partial(KKMeans_vanilla, init='all')
+        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
+
+
+class TestTable3_KKMeans_iterative__init_one(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        estimator = partial(KKMeans_iterative, init='one')
+        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
+
+
+class TestTable3_KKMeans_iterative__init_all(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        estimator = partial(KKMeans_iterative, init='all')
+        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
+
+
+# class TestTable3_KKMeans_iterative(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, idx):
+#         return self._dataset_results(measure_class, best_param, idx, KKMeans_iterative)
+#
+#
+# class TestTable3_KKMeans_frankenstein(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, idx):
+#         return self._dataset_results(measure_class, best_param, idx, KKMeans_frankenstein)
+#
+#
+# class TestTable3_SpectralClustering_rubanov(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, idx):
+#         return self._dataset_results(measure_class, best_param, idx, SpectralClustering_rubanov)
+
+# class TestTable3_SklearnKMeans__init_kmeanspp__algo_full(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, etalon_idx):
+#         estimator = partial(KMeans_sklearn, init='k-means++', algorithm='full')
+#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, n_init=10)
+#
+#
+# class TestTable3_SklearnKMeans__init_kmeanspp__algo_elkan(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, etalon_idx):
+#         estimator = partial(KMeans_sklearn, init='k-means++', algorithm='elkan')
+#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, n_init=10)
+#
+#
+# class TestTable3_SklearnKMeans__init_random__algo_full(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, etalon_idx):
+#         estimator = partial(KMeans_sklearn, init='random', algorithm='full')
+#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, n_init=10)
+#
+#
+# class TestTable3_SklearnKMeans__init_random__algo_elkan(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, etalon_idx):
+#         estimator = partial(KMeans_sklearn, init='random', algorithm='elkan')
+#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, n_init=10)
+
+
+# class TestTable3_ninit10(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, idx):
+#         return self._dataset_results(measure_class, best_param, idx, n_init=10)
 
 
 if __name__ == "__main__":

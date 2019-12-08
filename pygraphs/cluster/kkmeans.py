@@ -1,27 +1,70 @@
 from abc import ABC, abstractmethod
+from random import shuffle
 
 import numpy as np
+from numba import jit
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score, pairwise_kernels
 from sklearn.utils import check_random_state, check_array
 from sklearn.utils.validation import FLOAT_DTYPES
-from random import shuffle
 
 from pygraphs.cluster.base import KernelEstimator
-from numba import jit
 
 
-@jit
+@jit(nopython=True)
 def _hKh(hk: np.array, ei: np.array, K: np.array):
     hk_ei = np.expand_dims((hk - ei), axis=0).T
-    return hk_ei.T.dot(K).dot(hk_ei)
+    return hk_ei.T.dot(K).dot(hk_ei)[0, 0]
+
+
+@jit(nopython=True)
+def _init_h(K: np.array, init: str, n_clusters: int):
+    n = K.shape[0]
+
+    q_idx = np.arange(n)
+    np.random.shuffle(q_idx)
+
+    h = np.zeros((n_clusters, n), dtype=np.float32)
+    if init == 'one':  # init: choose one node for each cluster
+        for i in range(n_clusters):
+            h[i, q_idx[i]] = 1.
+    elif init == 'all':  # init: choose (almost) all nodes to clusters
+        nodes_per_cluster = n // n_clusters
+        for i in range(n_clusters):
+            for j in range(i * nodes_per_cluster, (i + 1) * nodes_per_cluster):
+                h[i, q_idx[j]] = 1. / nodes_per_cluster
+    else:
+        raise NotImplementedError()
+    return h
+
+
+@jit(nopython=True)
+def _init_l_U_nn_h(K: np.array, init: str, n_clusters: int):
+    K = K.astype(np.float32)
+    n = K.shape[0]
+    e = np.eye(n, dtype=np.float32)
+
+    while True:  # check all clusters used
+        h = _init_h(K, init, n_clusters)
+        U = np.zeros((n, n_clusters), dtype=np.float32)
+        l = np.zeros((n,), dtype=np.uint8)
+        for i in range(n):
+            k_star = np.array([_hKh(h[k], e[i], K) for k in range(n_clusters)]).argmin()
+            U[i][k_star] = 1
+            l[i] = k_star
+        nn = np.expand_dims(np.sum(U, axis=0), axis=0)
+        if np.any(nn == 0):  # bad start, rerun
+            continue
+        h = (U / nn).T
+        return l, U, nn[0], h
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, random_state=0):
+    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='one', random_state=None):
         super().__init__(n_clusters)
         self.n_init = n_init
         self.max_rerun = max_rerun
         self.max_iter = max_iter
+        self.init = init
         self.random_state = random_state
         self.eps = 10 ** -10
 
@@ -29,43 +72,23 @@ class KMeans_Fouss(KernelEstimator, ABC):
         self.labels_ = self.predict(K)
         return self
 
-    def _init_h(self, K: np.array, rs: np.random.RandomState):
-        n = K.shape[0]
-
-        # initialization: choose one node for each cluster
-        q_idx = np.arange(n)
-        rs.shuffle(q_idx)
-        q_idx = q_idx[:self.n_clusters]
-        assert len(list(set(q_idx))) == self.n_clusters
-
-        # initialization: h
-        h = np.zeros((self.n_clusters, n))
-        for i in range(self.n_clusters):
-            h[i][q_idx[i]] = 1
-
-        return h
-
-    # def _hKh(self, hk, ei, K):
-    #     hk_ei = (hk - ei)[None].T
-    #     return hk_ei.T.dot(K).dot(hk_ei)
-
-    def _predict_successful_once(self, K: np.array, rs: np.random.RandomState):
+    def _predict_successful_once(self, K: np.array):
         for i in range(self.max_rerun):
-            labels, inertia, success = self._predict_once(K, rs)
+            labels, inertia, success = self._predict_once(K)
             if success:
                 return labels, inertia
         print('reruns exceeded, take last result')
         return labels, inertia
 
     @abstractmethod
-    def _predict_once(self, K: np.array, rs: np.random.RandomState):
+    def _predict_once(self, K: np.array):
         pass
 
     def predict(self, K):
-        rs = check_random_state(self.random_state)
+        np.random.seed(self.random_state)
         best_labels, best_inertia = [], float('+inf')
         for i in range(self.n_init):
-            labels, inertia = self._predict_successful_once(K, rs)
+            labels, inertia = self._predict_successful_once(K)
             if inertia < best_inertia:
                 best_labels = labels
 
@@ -83,11 +106,12 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     name = 'KernelKMeans_vanilla'
 
-    def _predict_once(self, K: np.array, rs: np.random.RandomState):
+    def _predict_once(self, K: np.array):
+        K = K.astype(np.float32)
         n = K.shape[0]
-        e = np.eye(n)
+        e = np.eye(n, dtype=np.float32)
 
-        h = self._init_h(K, rs)
+        h = _init_h(K, self.init, self.n_clusters)
 
         labels, inertia = [0] * n, float('+inf')
         for iter in range(self.max_iter):
@@ -124,29 +148,12 @@ class KKMeans_iterative(KMeans_Fouss):
 
     name = 'KernelKMeans_iterative'
 
-    def _init_l_U_nn_h(self, n, K, e, rs):
-        nn = np.zeros((self.n_clusters,), dtype=np.uint8)
-        while np.any(nn == 0):  # check all clusters used
-            h = self._init_h(K, rs)
-
-            U = np.zeros((n, self.n_clusters), dtype=np.uint8)
-            l = np.zeros((n,), dtype=np.uint8)
-            for i in range(n):
-                k_star = np.argmin([_hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
-                U[i][k_star] = 1
-                l[i] = k_star
-            nn = np.sum(U, axis=0)
-            if np.any(nn == 0):  # bad start, rerun
-                continue
-            h = (U / nn[None]).T
-
-        return l, U, nn, h
-
-    def _predict_once(self, K: np.array, rs: np.random.RandomState):
+    def _predict_once(self, K: np.array):
+        K = K.astype(np.float32)
         n = K.shape[0]
-        e = np.eye(n)
+        e = np.eye(n, dtype=np.float32)
 
-        l, U, nn, h = self._init_l_U_nn_h(n, K, e, rs)  # init and first step
+        l, U, nn, h = _init_l_U_nn_h(K, self.init, self.n_clusters)  # init and first step
         labels = np.argmax(U, axis=1)
         inertia = np.sum([_hKh(h[labels[i]], e[i], K) for i in range(n)])
         old_labels, old_inertia = labels, inertia
@@ -165,7 +172,6 @@ class KKMeans_iterative(KMeans_Fouss):
                 if minΔJ < 0:
                     if nn[l[i]] == 1:  # it will cause empty cluster! exit with success=False
                         return labels, inertia, False
-
                     h[l[i]] = 1. / (nn[l[i]] - 1 + self.eps) * (nn[l[i]] * h[l[i]] - e[i])
                     nn[l[i]] -= 1
                     U[i, l[i]] = 0
@@ -186,7 +192,7 @@ class KKMeans_iterative(KMeans_Fouss):
         return labels, inertia, ~np.isnan(inertia)
 
 
-class KKMeans(KernelEstimator):
+class KKMeans_frankenstein(KernelEstimator):
     """Kernel K-means clustering
     Reference
     ---------

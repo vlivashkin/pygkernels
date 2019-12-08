@@ -43,7 +43,6 @@ def H0_to_H(H0):
     return H
 
 
-@jit
 def H_to_D(H):
     """
     D = (h * 1^T + 1 * h^T - H - H ^ T) / 2

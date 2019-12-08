@@ -26,7 +26,7 @@ class _KernelR(Kernel, ABC):
         return R
 
 
-# @deprecated()
+@deprecated()
 class Katz_R(_KernelR):
     name, default_scaler = 'Katz R', scaler.Rho
 
@@ -47,7 +47,7 @@ class Katz_R(_KernelR):
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class Estrada_R(_KernelR):
     name, default_scaler = 'Estrada R', scaler.Fraction
 
@@ -59,7 +59,7 @@ class Estrada_R(_KernelR):
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class Heat_R(_KernelR):  # this is logHeat, actually
     name, default_scaler = 'Heat R', scaler.Fraction
 
@@ -78,7 +78,7 @@ class Heat_R(_KernelR):  # this is logHeat, actually
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class NormalizedHeat_R(_KernelR):
     name, default_scaler = 'logNHeat R', scaler.Fraction
 
@@ -100,7 +100,7 @@ class NormalizedHeat_R(_KernelR):
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class RegularizedLaplacian_R(_KernelR):
     name, default_scaler = 'RegularizedLaplacian R', scaler.Fraction
 
@@ -120,7 +120,7 @@ class RegularizedLaplacian_R(_KernelR):
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class logPPR_R(_KernelR):
     name, default_scaler = 'logPPR R', scaler.Linear
 
@@ -140,7 +140,7 @@ class logPPR_R(_KernelR):
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class logModifPPR_R(_KernelR):
     name, default_scaler = 'logModifPPR R', scaler.Linear
 
@@ -159,7 +159,7 @@ class logModifPPR_R(_KernelR):
             return np.array(np.log(K))
 
 
-# @deprecated()
+@deprecated()
 class logHeatPPR_R(_KernelR):
     name, default_scaler = 'logHeatPPR R', scaler.Fraction
 

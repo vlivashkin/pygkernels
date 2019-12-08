@@ -5,7 +5,7 @@ import unittest
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KMeans_sklearn, SpectralClustering_rubanov, KKMeans
+from pygraphs.cluster import KKMeans_iterative, SpectralClustering_rubanov
 from pygraphs.cluster.kward import KWard
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import kernels
@@ -24,7 +24,7 @@ class TestEstimators(unittest.TestCase):
     def test_all_estimators(self):
         K = Samples.diploma_matrix  # this is not kernel but who cares
 
-        y_pred_kmeans = KKMeans(n_clusters=2).fit_predict(K)
+        y_pred_kmeans = KKMeans_iterative(n_clusters=2).fit_predict(K)
         y_pred_ward = KWard(n_clusters=2).fit_predict(K)
         y_pred_spectral = SpectralClustering_rubanov(n_clusters=2).fit_predict(K)
         logging.info('KMeans: {}'.format(y_pred_kmeans))

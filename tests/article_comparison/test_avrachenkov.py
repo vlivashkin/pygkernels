@@ -8,7 +8,6 @@ import logging
 import os
 import unittest
 from abc import ABC
-from collections import defaultdict
 from os.path import join as pj
 
 import networkx as nx
@@ -154,28 +153,28 @@ class BalancedModel(TestCompetition):
         return np.array(sum(([i] * size for i, size in enumerate(sizes)), []))
 
     def test_Walk(self):
-        self._compare(Katz_R, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0072)
+        self._compare(Walk_H, params=np.linspace(0, 0.5, 101)[1:-1], error_true=0.0072)
 
     def test_logComm(self):
-        self._compare(Estrada_R, params=np.linspace(0, 0.3, 101)[1:-1], error_true=0.0084)
+        self._compare(logComm_H, params=np.linspace(0, 0.3, 101)[1:-1], error_true=0.0084)
 
     def test_logHeat(self):
-        self._compare(Heat_R, params=np.linspace(0, 1.5, 101)[1:-1], error_true=0.0064)
+        self._compare(logHeat_H, params=np.linspace(0, 1.5, 101)[1:-1], error_true=0.0064)
 
     def test_logNHeat(self):
-        self._compare(NormalizedHeat_R, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0066)
+        self._compare(logNHeat_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0066)
 
     def test_logFor(self):
-        self._compare(RegularizedLaplacian_R, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0072)
+        self._compare(logFor_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0072)
 
     def test_logPPR(self):
-        self._compare(logPPR_R, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0073)
+        self._compare(logPPR_H, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0073)
 
     def test_logModifPPR(self):
-        self._compare(logModifPPR_R, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0072)
+        self._compare(logModifPPR_H, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0072)
 
     def test_logHeatPPR(self):
-        self._compare(logHeatPPR_R, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0074)
+        self._compare(logHeatPPR_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0074)
 
 
 @unittest.skip
@@ -193,28 +192,28 @@ class TestUnbalancedModel(TestCompetition):
         cls.graphs = GS
 
     def test_Walk(self):
-        self._compare(Katz_R, params=np.linspace(0, 1, 101)[1:-1], error_true=0.012)
+        self._compare(Walk_H, params=np.linspace(0, 0.5, 101)[1:-1], error_true=0.012)
 
     def test_logComm(self):
-        self._compare(Estrada_R, params=np.linspace(0, 0.3, 101)[1:-1], error_true=0.011)
+        self._compare(logComm_H, params=np.linspace(0, 0.3, 101)[1:-1], error_true=0.011)
 
     def test_logHeat(self):
-        self._compare(Heat_R, params=np.linspace(0, 1.5, 101)[1:-1], error_true=0.0104)
+        self._compare(logHeat_H, params=np.linspace(0, 1.5, 101)[1:-1], error_true=0.0104)
 
     def test_logNHeat(self):
-        self._compare(NormalizedHeat_R, params=np.linspace(0, 20, 101)[1:-1], error_true=0.009)
+        self._compare(logNHeat_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.009)
 
     def test_logFor(self):
-        self._compare(RegularizedLaplacian_R, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0026)
+        self._compare(logFor_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0026)
 
     def test_logPPR(self):
-        self._compare(logPPR_R, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0021)
+        self._compare(logPPR_H, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0021)
 
     def test_logModifPPR(self):
-        self._compare(logModifPPR_R, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0022)
+        self._compare(logModifPPR_H, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0022)
 
     def test_logHeatPPR(self):
-        self._compare(logHeatPPR_R, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0021)
+        self._compare(logHeatPPR_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0021)
 
 
 if __name__ == "__main__":
