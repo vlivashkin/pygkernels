@@ -9,15 +9,16 @@ from pygraphs.cluster.base import KernelEstimator, REstimatorWrapper
 class KMeans_sklearn(KernelEstimator):
     name = 'KMeans_sklearn'
 
-    def __init__(self, n_clusters, init='k-means++', algorithm='auto', random_state=None):
+    def __init__(self, n_clusters, init='k-means++', algorithm='auto', n_init=10, random_state=None):
         super().__init__(n_clusters)
         self.init = init
         self.algorithm = algorithm
+        self.n_init = n_init
         self.random_state = random_state
 
     def predict(self, K):
         _, pred, _ = k_means(K, n_clusters=self.n_clusters, init=self.init, algorithm=self.algorithm,
-                             random_state=self.random_state)
+                             n_init=self.n_init, random_state=self.random_state)
         return pred
 
 

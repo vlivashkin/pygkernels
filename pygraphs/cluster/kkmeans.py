@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from random import shuffle
 
 import numpy as np
 from numba import jit
@@ -16,9 +15,10 @@ def _hKh(hk: np.array, ei: np.array, K: np.array):
     return hk_ei.T.dot(K).dot(hk_ei)[0, 0]
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def _init_h(K: np.array, init: str, n_clusters: int):
     n = K.shape[0]
+    e = np.eye(n, dtype=np.float32)
 
     q_idx = np.arange(n)
     np.random.shuffle(q_idx)
@@ -32,12 +32,31 @@ def _init_h(K: np.array, init: str, n_clusters: int):
         for i in range(n_clusters):
             for j in range(i * nodes_per_cluster, (i + 1) * nodes_per_cluster):
                 h[i, q_idx[j]] = 1. / nodes_per_cluster
+    elif init == 'k-means++':
+        first_centroid = np.random.randint(n)
+        h[0, first_centroid] = 1
+        for c_idx in range(1, n_clusters):
+            min_distances = np.ones((n,))
+            for i in range(n):
+                distances = np.array([_hKh(h[k], e[i], K) for k in range(c_idx)])
+                k_star = distances.argmin()
+                min_distances[i] = distances[k_star]
+            min_distances = np.power(min_distances, 2)
+            # next_centroid = np.argmax(min_distances)
+
+            if np.sum(min_distances) > 0:
+                next_centroid = np.random.choice(range(n), p=min_distances / np.sum(min_distances))
+            else:  # no way to make all different centroids; let's choose random one just for rerun
+#                 print('min_distances = 0')
+                next_centroid = np.random.choice(range(n))
+
+            h[c_idx, next_centroid] = 1
     else:
         raise NotImplementedError()
     return h
 
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def _init_l_U_nn_h(K: np.array, init: str, n_clusters: int):
     K = K.astype(np.float32)
     n = K.shape[0]
@@ -116,7 +135,7 @@ class KKMeans_vanilla(KMeans_Fouss):
         labels, inertia = [0] * n, float('+inf')
         for iter in range(self.max_iter):
             # fix h, update U
-            U = np.zeros((n, self.n_clusters), dtype=np.uint8)
+            U = np.zeros((n, self.n_clusters), dtype=np.float32)
             for i in range(n):
                 k_star = np.argmin([_hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
                 U[i][k_star] = 1
@@ -160,7 +179,7 @@ class KKMeans_iterative(KMeans_Fouss):
 
         for _ in range(self.max_iter):
             node_order = list(range(n))
-            shuffle(node_order)
+            np.random.shuffle(node_order)
             for i in node_order:  # for each node
                 minΔJ, k_star = float('+inf'), -1
                 for k in range(self.n_clusters):
