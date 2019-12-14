@@ -16,6 +16,20 @@ def _hKh(hk: np.array, ei: np.array, K: np.array):
 
 
 # @jit(nopython=True)
+def _hKh2(h: np.array, i: np.array, K: np.array):
+    h_ei = h.copy()
+    h_ei[:, i] -= 1
+    # return np.diag(h_ei.dot(K).dot(h_ei.T))
+    return np.array([h_ei[k:k+1].dot(K).dot(h_ei[k:k+1].T) for k in range(h_ei.shape[0])])
+
+# @jit(nopython=True)
+def _inertia(h: np.array, K: np.array, labels: np.array):
+    n = K.shape[0]
+    e = np.eye(n, dtype=np.float32)
+    return np.array([_hKh(h[labels[i]], e[i], K) for i in range(0, n)]).sum()
+
+
+# @jit(nopython=True)
 def _init_h(K: np.array, init: str, n_clusters: int):
     n = K.shape[0]
     e = np.eye(n, dtype=np.float32)
@@ -36,18 +50,13 @@ def _init_h(K: np.array, init: str, n_clusters: int):
         first_centroid = np.random.randint(n)
         h[0, first_centroid] = 1
         for c_idx in range(1, n_clusters):
-            min_distances = np.ones((n,))
-            for i in range(n):
-                distances = np.array([_hKh(h[k], e[i], K) for k in range(c_idx)])
-                k_star = distances.argmin()
-                min_distances[i] = distances[k_star]
+            min_distances = [np.min([_hKh(h[k], e[i], K) for k in range(c_idx)]) for i in range(n)]
             min_distances = np.power(min_distances, 2)
             # next_centroid = np.argmax(min_distances)
 
             if np.sum(min_distances) > 0:
                 next_centroid = np.random.choice(range(n), p=min_distances / np.sum(min_distances))
             else:  # no way to make all different centroids; let's choose random one just for rerun
-#                 print('min_distances = 0')
                 next_centroid = np.random.choice(range(n))
 
             h[c_idx, next_centroid] = 1
@@ -60,15 +69,14 @@ def _init_h(K: np.array, init: str, n_clusters: int):
 def _init_l_U_nn_h(K: np.array, init: str, n_clusters: int):
     K = K.astype(np.float32)
     n = K.shape[0]
-    e = np.eye(n, dtype=np.float32)
 
     while True:  # check all clusters used
         h = _init_h(K, init, n_clusters)
         U = np.zeros((n, n_clusters), dtype=np.float32)
         l = np.zeros((n,), dtype=np.uint8)
         for i in range(n):
-            k_star = np.array([_hKh(h[k], e[i], K) for k in range(n_clusters)]).argmin()
-            U[i][k_star] = 1
+            k_star = _hKh2(h, i, K).argmin()
+            U[i, k_star] = 1
             l[i] = k_star
         nn = np.expand_dims(np.sum(U, axis=0), axis=0)
         if np.any(nn == 0):  # bad start, rerun
@@ -128,7 +136,6 @@ class KKMeans_vanilla(KMeans_Fouss):
     def _predict_once(self, K: np.array):
         K = K.astype(np.float32)
         n = K.shape[0]
-        e = np.eye(n, dtype=np.float32)
 
         h = _init_h(K, self.init, self.n_clusters)
 
@@ -137,7 +144,7 @@ class KKMeans_vanilla(KMeans_Fouss):
             # fix h, update U
             U = np.zeros((n, self.n_clusters), dtype=np.float32)
             for i in range(n):
-                k_star = np.argmin([_hKh(h[k], e[i], K) for k in range(0, self.n_clusters)])
+                k_star = _hKh2(h, i, K).argmin()
                 U[i][k_star] = 1
 
             # fix U, update h
@@ -151,7 +158,7 @@ class KKMeans_vanilla(KMeans_Fouss):
                 break
 
             labels = np.argmax(U, axis=1)
-            inertia = np.sum([_hKh(h[labels[i]], e[i], K) for i in range(0, n)])
+            inertia = _inertia(h, K, labels)
 
         return labels, inertia, True
 
@@ -174,7 +181,7 @@ class KKMeans_iterative(KMeans_Fouss):
 
         l, U, nn, h = _init_l_U_nn_h(K, self.init, self.n_clusters)  # init and first step
         labels = np.argmax(U, axis=1)
-        inertia = np.sum([_hKh(h[labels[i]], e[i], K) for i in range(n)])
+        inertia = _inertia(h, K, labels)
         old_labels, old_inertia = labels, inertia
 
         for _ in range(self.max_iter):
@@ -200,7 +207,7 @@ class KKMeans_iterative(KMeans_Fouss):
                     l[i] = k_star
 
             labels = np.argmax(U, axis=1)
-            inertia = np.sum([_hKh(h[labels[i]], e[i], K) for i in range(n)])
+            inertia = _inertia(h, K, labels)
 
             # early stop
             if np.all(labels == old_labels):  # nothing changed
