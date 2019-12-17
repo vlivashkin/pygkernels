@@ -13,7 +13,7 @@ from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla, KKMeans_iterative, SpectralClustering_rubanov, KKMeans_frankenstein, \
+from pygraphs.cluster import KKMeans_vanilla, KKMeans_iterative, KKMeans_frankenstein, SpectralClustering_rubanov, \
     KMeans_sklearn
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
@@ -47,7 +47,7 @@ class TestTable3(ABC):
         pass
 
     def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init_inertia=10,
-                         n_init_nmi=10):
+                         n_init_nmi=10, parallel=False):
         results = []
         for graphs, info in [
             self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
@@ -59,7 +59,6 @@ class TestTable3(ABC):
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
-            parallel = True
             if parallel:
                 def whole_kmeans_run(i_run):
                     kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=i_run)
@@ -159,26 +158,26 @@ class TestTable3_KKMeans_iterative_kmeanspp(TestTable3, unittest.TestCase):
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 
-# class TestTable3_KKMeans_frankenstein(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         return self._dataset_results(measure_class, best_param, etalon_idx, KKMeans_frankenstein)
-#
-#
-# class TestTable3_SpectralClustering_rubanov(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         return self._dataset_results(measure_class, best_param, etalon_idx, SpectralClustering_rubanov)
-#
-#
-# class TestTable3_SklearnKMeans_random(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         estimator = partial(KMeans_sklearn, init='random')
-#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
-#
-#
-# class TestTable3_SklearnKMeans_kmeanspp(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         estimator = partial(KMeans_sklearn, init='k-means++')
-#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
+class TestTable3_KKMeans_frankenstein(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        return self._dataset_results(measure_class, best_param, etalon_idx, KKMeans_frankenstein)
+
+
+class TestTable3_SpectralClustering_rubanov(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        return self._dataset_results(measure_class, best_param, etalon_idx, SpectralClustering_rubanov)
+
+
+class TestTable3_SklearnKMeans_random(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        estimator = partial(KMeans_sklearn, init='random')
+        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
+
+
+class TestTable3_SklearnKMeans_kmeanspp(TestTable3, unittest.TestCase):
+    def dataset_results(self, measure_class, best_param, etalon_idx):
+        estimator = partial(KMeans_sklearn, init='k-means++')
+        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 
 if __name__ == "__main__":
