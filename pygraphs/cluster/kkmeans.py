@@ -6,20 +6,20 @@ from numba import jit
 from pygraphs.cluster.base import KernelEstimator
 
 
-# @jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True)
 def _hKh(hk: np.array, ei: np.array, K: np.array):
     hk_ei = np.expand_dims((hk - ei), axis=0)
     return hk_ei.dot(K).dot(hk_ei.T)[0, 0]
 
 
-# @jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True)
 def _inertia(h: np.array, K: np.array, labels: np.array):
     n = K.shape[0]
     e = np.eye(n, dtype=np.float64)
     return np.array([_hKh(h[labels[i]], e[i], K) for i in range(0, n)]).sum()
 
 
-# @jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True)
 def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
     n_clusters, n = h.shape
     e = np.eye(n, dtype=np.float64)
@@ -53,7 +53,7 @@ def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
     return labels, inertia, success
 
 
-# @jit(nopython=True, cache=True)
+@jit(nopython=True, cache=True)
 def _iterative_predict(K: np.array, h: np.array, U: np.array, l: np.array, nn: np.array, max_iter: int, eps: float):
     n_clusters, n = h.shape
     e = np.eye(n, dtype=np.float64)
