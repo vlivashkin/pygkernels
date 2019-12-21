@@ -1,6 +1,6 @@
 import numpy as np
-from sklearn.utils import deprecated
 from numba import jit
+from sklearn.utils import deprecated
 
 
 @deprecated()
@@ -36,10 +36,12 @@ def get_normalized_L(A):
 
 def H0_to_H(H0):
     """
-    H = element - wise log(H0)
+    H = element-wise log(H0)
     """
+    mask = H0 <= 0
+    H0[mask] = 1
     H = np.log(H0)
-    H[np.isnan(H)] = 0
+    H[mask] = -np.inf
     return H
 
 

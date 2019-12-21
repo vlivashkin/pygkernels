@@ -92,7 +92,7 @@ def _iterative_predict(K: np.array, h: np.array, U: np.array, l: np.array, nn: n
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='one', random_state=None):
+    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='all', random_state=None):
         super().__init__(n_clusters)
         self.n_init = n_init
         self.max_rerun = max_rerun
@@ -145,7 +145,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
             labels, inertia, success = self._predict_once(K)
             if success:
                 return labels, inertia
-        print('reruns exceeded, take last result')
+        # print('reruns exceeded, take last result')
         return labels, inertia
 
     @abstractmethod
@@ -172,7 +172,7 @@ class KKMeans_vanilla(KMeans_Fouss):
     Algorithm 7.2: Simple kernel k-means clustering of nodes
     """
 
-    name = 'KernelKMeans_vanilla'
+    name = 'KKMeans_vanilla'
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
@@ -188,13 +188,13 @@ class KKMeans_iterative(KMeans_Fouss):
     Algorithm 7.3: Simple iterative kernel k-means clustering of nodes
     """
 
-    name = 'KernelKMeans_iterative'
+    name = 'KKMeans'
 
     def _init_h_U_l_nn(self, K: np.array):
         n = K.shape[0]
         e = np.eye(n, dtype=np.float64)
 
-        while True:  # check all clusters used
+        for i in range(self.max_iter):  # check all clusters used
             h = self._init_h(K)
             U, l = np.zeros((n, self.n_clusters), dtype=np.float64), np.zeros((n,), dtype=np.uint8)
             for i in range(n):
@@ -205,8 +205,14 @@ class KKMeans_iterative(KMeans_Fouss):
             if np.any(nn == 0):  # bad start, rerun
                 continue
             h = (U / nn).T
-            return h, U, l, nn[0]
+            return h, U, l, nn[0], True
+        return h, U, l, nn[0], False
 
     def _predict_once(self, K: np.array):
-        h, U, l, nn = self._init_h_U_l_nn(K)
-        return _iterative_predict(K, h, U, l, nn, self.max_iter, self.eps)
+        h, U, l, nn, success_init = self._init_h_U_l_nn(K)
+        if success_init:
+            return _iterative_predict(K, h, U, l, nn, self.max_iter, self.eps)
+        else:  # no way to initialize properly
+            labels = l.copy()
+            inertia = _inertia(h, K, labels)
+            return labels, inertia, ~np.isnan(inertia)

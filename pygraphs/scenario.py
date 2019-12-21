@@ -6,7 +6,7 @@ from random import shuffle
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score
-from tqdm import tqdm_notebook as tqdm
+from tqdm import tqdm
 
 from pygraphs.util import ddict2dict
 
@@ -153,7 +153,7 @@ class RejectCurve:
     High-level class for calculation i.e. reject curves: tpr vs. fpr
     """
 
-    def __init__(self, columns: list, distances: list, generator_class, n_graphs):
+    def __init__(self, columns: list, distances: list, generator_class):
         self.columns = columns
         self.distances = distances
         self.generator_class = generator_class

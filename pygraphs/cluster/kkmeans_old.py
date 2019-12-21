@@ -82,7 +82,7 @@ class KKMeans_frankenstein(KernelEstimator):
       http://www.cs.utexas.edu/users/inderjit/public_papers/kdd_spectral_kernelkmeans.pdf
     """
 
-    name = 'KernelKMeans'
+    name = 'KKMeans_frankenstein'
 
     def __init__(self, n_clusters, max_iter=300, tol=1e-4, n_init=10, init_choose_objective='inertia',
                  init_choose_strategy='max', dist_compensation_strategy='+40', kernel='precomputed', gamma='auto',

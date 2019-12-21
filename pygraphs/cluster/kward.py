@@ -28,7 +28,7 @@ class KWardCluster:
 
 
 class KWard(KernelEstimator):
-    name = 'KernelWard'
+    name = 'KWard'
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)

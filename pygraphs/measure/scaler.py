@@ -5,6 +5,7 @@ import numpy as np
 
 class Scaler(ABC):
     def __init__(self, A=None):
+        self.eps = 10 ** -10
         self.A = A
 
     def scale_list(self, ts):
@@ -26,7 +27,7 @@ class AlphaToT(Scaler):  # α > 0 -> 0 < t < α^{-1}
         self.rho = np.max(np.abs(cfm))
 
     def scale(self, alpha):
-        return 1 / (1 / alpha + self.rho)
+        return 1 / ((1 / alpha + self.rho + self.eps) + self.eps)
 
 
 class Rho(Scaler):  # pWalk, Walk
@@ -36,14 +37,14 @@ class Rho(Scaler):  # pWalk, Walk
         self.rho = np.max(np.abs(cfm))
 
     def scale(self, t):
-        return t / self.rho
+        return t / (self.rho + self.eps)
 
 
 class Fraction(Scaler):  # Forest, logForest, Comm, logComm, Heat, logHeat, SCT, SCCT, ...
     def scale(self, t):
-        return 0.5 * t / (1.0 - t)
+        return 0.5 * t / (1.0 - t + self.eps)
 
 
 class FractionReversed(Scaler):  # RSP, FE
     def scale(self, beta):
-        return (1.0 - beta) / beta
+        return (1.0 - beta) / (beta, self.eps)

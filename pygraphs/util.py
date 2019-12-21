@@ -39,17 +39,16 @@ class PrintOnce:
 
 def load_or_calc_and_save(filename):
     def my_decorator(func):
-        def wrapped():
+        def wrapped(n_graphs, n_jobs):
             if os.path.exists(filename):
-                print('File exist! Skip calculations')
+                print(f'{func.__name__}: cache file found! Skip calculations')
                 with open(filename, 'rb') as f:
                     result = pickle.load(f)
             else:
-                result = func()
+                print(f'{func.__name__}: RECALC. n_graphs={n_graphs}, n_jobs={n_jobs}')
+                result = func(n_graphs, n_jobs)
                 with open(filename, 'wb') as f:
                     pickle.dump(result, f)
             return result
-
         return wrapped
-
     return my_decorator
