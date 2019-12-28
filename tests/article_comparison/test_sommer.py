@@ -13,8 +13,7 @@ from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla, KKMeans_iterative, KMeans_sklearn, SpectralClustering_rubanov, \
-    KKMeans_frankenstein
+from pygraphs.cluster import KKMeans_vanilla, KKMeans_iterative
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
@@ -47,13 +46,13 @@ class TestTable3(ABC):
         pass
 
     def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init_inertia=10,
-                         n_init_nmi=10, parallel=False):
+                         n_init_nmi=1, parallel=False):
         results = []
         for graphs, info in [
-            self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
-            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            # self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
+            # self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
+            self.datasets['news_3cl_1'],  # self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
+            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
@@ -99,112 +98,31 @@ class TestTable3(ABC):
                                 result['graph_name'], result['measure_name'], result['test_nmi'],
                                 result['true_nmi'], result['diff']))
 
-    @unittest.skip
-    def test_CCT(self):
-        self.dataset_results(SCCT_H, 26, 0)
-
-    @unittest.skip
-    def test_FE(self):
-        self.dataset_results(FE_K, 0.1, 1)
-
     def test_logForH(self):
         self.dataset_results(logFor_H, 1.0, 2)
 
-    @unittest.skip
-    def test_logForK(self):
-        self.dataset_results(logFor_K, 1.0, 2)
 
-    @unittest.skip
-    def test_RSP(self):
-        self.dataset_results(RSP_K, 0.03, 3)
-
-    @unittest.skip
-    def test_SCT(self):
-        self.dataset_results(SCT_H, 22, 4)
-
-    @unittest.skip
-    def test_SP(self):
-        self.dataset_results(SPCT_H, 1, 5)
-
-
-@unittest.skip
-class TestTable3_KKMeans_vanilla_one(TestTable3, unittest.TestCase):
+class TestTable3_KKMeans_vanilla_all_numpy(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='one')
+        estimator = partial(KKMeans_vanilla, init='all', backend='numpy')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 
-@unittest.skip
-class TestTable3_KKMeans_iterative_one(TestTable3, unittest.TestCase):
+class TestTable3_KKMeans_vanilla_all_pytorch(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_iterative, init='one')
+        estimator = partial(KKMeans_vanilla, init='all', backend='pytorch')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 
-@unittest.skip
-class TestTable3_KKMeans_vanilla_all(TestTable3, unittest.TestCase):
+class TestTable3_KKMeans_iterative_all_numpy(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='all')
+        estimator = partial(KKMeans_iterative, init='all', backend='numpy')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 
-@unittest.skip
-class TestTable3_KKMeans_vanilla_all_parallel(TestTable3, unittest.TestCase):
+class TestTable3_KKMeans_iterative_all_pytorch(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='all')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
-
-
-@unittest.skip
-class TestTable3_KKMeans_iterative_all(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_iterative, init='all')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
-
-
-class TestTable3_KKMeans_iterative_all_parallel(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_iterative, init='all')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
-
-
-@unittest.skip
-class TestTable3_KKMeans_vanilla_kmeanspp(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='k-means++')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
-
-
-@unittest.skip
-class TestTable3_KKMeans_iterative_kmeanspp(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_iterative, init='k-means++')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
-
-
-@unittest.skip
-class TestTable3_KKMeans_frankenstein(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        return self._dataset_results(measure_class, best_param, etalon_idx, KKMeans_frankenstein)
-
-
-@unittest.skip
-class TestTable3_SpectralClustering_rubanov(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        return self._dataset_results(measure_class, best_param, etalon_idx, SpectralClustering_rubanov)
-
-
-@unittest.skip
-class TestTable3_SklearnKMeans_random(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KMeans_sklearn, init='random')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
-
-
-@unittest.skip
-class TestTable3_SklearnKMeans_kmeanspp(TestTable3, unittest.TestCase):
-    def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KMeans_sklearn, init='k-means++')
+        estimator = partial(KKMeans_iterative, init='all', backend='pytorch')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 

@@ -9,7 +9,7 @@ sys.path.append('../..')
 import numpy as np
 from collections import defaultdict
 import matplotlib.pyplot as plt
-from tqdm import tqdm_notebook as tqdm
+from tqdm import tqdm
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs.graphs.generator import StochasticBlockModel

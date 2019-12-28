@@ -1,98 +1,14 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from numba import jit
 
+from pygraphs.cluster import _kmeans_numpy, _kmeans_pytorch
 from pygraphs.cluster.base import KernelEstimator
 
 
-@jit(nopython=True, cache=True)
-def _hKh(hk: np.array, ei: np.array, K: np.array):
-    hk_ei = np.expand_dims((hk - ei), axis=0)
-    return hk_ei.dot(K).dot(hk_ei.T)[0, 0]
-
-
-@jit(nopython=True, cache=True)
-def _inertia(h: np.array, K: np.array, labels: np.array):
-    n = K.shape[0]
-    e = np.eye(n, dtype=np.float64)
-    return np.array([_hKh(h[labels[i]], e[i], K) for i in range(0, n)]).sum()
-
-
-@jit(nopython=True, cache=True)
-def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
-    n_clusters, n = h.shape
-    e = np.eye(n, dtype=np.float64)
-
-    labels, success = np.zeros((n,), dtype=np.uint8), True
-    for _ in range(max_iter):
-        # fix h, update U
-        U, l = np.zeros((n, n_clusters), dtype=np.float64), np.zeros((n,), dtype=np.uint8)
-        for i in range(n):
-            k_star, min_inertia = -1, np.inf
-            for k in range(n_clusters):
-                inertia = _hKh(h[k], e[i], K)
-                if inertia < min_inertia:
-                    k_star, min_inertia = k, inertia
-            U[i, k_star] = 1
-            l[i] = k_star
-
-        # early stop
-        if np.all(labels == l):  # nothing changed
-            break
-        labels = l
-
-        # fix U, update h
-        nn = np.expand_dims(np.sum(U, axis=0), axis=0)
-        if np.any(nn == 0):  # empty cluster! exit with success=False
-            success = False
-            break
-        h = (U / nn).T
-
-    inertia = _inertia(h, K, labels)
-    return labels, inertia, success
-
-
-@jit(nopython=True, cache=True)
-def _iterative_predict(K: np.array, h: np.array, U: np.array, l: np.array, nn: np.array, max_iter: int, eps: float):
-    n_clusters, n = h.shape
-    e = np.eye(n, dtype=np.float64)
-
-    labels = l.copy()
-    for _ in range(max_iter):
-        node_order = np.array(list(range(n)))
-        np.random.shuffle(node_order)
-        for i in node_order:  # for each node
-            k_star, minΔJ = -1, np.inf
-            for k in range(n_clusters):
-                ΔJ1 = nn[k] / (nn[k] + 1 + eps) * _hKh(h[k], e[i], K)
-                ΔJ2 = nn[l[i]] / (nn[l[i]] - 1 + eps) * _hKh(h[l[i]], e[i], K)
-                ΔJ = ΔJ1 - ΔJ2
-                if ΔJ < minΔJ:
-                    minΔJ, k_star = ΔJ, k
-            if minΔJ < 0 and l[i] != k_star:
-                if nn[l[i]] == 1:  # it will cause empty cluster! exit with success=False
-                    inertia = _inertia(h, K, labels)
-                    return labels, inertia, False
-                h[l[i]] = 1. / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
-                U[i, l[i]] = 0
-                nn[l[i]] -= 1
-                h[k_star] = 1. / (nn[k_star] + 1 + eps) * (nn[k_star] * h[k_star] + e[i])
-                U[i, k_star] = 1
-                nn[k_star] += 1
-                l[i] = k_star
-
-        # early stop
-        if np.all(labels == l):  # nothing changed
-            break
-        labels = l.copy()
-
-    inertia = _inertia(h, K, labels)
-    return labels, inertia, ~np.isnan(inertia)
-
-
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='all', random_state=None):
+    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='all', random_state=None,
+                 backend='pytorch'):
         super().__init__(n_clusters)
         self.n_init = n_init
         self.max_rerun = max_rerun
@@ -100,6 +16,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         self.init = init
         self.random_state = random_state
         self.eps = 10 ** -10
+        self.backend = backend
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)
@@ -125,7 +42,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
             first_centroid = np.random.randint(n)
             h[0, first_centroid] = 1
             for c_idx in range(1, self.n_clusters):
-                min_distances = [np.min([_hKh(h[k], e[i], K) for k in range(c_idx)]) for i in range(n)]
+                min_distances = [np.min([_kmeans_numpy._hKh(h[k], e[i], K) for k in range(c_idx)]) for i in range(n)]
                 min_distances = np.power(min_distances, 2)
                 # next_centroid = np.argmax(min_distances)
 
@@ -176,7 +93,11 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
-        return _vanilla_predict(K, h_init, self.max_iter)
+
+        if self.backend == 'numpy':
+            return _kmeans_numpy._vanilla_predict(K, h_init, self.max_iter)
+        elif self.backend == 'pytorch':
+            return _kmeans_pytorch._vanilla_predict(K, h_init, self.max_iter)
 
 
 class KKMeans_iterative(KMeans_Fouss):
@@ -198,7 +119,7 @@ class KKMeans_iterative(KMeans_Fouss):
             h = self._init_h(K)
             U, l = np.zeros((n, self.n_clusters), dtype=np.float64), np.zeros((n,), dtype=np.uint8)
             for i in range(n):
-                k_star = np.array([_hKh(h[k], e[i], K) for k in range(self.n_clusters)]).argmin()
+                k_star = np.array([_kmeans_numpy._hKh(h[k], e[i], K) for k in range(self.n_clusters)]).argmin()
                 U[i][k_star] = 1
                 l[i] = k_star
             nn = np.sum(U, axis=0, keepdims=True)
@@ -211,8 +132,11 @@ class KKMeans_iterative(KMeans_Fouss):
     def _predict_once(self, K: np.array):
         h, U, l, nn, success_init = self._init_h_U_l_nn(K)
         if success_init:
-            return _iterative_predict(K, h, U, l, nn, self.max_iter, self.eps)
+            if self.backend == 'numpy':
+                return _kmeans_numpy._iterative_predict(K, h, U, l, nn, self.max_iter, self.eps)
+            elif self.backend == 'pytorch':
+                return _kmeans_pytorch._iterative_predict(K, h, U, l, nn, self.max_iter, self.eps)
         else:  # no way to initialize properly
             labels = l.copy()
-            inertia = _inertia(h, K, labels)
+            inertia = _kmeans_numpy._inertia(h, K, labels)
             return labels, inertia, ~np.isnan(inertia)

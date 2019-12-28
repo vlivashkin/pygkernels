@@ -8,7 +8,7 @@ sys.path.append('../..')
 
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import tqdm_notebook as tqdm
+from tqdm import tqdm
 from sklearn.metrics import adjusted_rand_score
 from joblib import Parallel, delayed
 
@@ -44,7 +44,7 @@ def _calc(n_graphs=0, n_jobs=6):
 
 
 def calc_part6(n_jobs=6):
-    results = _calc(n_jobs=n_jobs)
+    results = _calc(n_graphs=0, n_jobs=n_jobs)
 
     for dataset_name, measure_results in results.items():
         print(dataset_name)
