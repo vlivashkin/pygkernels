@@ -11,6 +11,27 @@ def _inertia(h: np.array, e, K: np.array, labels: np.array):
     return np.einsum('ij,jk,ki->', h_e, K, h_e)
 
 
+def _kmeanspp(K, n_clusters):
+    n = K.shape[0]
+    e = np.eye(n, dtype=np.float64)
+    h = np.zeros((n_clusters, n), dtype=np.float64)
+
+    first_centroid = np.random.randint(n)
+    h[0, first_centroid] = 1
+    for c_idx in range(1, n_clusters):
+        h_e = h[:, None] - e[None]  # [k, n, n]
+        min_distances = np.min(np.einsum('kni,ij,knj->kn', [h_e, K, h_e]), dim=0)
+        min_distances = np.power(min_distances, 2)
+        # next_centroid = np.argmax(min_distances)
+
+        if np.sum(min_distances) > 0:
+            next_centroid = np.random.choice(range(n), p=min_distances / np.sum(min_distances))
+        else:  # no way to make all different centroids; let's choose random one just for rerun
+            next_centroid = np.random.choice(range(n))
+        h[c_idx, next_centroid] = 1
+    return h
+
+
 def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
     n_clusters, n = h.shape
     e = np.eye(n, dtype=np.float64)
@@ -35,10 +56,23 @@ def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
     return labels, inertia, success
 
 
-def _iterative_predict(K: np.array, h: np.array, U: np.array, l: np.array, nn: np.array, max_iter: int, eps: float):
+def _iterative_predict(K: np.array, h: np.array, max_iter: int, eps: float):
     n_clusters, n = h.shape
     e = np.eye(n, dtype=np.float64)
 
+    # initialization
+    h_e = h[:, None] - e[None]  # [k, n, n]
+    l = np.argmin(np.einsum('kni,ij,knj->kn', h_e, K, h_e), axis=0)
+
+    U = np.zeros((n, n_clusters), dtype=np.float64)
+    U[range(n), l] = 1
+    nn = U.sum(axis=0, keepdims=True)
+    if np.any(nn == 0):  # bad start, rerun
+        inertia = _inertia(h, e, K, l)
+        return l, inertia, False
+    h = (U / nn).T
+
+    # iterative steps
     labels = l.copy()
     for _ in range(max_iter):
         node_order = np.array(list(range(n)))
