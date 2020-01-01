@@ -12,7 +12,7 @@ from collections import defaultdict
 
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import *
-from pygraphs.cluster.kkmeans import KKMeans_iterative as KKMeans
+from pygraphs.cluster.kkmeans import KKMeans_vanilla as KKMeans
 from pygraphs.scenario import RejectCurve, d3_colors
 
 distances_kernels_pairs = [

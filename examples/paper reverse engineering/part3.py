@@ -15,7 +15,7 @@ from scipy import stats
 
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans_iterative as KKMeans
+from pygraphs.cluster import KKMeans_vanilla as KKMeans
 from pygraphs.scenario import ParallelByGraphs
 from pygraphs.scorer import copeland
 from pygraphs.util import load_or_calc_and_save, ddict2dict
@@ -25,28 +25,22 @@ from pygraphs.util import load_or_calc_and_save, ddict2dict
 def _calc_best_params(n_graphs=100, n_jobs=-1):
     """find best params and 95% percentile"""
 
-    # calc data to find best params
-    results = defaultdict(lambda: defaultdict(lambda: 0))
-    for column in tqdm(list(product([100, 200], [2, 4], [0.1, 0.15]))):
-        n_nodes, n_classes, p_out = column
-        graphs, info = StochasticBlockModel(n_nodes, n_classes, p_in=0.3, p_out=p_out).generate_graphs(n_graphs)
-        classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 31), progressbar=False)
-        for measure_class in tqdm(kernels, desc=str(column)):
-            results[column][measure_class.name] = classic_plot.perform(KKMeans, measure_class, graphs, n_classes,
-                                                                       n_jobs=n_jobs)
-
-    # find best params
     best_params = defaultdict(lambda: defaultdict(lambda: 0))
     percentile_params = defaultdict(lambda: defaultdict(lambda: 0))
-    for column, measures in results.items():
-        for measure_name, measure_results in measures.items():
-            x, y, error = measure_results
+
+    for column in tqdm(list(product([100, 200], [2, 4], [0.1, 0.15]))):
+        n_nodes, n_classes, p_out = column
+        graphs, _ = StochasticBlockModel(n_nodes, n_classes, p_in=0.3, p_out=p_out).generate_graphs(n_graphs)
+        classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 31), progressbar=False, verbose=True)
+        for measure_class in tqdm(kernels, desc=str(column)):
+            x, y, error = classic_plot.perform(KKMeans, measure_class, graphs, n_classes, n_jobs=n_jobs)
+
             best_idx = np.argmax(y)
             percentile_idx = list(y).index(np.percentile(y, 90, interpolation='lower'))
-            print(f'{column}\t{measure_name.ljust(8, " ")}\t'
+            print(f'{column}\t{measure_class.name.ljust(8, " ")}\t'
                   f'{x[best_idx]:0.2f} ({y[best_idx]:0.2f})\t{x[percentile_idx]:0.2f} ({y[percentile_idx]:0.2f})')
-            best_params[column][measure_name] = x[best_idx]
-            percentile_params[column][measure_name] = x[percentile_idx]
+            best_params[column][measure_class.name] = x[best_idx]
+            percentile_params[column][measure_class.name] = x[percentile_idx]
     return ddict2dict(best_params), ddict2dict(percentile_params)
 
 
@@ -102,7 +96,7 @@ def _print_results(results):
         print(kernel.name, '\t', '\t'.join([str(mr_transposed[col_name][idx]) for col_name in columns_right_order]))
 
 
-def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=6):
+def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
     best_params, percentile_params = _calc_best_params(n_graphs=n_graphs_train, n_jobs=n_jobs)
 
     for setup in best_params.keys():

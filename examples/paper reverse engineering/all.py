@@ -6,8 +6,8 @@ from part6 import calc_part6
 
 if __name__ == '__main__':
     N_JOBS = 6
-    # print('### PART2 ###')
-    # calc_part2(n_jobs=N_JOBS)
+    print('### PART2 ###')
+    calc_part2(n_jobs=N_JOBS)
     print('### PART3 ###')
     calc_part3(n_jobs=N_JOBS)
     print('### PART4 ###')

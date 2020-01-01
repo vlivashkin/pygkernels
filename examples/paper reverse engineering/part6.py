@@ -14,7 +14,7 @@ from joblib import Parallel, delayed
 
 from pygraphs.graphs.dataset import Datasets
 from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans_iterative as KKMeans
+from pygraphs.cluster import KKMeans_vanilla as KKMeans
 from pygraphs.scenario import ParallelByGraphs, d3_colors
 from pygraphs.util import load_or_calc_and_save, configure_logging
 

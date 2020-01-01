@@ -8,7 +8,7 @@ from pygraphs.cluster.base import KernelEstimator
 
 class KMeans_Fouss(KernelEstimator, ABC):
     def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='all', random_state=None,
-                 backend='pytorch', device=1):
+                 backend='pytorch', device=0):
         super().__init__(n_clusters)
         self.n_init = n_init
         self.max_rerun = max_rerun
@@ -62,10 +62,10 @@ class KMeans_Fouss(KernelEstimator, ABC):
 
     def predict(self, K):
         np.random.seed(self.random_state)
-        best_labels, best_inertia = [], float('+inf')
+        best_labels, best_inertia = [], np.inf
         for i in range(self.n_init):
             labels, inertia = self._predict_successful_once(K)
-            if inertia < best_inertia:
+            if inertia < best_inertia or len(best_labels) == 0:
                 best_labels = labels
 
         return best_labels
@@ -84,7 +84,8 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
-        return self.backend._vanilla_predict(K, h_init, self.max_iter, device=self.device)
+        result = self.backend._vanilla_predict(K, h_init, self.max_iter, device=self.device)
+        return result
 
 
 class KKMeans_iterative(KMeans_Fouss):
@@ -100,4 +101,5 @@ class KKMeans_iterative(KMeans_Fouss):
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
-        return self.backend._iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
+        result = self.backend._iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
+        return result

@@ -10,9 +10,9 @@ def torch_func(func):
                     for x in args]
             results = func(*args, **kwargs)
             if type(results) == tuple:
-                results = tuple(x.numpy() if type(x) == torch.tensor else x for x in results)
+                results = tuple(x.cpu().numpy() if type(x) == torch.Tensor else x for x in results)
             else:
-                results = results.numpy() if type(results) == torch.tensor else results
+                results = results.cpu().numpy() if type(results) == torch.Tensor else results
         return results
 
     return wrapper
@@ -24,7 +24,7 @@ def _hKh(hk, ei, K):
 
 
 def _inertia(h, e, K, labels):
-    h_e = h[labels] - e
+    h_e = h.gather(0, labels[None]) - e
     return torch.einsum('ij,jk,ki->', [h_e, K, h_e])
 
 
@@ -53,7 +53,7 @@ def _vanilla_predict(K, h, max_iter: int, device=0):
     n_clusters, n = h.shape
     e = torch.eye(n, dtype=torch.float32).to(device)
 
-    labels, success = np.zeros((n,), dtype=np.uint8), True
+    labels, success = torch.zeros((n,), dtype=torch.int64).to(device), True
     for iter in range(max_iter):
         h_e = h.unsqueeze(1) - e.unsqueeze(0)  # [k, n, n]
         l = torch.einsum('kni,ij,knj->kn', [h_e, K, h_e]).argmin(dim=0)

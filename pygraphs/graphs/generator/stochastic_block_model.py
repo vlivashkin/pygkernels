@@ -29,11 +29,11 @@ class StochasticBlockModel:
 
         name_parts = ['n={}'.format(self.n), 'k={}'.format(self.k)]
         if self.cluster_sizes_mode:
-            name_parts.append('cluster_sizes_mode')
+            name_parts.append('cluster_sizes mode')
         if self.probability_matrix_mode:
-            name_parts.append('probability_matrix_mode')
+            name_parts.append('probability_matrix mode')
         else:
-            name_parts.append('p_in={}, p_out=()'.format(self.p_in, self.p_out))
+            name_parts.append(f'p_in={self.p_in}, p_out={self.p_out}')
         self.name = ', '.join(name_parts)
 
     def generate_graph(self):

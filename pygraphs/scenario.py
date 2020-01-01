@@ -97,30 +97,27 @@ class ParallelByGraphs:
 
     def perform(self, estimator_class, kernel_class, graphs, n_class, n_jobs=1):
         clf = estimator_class(n_class)
-
-        raw_param_dict = defaultdict(list)
         if self.progressbar:
             graphs = tqdm(graphs, desc=kernel_class.name)
-        if n_jobs == 1:  # not parallel
-            # logging.info('n_jobs == 1, run NOT in parallel')
-            for graph_idx, graph in enumerate(graphs):
-                graph_results = self._calc_graph(graph, kernel_class, clf, graph_idx)
-                for param_flat, ari in graph_results.items():
-                    raw_param_dict[param_flat].append(ari)
-        else:
-            # logging.info(f'n_jobs == {n_jobs}, run in parallel!')
+
+        raw_param_dict = defaultdict(list)
+        if n_jobs > 1:  # parallel
             all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(graph, kernel_class, clf, graph_idx)
                                                         for graph_idx, graph in enumerate(graphs))
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
+        else:
+            for graph_idx, graph in enumerate(graphs):
+                graph_results = self._calc_graph(graph, kernel_class, clf, graph_idx)
+                for param_flat, ari in graph_results.items():
+                    raw_param_dict[param_flat].append(ari)
 
         param_dict = {}
         for param, values in raw_param_dict.items():
-            # print(len(values), 0.5 * len(graphs))
+            # logging.info(f'{param:.2f}: {len(values)}, {0.5 * len(graphs)}')
             if len(values) >= 0.5 * len(graphs):
                 param_dict[param] = np.nanmean(values), np.nanstd(values)
-        # print('param_dict', param_dict)
         if len(param_dict) > 0:
             x, y, error = zip(*[(x, y[0], y[1]) for x, y in sorted(param_dict.items(), key=lambda x: x[0])])
         else:

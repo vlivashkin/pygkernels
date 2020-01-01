@@ -15,14 +15,26 @@ from sklearn.metrics import adjusted_rand_score
 
 from pygraphs.graphs import StochasticBlockModel
 from pygraphs.measure import *
-from pygraphs.cluster import KKMeans_iterative as KKMeans, KWard
+from pygraphs.cluster import KKMeans_vanilla as KKMeans
 from pygraphs.scenario import ParallelByGraphs, plot_results
 from pygraphs.util import load_or_calc_and_save
 
 
+def _calc(graphs, name=None, n_jobs=-1):
+    estimators = [KKMeans]
+    measures = [pWalk_H, Walk_H, For_H, logFor_H, Comm_H, logComm_H, Heat_H, logHeat_H, NHeat_H, logNHeat_H,
+                PPR_H, logPPR_H, ModifPPR_H, logModifPPR_H, HeatPPR_H, logHeatPPR_H]
+
+    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 101), progressbar=True)
+    results = defaultdict(list)
+    for estimator, measure in tqdm(list(product(estimators, measures)), desc=name):
+        results[f"{estimator.name}_{measure.name}"] = classic_plot.perform(estimator, measure, graphs, 2, n_jobs)
+    return results
+
+
 def _plot_log_results(results, img_path):
     fig, ax = plt.subplots(2, 8, figsize=(15, 6))
-    for idx_i, estimator in enumerate([KKMeans, KWard]):
+    for idx_i, estimator in enumerate([KKMeans]):
         ax[idx_i][0].set_ylabel(f'{estimator.name}, f1')
         for idx_j, (name1, name2, xlim, ylim) in enumerate([
             [(f'{estimator.name}_pWalk', 'pWalk'),
@@ -86,18 +98,6 @@ def _plot_log_results4(results, img_path):
     plt.savefig(img_path)
 
 
-def _calc(graphs, name=None, n_jobs=-1):
-    estimators = [KKMeans, KWard]
-    measures = [pWalk_H, Walk_H, For_H, logFor_H, Comm_H, logComm_H, Heat_H, logHeat_H, NHeat_H, logNHeat_H,
-                PPR_H, logPPR_H, ModifPPR_H, logModifPPR_H, HeatPPR_H, logHeatPPR_H]
-
-    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 101), progressbar=True)
-    results = defaultdict(list)
-    for estimator, measure in tqdm(list(product(estimators, measures)), desc=name):
-        results[f"{estimator.name}_{measure.name}"] = classic_plot.perform(estimator, measure, graphs, 2, n_jobs)
-    return results
-
-
 @load_or_calc_and_save('cache/2_11_ari.pkl')
 def calc2_11(n_graphs=200, n_jobs=-1):
     """**Fig. 1** Logarithmic vs. plain measures for G(100,(2)0.2,0.05)"""
@@ -122,15 +122,15 @@ def calc2_31(n_graphs=200, n_jobs=-1):
 def calc_part2(n_graphs=200, n_jobs=6):
     results = calc2_11(n_graphs, n_jobs)
     _plot_log_results(results, 'results/2_11_1.png')
-    _plot_log_results4(results, 'results/2_11_2.png')
+    # _plot_log_results4(results, 'results/2_11_2.png')
 
     results = calc2_21(n_graphs, n_jobs)
     _plot_log_results(results, 'results/2_21_1.png')
-    _plot_log_results4(results, 'results/2_21_2.png')
+    # _plot_log_results4(results, 'results/2_21_2.png')
 
     results = calc2_31(n_graphs, n_jobs)
     _plot_log_results(results, 'results/2_31_1.png')
-    _plot_log_results4(results, 'results/2_31_2.png')
+    # _plot_log_results4(results, 'results/2_31_2.png')
 
 
 if __name__ == '__main__':
