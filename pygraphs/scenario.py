@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from functools import partial
 from itertools import combinations
 from random import shuffle
 
@@ -95,21 +96,22 @@ class ParallelByGraphs:
                     logging.error("{}, {:.2f}, graph {}: {}".format(kernel_class.name, param, graph_idx, e))
         return graph_results
 
-    def perform(self, estimator_class, kernel_class, graphs, n_class, n_jobs=1):
-        clf = estimator_class(n_class)
+    def perform(self, estimator_class, kernel_class, graphs, n_classes, n_jobs=1):
         if self.progressbar:
             graphs = tqdm(graphs, desc=kernel_class.name)
 
         raw_param_dict = defaultdict(list)
         if n_jobs > 1:  # parallel
-            all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(graph, kernel_class, clf, graph_idx)
-                                                        for graph_idx, graph in enumerate(graphs))
+            all_graph_results = Parallel(n_jobs=n_jobs)(
+                delayed(self._calc_graph)(graph, kernel_class, estimator_class(n_classes, device=graph_idx % 2), graph_idx)
+                for graph_idx, graph in enumerate(graphs)
+            )
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
         else:
             for graph_idx, graph in enumerate(graphs):
-                graph_results = self._calc_graph(graph, kernel_class, clf, graph_idx)
+                graph_results = self._calc_graph(graph, kernel_class, estimator_class(n_classes, device=0), graph_idx)
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
 

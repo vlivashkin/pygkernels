@@ -96,7 +96,7 @@ class Comm_H(Kernel):
         """
         H0 = exp(tA)
         """
-        return expm(t * self.A) if t < 30 else None
+        return expm(t * self.A)  # if t < 30 else None
 
 
 class Heat_H(Kernel):

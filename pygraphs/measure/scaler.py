@@ -47,4 +47,4 @@ class Fraction(Scaler):  # Forest, logForest, Comm, logComm, Heat, logHeat, SCT,
 
 class FractionReversed(Scaler):  # RSP, FE
     def scale(self, beta):
-        return (1.0 - beta) / (beta, self.eps)
+        return (1.0 - beta) / (beta + self.eps)

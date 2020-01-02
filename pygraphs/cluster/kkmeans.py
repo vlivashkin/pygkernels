@@ -7,7 +7,7 @@ from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='all', random_state=None,
+    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', random_state=None,
                  backend='pytorch', device=0):
         super().__init__(n_clusters)
         self.n_init = n_init
