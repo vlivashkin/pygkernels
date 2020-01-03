@@ -9,7 +9,7 @@ from pygraphs.cluster.base import KernelEstimator
 class KMeans_Fouss(KernelEstimator, ABC):
     def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', random_state=None,
                  backend='pytorch', device=0):
-        super().__init__(n_clusters)
+        super().__init__(n_clusters, device=device)
         self.n_init = n_init
         self.max_rerun = max_rerun
         self.max_iter = max_iter
@@ -21,7 +21,6 @@ class KMeans_Fouss(KernelEstimator, ABC):
             self.backend = _kmeans_numpy
         elif backend == 'pytorch':
             self.backend = _kmeans_pytorch
-        self.device = device
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)

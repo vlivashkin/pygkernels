@@ -46,7 +46,7 @@ def load_or_calc_and_save(filename):
                     result = pickle.load(f)
             else:
                 print(f'{func.__name__}: RECALC. n_graphs={n_graphs}, n_params={n_params}, n_jobs={n_jobs}')
-                result = func(n_graphs, n_jobs)
+                result = func(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
                 with open(filename, 'wb') as f:
                     pickle.dump(result, f)
             return result

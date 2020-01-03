@@ -38,8 +38,8 @@ def _calc_best_params(column, n_graphs=100, n_params=31, n_jobs=-1):
             percentile_idx = list(y).index(np.percentile(y, 90, interpolation='lower'))
 
             print(f'{column} {measure_class.name} {init}')
-            print(f'\tbest idx: {x[best_idx]:0.2f}\tari: {y[best_idx]:0.2f}')
-            print(f'\tperc idx: {x[percentile_idx]:0.2f}\tari: {y[percentile_idx]:0.2f}')
+            print(f'\tbest param: {x[best_idx]:0.2f}\tari: {y[best_idx]:0.2f}')
+            print(f'\tperc param: {x[percentile_idx]:0.2f}\tari: {y[percentile_idx]:0.2f}')
 
             best_params[measure_class.name][init] = {
                 'x': x, 'y': y, 'error': error,
