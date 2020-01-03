@@ -1,5 +1,4 @@
 import numpy as np
-from numba import jit
 from sklearn.utils import deprecated
 
 
@@ -8,12 +7,10 @@ def normalize(dm):
     return dm / dm.std() if dm.std() != 0 else dm
 
 
-@jit
 def get_D(A):
     return np.diag(np.sum(A, axis=0))
 
 
-@jit
 def get_D_1(A):
     """
     D_1 = D^{-1}
@@ -21,12 +18,10 @@ def get_D_1(A):
     return np.diag(1. / np.sum(A, axis=0))
 
 
-@jit
 def get_L(A):
     return get_D(A) - A
 
 
-@jit
 def get_normalized_L(A):
     D = get_D(A)
     L = get_L(A)
@@ -55,7 +50,6 @@ def H_to_D(H):
     return 0.5 * ((h.dot(i.transpose()) + i.dot(h.transpose())) - H - H.transpose())
 
 
-@jit
 def D_to_K(D):
     """
     K = -1 / 2 HΔH

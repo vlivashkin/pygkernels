@@ -1,7 +1,8 @@
 import os
 import sys
 import warnings
-from functools import partial
+
+from _classic_plot_kkmeans import classic_plots_kkmeans
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 warnings.filterwarnings("ignore")
@@ -9,7 +10,6 @@ sys.path.append('../..')
 
 from collections import defaultdict
 from itertools import product
-import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import adjusted_rand_score
 from scipy import stats
@@ -17,98 +17,7 @@ from scipy import stats
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.cluster import KKMeans_vanilla as KKMeans
-from pygraphs.scenario import ParallelByGraphs
 from pygraphs.scorer import copeland
-from pygraphs.util import load_or_calc_and_save, ddict2dict
-
-
-def _calc_best_params(column, n_graphs=100, n_jobs=-1):
-    """
-    Find best params and 95% percentile
-    """
-
-    n_nodes, n_classes, p_out = column
-    graphs, _ = StochasticBlockModel(n_nodes, n_classes, p_in=0.3, p_out=p_out).generate_graphs(n_graphs)
-    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 31), progressbar=False, verbose=True)
-
-    best_params = defaultdict(lambda: defaultdict(lambda: dict))
-    for measure_class in tqdm(kernels, desc=str(column)):
-        for init in ['one', 'all', 'k-means++']:
-            estimator = partial(KKMeans, init=init)
-            x, y, error = classic_plot.perform(estimator, measure_class, graphs, n_classes, n_jobs=n_jobs)
-            best_idx = np.argmax(y)
-            percentile_idx = list(y).index(np.percentile(y, 90, interpolation='lower'))
-
-            print(f'{column} {measure_class.name} {init}')
-            print(f'\tbest idx: {x[best_idx]:0.2f}\tari: {y[best_idx]:0.2f}')
-            print(f'\tperc idx: {x[percentile_idx]:0.2f}\tari: {y[percentile_idx]:0.2f}')
-
-            best_params[measure_class.name][init] = {
-                'x': x, 'y': y, 'error': error,
-                'best_param': x[best_idx], 'best_ari': y[best_idx],
-                'precentile_param': x[percentile_idx], 'precentile_ari': y[percentile_idx],
-            }
-    return ddict2dict(best_params)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_100_2_005.pkl')
-def _calc_best_params_100_2_005(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.05), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_100_2_01.pkl')
-def _calc_best_params_100_2_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.1), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_100_2_015.pkl')
-def _calc_best_params_100_2_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.15), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_100_3_01.pkl')
-def _calc_best_params_100_3_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((102, 3, 0.1), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_100_4_01.pkl')
-def _calc_best_params_100_4_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 4, 0.1), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_100_4_015.pkl')
-def _calc_best_params_100_4_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 4, 0.15), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_200_2_005.pkl')
-def _calc_best_params_200_2_005(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.05), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_200_2_01.pkl')
-def _calc_best_params_200_2_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.1), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_200_2_015.pkl')
-def _calc_best_params_200_2_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.15), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_200_3_01.pkl')
-def _calc_best_params_200_3_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((201, 3, 0.1), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_200_4_01.pkl')
-def _calc_best_params_200_4_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 4, 0.1), n_graphs, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/3_best_params_200_4_015.pkl')
-def _calc_best_params_200_4_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 4, 0.15), n_graphs, n_jobs)
 
 
 def _calc_competitions(best_params, n_graphs=600):
@@ -167,43 +76,41 @@ def _print_results(results):
 
 
 def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
-    best_params = _calc_best_params_100_2_005(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_100_2_01(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_100_2_015(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_100_3_01(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_100_4_01(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_100_4_015(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_200_2_005(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_200_2_01(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_200_2_015(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_200_3_01(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_200_4_01(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    best_params = _calc_best_params_200_4_015(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    #
-    # for setup in best_params.keys():
-    #     print(setup, end='\t')
-    # print()
-    # for kernel in kernels:
-    #     print(kernel.name, end='\t')
-    #     for setup in best_params.keys():
-    #         print(f"{best_params[setup][kernel.name]:.2f}", end='\t')
-    #     print()
-    #
-    # # best
-    # results = _calc_competitions(best_params, n_graphs=n_graphs_inference)
-    #
-    # for column_name, column_results in results.items():
-    #     print(column_name, [(x.name, column_results[x.name]) for x in kernels])
-    #
-    # _print_results(results)
-    #
-    # # percentile
-    # results = _calc_competitions(percentile_params, n_graphs=n_graphs_inference)
-    #
-    # for column_name, column_results in results.items():
-    #     print(column_name, [(x.name, column_results[x.name]) for x in kernels])
-    #
-    # _print_results(results)
+    # classic_plots: [column][kernel_name][init][feature]
+    classic_plots = classic_plots_kkmeans(n_graphs=n_graphs_train, n_jobs=n_jobs)
+
+    init, best_feature, percentile_feature = 'k-means++', 'best_param', 'precentile_param'
+    columns = list(classic_plots.keys())
+
+    best_params, percentile_params = defaultdict(dict), defaultdict(dict)
+    for column, kernel in product(columns, kernels):
+        best_params[column][kernel.name] = classic_plots[column][kernel.name][init][best_feature]
+        percentile_params[column][kernel.name] = classic_plots[column][kernel.name][init][percentile_feature]
+
+    for column in best_params.keys():
+        print(column, end='\t')
+    print()
+    for kernel in kernels:
+        print(kernel.name, end='\t')
+        for column in best_params.keys():
+            print(f"{best_params[column][kernel.name]:.2f}", end='\t')
+        print()
+
+    # best
+    results = _calc_competitions(best_params, n_graphs=n_graphs_inference)
+
+    for column_name, column_results in results.items():
+        print(column_name, [(x.name, column_results[x.name]) for x in kernels])
+
+    _print_results(results)
+
+    # percentile
+    results = _calc_competitions(percentile_params, n_graphs=n_graphs_inference)
+
+    for column_name, column_results in results.items():
+        print(column_name, [(x.name, column_results[x.name]) for x in kernels])
+
+    _print_results(results)
 
 
 if __name__ == '__main__':

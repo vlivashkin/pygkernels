@@ -20,12 +20,12 @@ from pygraphs.scenario import ParallelByGraphs, plot_results
 from pygraphs.util import load_or_calc_and_save
 
 
-def _calc(graphs, name=None, n_jobs=-1):
+def _calc(graphs, n_params=101, name=None, n_jobs=-1):
     estimators = [KKMeans]
     measures = [pWalk_H, Walk_H, For_H, logFor_H, Comm_H, logComm_H, Heat_H, logHeat_H, NHeat_H, logNHeat_H,
                 PPR_H, logPPR_H, ModifPPR_H, logModifPPR_H, HeatPPR_H, logHeatPPR_H]
 
-    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 101), progressbar=True)
+    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, n_params), progressbar=True)
     results = defaultdict(list)
     for estimator, measure in tqdm(list(product(estimators, measures)), desc=name):
         results[f"{estimator.name}_{measure.name}"] = classic_plot.perform(estimator, measure, graphs, 2, n_jobs)
@@ -99,24 +99,24 @@ def _plot_log_results4(results, img_path):
 
 
 @load_or_calc_and_save('cache/2_11_ari.pkl')
-def calc2_11(n_graphs=200, n_jobs=-1):
+def calc2_11(n_graphs=200, n_params=101, n_jobs=-1):
     """**Fig. 1** Logarithmic vs. plain measures for G(100,(2)0.2,0.05)"""
     graphs, info = StochasticBlockModel(100, 2, p_in=0.2, p_out=0.05).generate_graphs(n_graphs)
-    return _calc(graphs, name='2_11', n_jobs=n_jobs)
+    return _calc(graphs, n_params, name='2_11', n_jobs=n_jobs)
 
 
 @load_or_calc_and_save('cache/2_21_ari.pkl')
-def calc2_21(n_graphs=200, n_jobs=-1):
+def calc2_21(n_graphs=200, n_params=101, n_jobs=-1):
     """**Fig. 2** Logarithmic vs. plain measures for G(100,(3)0.3,0.1)"""
     graphs, info = StochasticBlockModel(102, 3, p_in=0.3, p_out=0.1).generate_graphs(n_graphs)
-    return _calc(graphs, name='2_21', n_jobs=n_jobs)
+    return _calc(graphs, n_params, name='2_21', n_jobs=n_jobs)
 
 
 @load_or_calc_and_save('cache/2_31_ari.pkl')
-def calc2_31(n_graphs=200, n_jobs=-1):
+def calc2_31(n_graphs=200, n_params=101, n_jobs=-1):
     """**Fig. 3** Logarithmic vs. plain measures for G(200,(2)0.3,0.1)"""
     graphs, info = StochasticBlockModel(200, 2, p_in=0.3, p_out=0.1).generate_graphs(n_graphs)
-    return _calc(graphs, name='2_31', n_jobs=n_jobs)
+    return _calc(graphs, n_params, name='2_31', n_jobs=n_jobs)
 
 
 def calc_part2(n_graphs=200, n_jobs=6):
