@@ -126,7 +126,7 @@ def _print_raw(results, features):
         print('\t'.join(values))
 
 
-def classic_plots_kward(n_graphs=100, n_params=31, n_jobs=1):
+def classic_plots_kward(n_graphs=200, n_params=101, n_jobs=1):
     results = {
         (100, 2, 0.2, 0.05): _kward_100_2_02_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         (100, 2, 0.3, 0.05): _kward_100_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
