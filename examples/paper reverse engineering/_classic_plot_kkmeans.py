@@ -25,8 +25,8 @@ def _calc_best_params(column, n_graphs=100, n_params=31, n_jobs=-1):
     Find classic plot, best params and 95% percentile
     """
 
-    n_nodes, n_classes, p_out = column
-    graphs, _ = StochasticBlockModel(n_nodes, n_classes, p_in=0.3, p_out=p_out).generate_graphs(n_graphs)
+    n_nodes, n_classes, p_in, p_out = column
+    graphs, _ = StochasticBlockModel(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
     classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, n_params), progressbar=False, verbose=True)
 
     best_params = defaultdict(dict)
@@ -44,69 +44,74 @@ def _calc_best_params(column, n_graphs=100, n_params=31, n_jobs=-1):
             best_params[measure_class.name][init] = {
                 'x': x, 'y': y, 'error': error,
                 'best_param': x[best_idx], 'best_ari': y[best_idx],
-                'precentile_param': x[percentile_idx], 'precentile_ari': y[percentile_idx],
+                'percentile_param': x[percentile_idx], 'percentile_ari': y[percentile_idx],
             }
     return ddict2dict(best_params)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_100_2_005.pkl')
-def _kkmeans_100_2_005(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.05), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_2_02_005.pkl')
+def _kkmeans_100_2_02_005(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((100, 2, 0.2, 0.05), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_100_2_01.pkl')
-def _kkmeans_100_2_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.1), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_2_03_005.pkl')
+def _kkmeans_100_2_03_005(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((100, 2, 0.3, 0.05), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_100_2_015.pkl')
-def _kkmeans_100_2_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.15), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_2_03_01.pkl')
+def _kkmeans_100_2_03_01(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((100, 2, 0.3, 0.1), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_100_3_01.pkl')
-def _kkmeans_100_3_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((102, 3, 0.1), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_2_03_015.pkl')
+def _kkmeans_100_2_03_015(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((100, 2, 0.3, 0.15), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_100_4_01.pkl')
-def _kkmeans_100_4_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 4, 0.1), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_3_03_01.pkl')
+def _kkmeans_102_3_03_01(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((102, 3, 0.3, 0.1), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_100_4_015.pkl')
-def _kkmeans_100_4_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((100, 4, 0.15), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_4_03_01.pkl')
+def _kkmeans_100_4_03_01(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((100, 4, 0.3, 0.1), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_200_2_005.pkl')
-def _kkmeans_200_2_005(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.05), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_100_4_03_015.pkl')
+def _kkmeans_100_4_03_015(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((100, 4, 0.3, 0.15), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_200_2_01.pkl')
-def _kkmeans_200_2_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.1), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_200_2_03_005.pkl')
+def _kkmeans_200_2_03_005(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((200, 2, 0.3, 0.05), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_200_2_015.pkl')
-def _kkmeans_200_2_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.15), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_200_2_03_01.pkl')
+def _kkmeans_200_2_03_01(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((200, 2, 0.3, 0.1), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_200_3_01.pkl')
-def _kkmeans_200_3_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((201, 3, 0.1), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_200_2_03_015.pkl')
+def _kkmeans_200_2_03_015(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((200, 2, 0.3, 0.15), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_200_4_01.pkl')
-def _kkmeans_200_4_01(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 4, 0.1), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_201_3_03_01.pkl')
+def _kkmeans_201_3_03_01(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((201, 3, 0.3, 0.1), n_graphs, n_params, n_jobs)
 
 
-@load_or_calc_and_save(f'cache/kkmeans_200_4_015.pkl')
-def _kkmeans_200_4_015(n_graphs=100, n_jobs=-1):
-    return _calc_best_params((200, 4, 0.15), n_graphs, n_jobs)
+@load_or_calc_and_save(f'cache/kkmeans_200_4_03_01.pkl')
+def _kkmeans_200_4_03_01(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((200, 4, 0.3, 0.1), n_graphs, n_params, n_jobs)
+
+
+@load_or_calc_and_save(f'cache/kkmeans_200_4_03_015.pkl')
+def _kkmeans_200_4_03_015(n_graphs=100, n_params=31, n_jobs=-1):
+    return _calc_best_params((200, 4, 0.3, 0.15), n_graphs, n_params, n_jobs)
 
 
 def _print_raw(results, inits, features):
@@ -128,24 +133,25 @@ def _print_raw(results, inits, features):
 
 def classic_plots_kkmeans(n_graphs=100, n_params=31, n_jobs=1):
     results = {
-        (100, 2, 0.05): _kkmeans_100_2_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (100, 2, 0.1): _kkmeans_100_2_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (100, 2, 0.15): _kkmeans_100_2_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (100, 3, 0.1): _kkmeans_100_3_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (100, 4, 0.1): _kkmeans_100_4_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (100, 4, 0.15): _kkmeans_100_4_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (200, 2, 0.05): _kkmeans_200_2_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (200, 2, 0.1): _kkmeans_200_2_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (200, 2, 0.15): _kkmeans_200_2_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (200, 3, 0.1): _kkmeans_200_3_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (200, 4, 0.1): _kkmeans_200_4_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        (200, 4, 0.15): _kkmeans_200_4_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
+        (100, 2, 0.2, 0.05): _kkmeans_100_2_02_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (100, 2, 0.3, 0.05): _kkmeans_100_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (100, 2, 0.3, 0.1): _kkmeans_100_2_03_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (100, 2, 0.3, 0.15): _kkmeans_100_2_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (102, 3, 0.3, 0.1): _kkmeans_102_3_03_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (100, 4, 0.3, 0.1): _kkmeans_100_4_03_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (100, 4, 0.3, 0.15): _kkmeans_100_4_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (200, 2, 0.3, 0.05): _kkmeans_200_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (200, 2, 0.3, 0.1): _kkmeans_200_2_03_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (200, 2, 0.3, 0.15): _kkmeans_200_2_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (201, 3, 0.3, 0.1): _kkmeans_201_3_03_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (200, 4, 0.3, 0.1): _kkmeans_200_4_03_01(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (200, 4, 0.3, 0.15): _kkmeans_200_4_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
     }
 
     # _print_raw(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
     # _print_raw(results, ['one', 'all', 'k-means++'], 'best_ari')
     # _print_raw(results, ['one', 'all', 'k-means++'], 'best_param')
-    # _print_raw(results, 'k-means++', 'best_ari')
+    _print_raw(results, 'k-means++', 'best_ari')
 
     return results
 
