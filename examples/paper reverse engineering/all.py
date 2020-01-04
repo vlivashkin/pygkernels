@@ -1,5 +1,6 @@
 from _classic_plot_kkmeans import classic_plots_kkmeans
 from _classic_plot_kward import classic_plots_kward
+from _datasets_kkmeans import datasets_kkmeans
 from part2 import calc_part2
 from part3 import calc_part3
 from part4 import calc_part4
@@ -9,11 +10,14 @@ from part6 import calc_part6
 if __name__ == '__main__':
     N_JOBS = 6
 
-    print('### CALC_CLASSIC_GRAPHS KKMEANS ###')
+    print('### CALC CLASSIC GRAPHS KKMEANS ###')
     classic_plots_kkmeans(n_jobs=N_JOBS)
 
-    print('### CALC_CLASSIC_GRAPHS KWARD ###')
+    print('### CALC CLASSIC GRAPHS KWARD ###')
     classic_plots_kward(n_jobs=N_JOBS)
+
+    print('### CALC DATASETS KKMEANS ###')
+    datasets_kkmeans(n_jobs=N_JOBS)
 
     print('### PART2 ###')
     calc_part2(n_jobs=N_JOBS)

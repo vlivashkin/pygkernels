@@ -12,122 +12,72 @@ from collections import defaultdict
 
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import *
-from pygraphs.cluster.kkmeans import KKMeans_vanilla as KKMeans
 from pygraphs.scenario import RejectCurve, d3_colors
+from _classic_plot_kkmeans import classic_plots_kkmeans
 
 distances_kernels_pairs = [
-    (pWalk_H, pWalk_D),
-    (Walk_H, Walk_D),
-    (For_H, For_D),
-    (logFor_H, logFor_D),
-    (Comm_H, Comm_D),
-    (logComm_H, logComm_D),
-    (Heat_H, Heat_D),
-    (logHeat_H, logHeat_D),
-    (SCT_H, SCT_D),
-    (SCCT_H, SCCT_D),
-    (RSP_K, RSP_D),
-    (FE_K, FE_D),
-    (logPPR_H, logPPR_D),
-    (ModifPPR_H, ModifPPR_D),
-    (logModifPPR_H, logModifPPR_D),
-    (HeatPPR_H, HeatPPR_D),
-    (logHeatPPR_H, logHeatPPR_D),
-    (SPCT_H, SPCT_D),
-    (SP_K, SP_D),
-    (CT_H, CT_D)
+    ('pWalk', pWalk_H, pWalk_D),
+    ('Walk', Walk_H, Walk_D),
+    ('For', For_H, For_D),
+    ('logFor', logFor_H, logFor_D),
+    ('Comm', Comm_H, Comm_D),
+    ('logComm', logComm_H, logComm_D),
+    ('Heat', Heat_H, Heat_D),
+    ('logHeat', logHeat_H, logHeat_D),
+    ('SCT', SCT_H, SCT_D),
+    ('SCCT', SCCT_H, SCCT_D),
+    ('RSP', RSP_K, RSP_D),
+    ('FE', FE_K, FE_D),
+    ('logPPR', logPPR_H, logPPR_D),
+    ('ModifPPR', ModifPPR_H, ModifPPR_D),
+    ('logModifPPR', logModifPPR_H, logModifPPR_D),
+    ('HeatPPR', HeatPPR_H, HeatPPR_D),
+    ('logHeatPPR', logHeatPPR_H, logHeatPPR_D),
+    ('SP-CT', SPCT_H, SPCT_D),
+    ('SP', SP_K, SP_D),
+    ('CT', CT_H, CT_D)
 ]
 
-all_measures = [x[0] for x in distances_kernels_pairs]
-all_distances = [x[1] for x in distances_kernels_pairs]
-
-result_params = {
-    (100, 2, 0.3, 0.05): {
-        "CT H": 0.00,
-        "SP K": 0.00,
-        "Comm H": 0.42,
-        "logComm H": 0.46,
-        "Heat H": 0.70,
-        "Walk H": 0.82,
-        "logHeat H": 0.70,
-        "SCT H": 0.46,
-        "logFor H": 0.72,
-        "RSP K": 0.98,
-        "For H": 0.96,
-        "FE K": 0.96,
-        "SCCT H": 0.98,
-        "pWalk H": 0.86,
-        "SP-CT H": 0.00
-    },
-    (100, 2, 0.3, 0.1): {
-        "CT H": 0.00,
-        "SP K": 0.00,
-        "Comm H": 0.36,
-        "logComm H": 0.54,
-        "Heat H": 0.74,
-        "Walk H": 0.76,
-        "logHeat H": 0.46,
-        "SCT H": 0.50,
-        "logFor H": 0.40,
-        "RSP K": 0.98,
-        "For H": 0.98,
-        "FE K": 0.92,
-        "SCCT H": 0.74,
-        "pWalk H": 0.80,
-        "SP-CT H": 0.04
-    },
-    (100, 2, 0.3, 0.15): {
-        "CT H": 0.00,
-        "SP K": 0.00,
-        "Comm H": 0.24,
-        "logComm H": 0.64,
-        "Heat H": 0.82,
-        "Walk H": 0.76,
-        "logHeat H": 0.18,
-        "SCT H": 0.48,
-        "logFor H": 0.28,
-        "RSP K": 0.98,
-        "For H": 0.44,
-        "FE K": 0.76,
-        "SCCT H": 0.44,
-        "pWalk H": 0.86,
-        "SP-CT H": 0.36
-    }
-}
+all_names = [x[0] for x in distances_kernels_pairs]
+all_measures = [x[1] for x in distances_kernels_pairs]
+all_distances = [x[2] for x in distances_kernels_pairs]
 
 
-def _draw_one_by_one(results_rc, out_name='results/4_one_by_one.png'):
+def _draw_one_by_one(results_rc, out_name):
+    print(f'_draw_one_by_one: out_name={out_name}')
+
     fig, ax = plt.subplots(len(all_measures), 3, figsize=(12, 50), sharex=True, sharey=True)
     for column_idx, column in enumerate(results_rc.keys()):
-        for measure_name_idx, measure in enumerate(all_measures):
-            measure_name = measure.name[:-2]
+        for measure_name_idx, measure_name in enumerate(all_names):
             axi = ax[measure_name_idx][column_idx]
             for graph_idx, (tpr, fpr) in enumerate(results_rc[column][measure_name]):
                 axi.plot(tpr, fpr, color='black', alpha=0.1)
             axi.set_title("G({}, ({}){}, {}), {}".format(*column, measure_name))
             axi.set_xlim(0, 1)
             axi.set_ylim(0, 1)
-    plt.savefig(out_name)
+    plt.savefig(out_name, bbox_inches='tight')
 
 
-def _draw_pout01(results_rc, out_name='4_100(2)_0.3_0.1.png'):
+def _draw_g100_2_03_01(results_rc, out_name):
+    print(f'_draw_g100_2_03_01: out_name={out_name}')
+
     fig, ax = plt.subplots(5, 4, figsize=(16, 16), sharex=True, sharey=True)
     column = list(results_rc.keys())[1]
-    for measure_name_idx, measure in enumerate(all_measures):
-        measure_name = measure.name[:-2]
+    for measure_name_idx, measure_name in enumerate(all_names):
         axi = ax[measure_name_idx // 4][measure_name_idx % 4]
         for graph_idx, (tpr, fpr) in enumerate(results_rc[column][measure_name]):
             axi.plot(tpr, fpr, color='black', alpha=0.1)
         axi.set_title("G({}, ({}){}, {}), {}".format(*column, measure_name))
         axi.set_xlim(0, 1)
         axi.set_ylim(0, 1)
-    plt.savefig(out_name)
+    plt.savefig(out_name, bbox_inches='tight')
 
 
-def _draw_all(results_rc, out_name='results/4_all.png'):
+def _draw_all(results_rc, out_name):
+    print(f'_draw_all: out_name={out_name}')
+
     fig, axi = plt.subplots(1, figsize=(5, 4))
-    for measure_name_idx, measure in enumerate(all_measures):
-        measure_name = measure.name[:-2]
+    for measure_name_idx, measure_name in enumerate(all_names):
         tpr_all = defaultdict(list)
         for graph_idx, (tpr, fpr) in enumerate(results_rc[(100, 2, 0.3, 0.10)][measure_name]):
             tprg = defaultdict(list)
@@ -138,7 +88,7 @@ def _draw_all(results_rc, out_name='results/4_all.png'):
         for bucket, fis in tpr_all.items():
             tpr_all[bucket] = np.mean(fis)
 
-        axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, tpr_all.values(),
+        axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, list(tpr_all.values()),
                  label=measure_name, color=d3_colors[measure_name])
     axi.set_xlabel("nodes from different classes")
     axi.set_ylabel("nodes from the same class")
@@ -148,13 +98,14 @@ def _draw_all(results_rc, out_name='results/4_all.png'):
     axi.set_xlim(0, 1)
     axi.set_ylim(0, 1)
     axi.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    plt.savefig(out_name)
+    plt.savefig(out_name, bbox_inches='tight')
 
 
-def _draw_4best(results_rc, out_name='results/4_4best.png'):
+def _draw_4best(results_rc, out_name):
+    print(f'_draw_4best: out_name={out_name}')
+
     fig, axi = plt.subplots(1, figsize=(5, 4))
-    for measure_name_idx, measure in enumerate(all_measures):
-        measure_name = measure.name[:-2]
+    for measure_name_idx, measure_name in enumerate(all_names):
         tpr_all = defaultdict(list)
         for graph_idx, (tpr, fpr) in enumerate(results_rc[(100, 2, 0.3, 0.10)][measure_name]):
             tprg = defaultdict(list)
@@ -168,7 +119,7 @@ def _draw_4best(results_rc, out_name='results/4_4best.png'):
         if measure_name not in ['logComm', 'logFor', 'logHeat', 'SCCT']:
             continue
 
-        axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, tpr_all.values(),
+        axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, list(tpr_all.values()),
                  label=measure_name, color=d3_colors[measure_name])
     axi.set_xlabel("nodes from different classes")
     axi.set_ylabel("nodes from the same class")
@@ -178,31 +129,30 @@ def _draw_4best(results_rc, out_name='results/4_4best.png'):
     axi.set_xlim(0, 1)
     axi.set_ylim(0, 1)
     axi.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    plt.savefig(out_name)
+    plt.savefig(out_name, bbox_inches='tight')
 
 
-def _calc_rc(recalc=False):
-    columns = [
-        # n_nodes, n_classes, p_in, p_out
+def calc_part4(n_graphs=100):
+    cache_kkmeans, init = classic_plots_kkmeans(), 'k-means++'
+    result_params = defaultdict(lambda: defaultdict(dict))  # choose k-means++ init
+    for column in cache_kkmeans.keys():
+        for kernel_name in cache_kkmeans[column].keys():
+            result_params[column][kernel_name] = cache_kkmeans[column][kernel_name][init]['best_param']
+
+    columns = [  # n_nodes, n_classes, p_in, p_out
         (100, 2, 0.3, 0.05),
         (100, 2, 0.3, 0.1),
         (100, 2, 0.3, 0.15),
     ]
-    rc = RejectCurve(columns, all_distances, StochasticBlockModel)
-    if recalc:
-        rc.calc_best_params(all_measures, KKMeans, 100)
-    else:
-        rc.set_best_params(result_params)
-    return rc.perform(100)
 
+    rc = RejectCurve(columns, all_distances, StochasticBlockModel, result_params)
+    results_rc = rc.perform(n_graphs=n_graphs)
 
-def calc_part4():
-    results_rc = _calc_rc(recalc=True)
-    _draw_one_by_one(results_rc)  # draw all rc
-    _draw_pout01(results_rc)  # draw (100, 2, 0.3, 0.1) for all measures
-    _draw_all(results_rc)  # draw all in one pic
-    _draw_4best(results_rc)  # draw 4 best measures
+    _draw_one_by_one(results_rc, 'results/p4-one_by_one.png')  # draw all rc
+    _draw_g100_2_03_01(results_rc, 'results/p4-g100_2_0.3_0.1.png')  # draw (100, 2, 0.3, 0.1) for all measures
+    _draw_all(results_rc, 'results/p4-all.png')  # draw all in one pic
+    _draw_4best(results_rc, 'results/p4-4best.png')  # draw 4 best measures
 
 
 if __name__ == '__main__':
-    calc_part4()
+    calc_part4(n_graphs=10)

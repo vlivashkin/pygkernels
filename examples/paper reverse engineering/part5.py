@@ -20,9 +20,9 @@ from pygraphs.util import load_or_calc_and_save, ddict2dict
 
 
 @load_or_calc_and_save('cache/5_2class.pkl')
-def _calc51(n_graphs=200, n_jobs=6):
+def _calc51(n_graphs=200, n_params=101, n_jobs=6):
     results = defaultdict(lambda: defaultdict(list))
-    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 51), progressbar=True)
+    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True)
     for first_class in tqdm([1, 2, 3, 7] + list(range(0, 51, 5))):
         graphs, info = StochasticBlockModel(100, 2, p_in=0.3, p_out=0.1, cluster_sizes=[first_class, 100 - first_class]) \
             .generate_graphs(n_graphs)
@@ -58,7 +58,7 @@ def _draw51(results, out_name):
 
 
 @load_or_calc_and_save('cache/5_six.pkl')
-def _calc52_6_clusters(n_graphs=100, n_jobs=6):
+def _calc52_6_clusters(n_graphs=100, n_params=101, n_jobs=6):
     cluster_sizes = [65, 35, 25, 13, 8, 4]
     probability_matrix = np.array([
         [0.30, 0.20, 0.10, 0.15, 0.07, 0.25],
@@ -72,7 +72,7 @@ def _calc52_6_clusters(n_graphs=100, n_jobs=6):
         .generate_graphs(n_graphs)
 
     results = {}
-    classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 51), progressbar=True)
+    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True)
     for measure_class in kernels:
         x, y, error = classic_plot.perform(KKMeans, measure_class, graphs, 2, n_jobs=n_jobs)
         results[measure_class.name] = (x, y, error)
@@ -94,6 +94,7 @@ def calc_part5(n_jobs=6):
     results = _calc51(n_graphs=200, n_jobs=n_jobs)
     _draw51(results, out_name='./results/51.png')
 
+    # 5.2 6 clusters
     results = _calc52_6_clusters(n_graphs=200, n_jobs=n_jobs)
     _draw52(results, out_name='./results/52.png')
 

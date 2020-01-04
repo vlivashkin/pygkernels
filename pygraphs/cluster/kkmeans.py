@@ -8,7 +8,7 @@ from pygraphs.cluster.base import KernelEstimator
 
 class KMeans_Fouss(KernelEstimator, ABC):
     def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', random_state=None,
-                 backend='pytorch', device=0):
+                 backend='pytorch', device='cpu'):
         super().__init__(n_clusters, device=device)
         self.n_init = n_init
         self.max_rerun = max_rerun
@@ -79,7 +79,7 @@ class KKMeans_vanilla(KMeans_Fouss):
     Algorithm 7.2: Simple kernel k-means clustering of nodes
     """
 
-    name = 'KKMeans_vanilla'
+    name = 'KKMeans'
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
@@ -96,7 +96,7 @@ class KKMeans_iterative(KMeans_Fouss):
     Algorithm 7.3: Simple iterative kernel k-means clustering of nodes
     """
 
-    name = 'KKMeans'
+    name = 'KKMeans_iterative'
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)

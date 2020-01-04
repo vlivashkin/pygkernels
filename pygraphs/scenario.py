@@ -1,12 +1,10 @@
 import logging
 from collections import defaultdict
-from functools import partial
 from itertools import combinations
 from random import shuffle
 
 import numpy as np
 from joblib import Parallel, delayed
-from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm
 
 from pygraphs.util import ddict2dict
@@ -32,7 +30,9 @@ d3_category20 = [
     '#dbdb8d',
     '#17becf',
     '#9edae5',
-    '#cccccc'
+    '#cccccc',
+    '#999999',
+    '#666666'
 ]
 
 
@@ -64,18 +64,20 @@ d3_colors = {
     'logModifPPR': d3_category20[17],
     'HeatPPR': d3_category20[18],
     'logHeatPPR': d3_category20[19],
-    'SP-CT': d3_category20[20]
+    'SP-CT': d3_category20[20],
+    'SP': d3_category20[21],
+    'CT': d3_category20[22]
 }
 
 
 class ParallelByGraphs:
     """
-    High-level class for calculate quality vs. param graphs
+    High-level class for calculate "quality vs. param" plots
     """
 
     def __init__(self, scorer, params_flat, progressbar=False, verbose=False):
         self.scorer = scorer
-        self.params_flat = params_flat
+        self.params_flat = params_flat if type(params_flat) == list else np.linspace(0, 1, params_flat)
         self.progressbar = progressbar
         self.verbose = verbose
 
@@ -102,10 +104,9 @@ class ParallelByGraphs:
 
         raw_param_dict = defaultdict(list)
         if n_jobs > 1:  # parallel
-            all_graph_results = Parallel(n_jobs=n_jobs)(
-                delayed(self._calc_graph)(graph, kernel_class, estimator_class(n_classes, device=graph_idx % 2), graph_idx)
-                for graph_idx, graph in enumerate(graphs)
-            )
+            all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(
+                graph, kernel_class, estimator_class(n_classes, device=graph_idx % 2), graph_idx  # TODO: fix if < 2 gpu
+            ) for graph_idx, graph in enumerate(graphs))
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
@@ -152,42 +153,17 @@ class RejectCurve:
     High-level class for calculation i.e. reject curves: tpr vs. fpr
     """
 
-    def __init__(self, columns: list, distances: list, generator_class):
+    def __init__(self, columns: list, distances: list, generator_class, best_params):
         self.columns = columns
         self.distances = distances
         self.generator_class = generator_class
 
-        self._best_params = None
-
-    def set_best_params(self, best_params):
-        sorted_distance_names = sorted([x.name for x in self.distances])
-        assert sorted(list(best_params.keys())) == sorted(self.columns)
-        for distances_in_column in [x.keys() for x in best_params.values()]:
-            assert sorted(distances_in_column) == sorted_distance_names
-        self._best_params = best_params
-
-    def calc_best_params(self, kernels: list, estimator_class, n_graphs, n_jobs=-1):
-        print("calc data to find best params...")
-        results = defaultdict(lambda: defaultdict(lambda: 0))
-        for column in tqdm(self.columns):
-            n_nodes, n_classes, p_in, p_out = column
-            graphs, info = self.generator_class(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
-            classic_plot = ParallelByGraphs(adjusted_rand_score, np.linspace(0, 1, 51), progressbar=True)
-            for kernel_class in tqdm(kernels, desc=str(column)):
-                results[column][kernel_class.name] = classic_plot.perform(estimator_class, kernel_class, graphs,
-                                                                          n_classes, n_jobs=n_jobs)
-
-        print("find best params...")
-        best_params = defaultdict(lambda: defaultdict(lambda: 0))
-        for column, kernels_results in results.items():
-            for kernel_name, kernel_results in kernels_results.items():
-                x, y, error = kernel_results
-                best_idx = np.argmax(y)
-                print('{}\t{}\t{:0.2f} ({:0.2f})'.format(column, kernel_name.ljust(8, ' '), x[best_idx], y[best_idx]))
-                best_params[column][kernel_name[:-2]] = x[best_idx]
-
-        self._best_params = ddict2dict(best_params)
-        return results
+        assert all([column in list(best_params.keys()) for column in self.columns])
+        self._best_params = defaultdict(dict)
+        for column in self.columns:
+            for distance in self.distances:
+                self._best_params[column][distance.name] = best_params[column][distance.name]
+        self._best_params = ddict2dict(self._best_params)
 
     @staticmethod
     def _reject_curve(K, y_true, need_shuffle):
