@@ -49,10 +49,10 @@ all_distances = [x[2] for x in distances_kernels_pairs]
 def _draw_one_by_one(results_rc, out_name):
     print(f'_draw_one_by_one: out_name={out_name}')
 
-    fig, ax = plt.subplots(len(all_measures), 3, figsize=(12, 50), sharex=True, sharey=True)
+    fig, ax = plt.subplots(int((len(all_measures) + 1) / 2), 6, figsize=(20, 30), sharex=True, sharey=True)
     for column_idx, column in enumerate(results_rc.keys()):
         for measure_name_idx, measure_name in enumerate(all_names):
-            axi = ax[measure_name_idx][column_idx]
+            axi = ax[measure_name_idx // 2][column_idx + 3 * (measure_name_idx % 2)]
             for graph_idx, (tpr, fpr) in enumerate(results_rc[column][measure_name]):
                 axi.plot(tpr, fpr, color='black', alpha=0.1)
             axi.set_title("G({}, ({}){}, {}), {}".format(*column, measure_name))
@@ -64,10 +64,10 @@ def _draw_one_by_one(results_rc, out_name):
 def _draw_g100_2_03_01(results_rc, out_name):
     print(f'_draw_g100_2_03_01: out_name={out_name}')
 
-    fig, ax = plt.subplots(5, 4, figsize=(16, 16), sharex=True, sharey=True)
+    fig, ax = plt.subplots(5, 5, figsize=(16, 16), sharex=True, sharey=True)
     column = list(results_rc.keys())[1]
     for measure_name_idx, measure_name in enumerate(all_names):
-        axi = ax[measure_name_idx // 4][measure_name_idx % 4]
+        axi = ax[measure_name_idx // 5][measure_name_idx % 5]
         for graph_idx, (tpr, fpr) in enumerate(results_rc[column][measure_name]):
             axi.plot(tpr, fpr, color='black', alpha=0.1)
         axi.set_title("G({}, ({}){}, {}), {}".format(*column, measure_name))
