@@ -16,6 +16,8 @@ __all__ = [
     "logComm_D",
     "Heat_D",
     "logHeat_D",
+    "NHeat_D",
+    "logNHeat_D",
     "SCT_D",
     "SCCT_D",
     "RSP_D",

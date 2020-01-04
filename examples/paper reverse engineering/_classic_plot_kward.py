@@ -121,11 +121,10 @@ def classic_plots_kward(n_graphs=200, n_params=101, n_jobs=1):
         (100, 4, 0.3, 0.15): _kward_100_4_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         (200, 2, 0.3, 0.05): _kward_200_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         (200, 2, 0.3, 0.10): _kward_200_2_03_010(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
-        # (200, 2, 0.3, 0.15): _kward_200_2_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
+        (200, 2, 0.3, 0.15): _kward_200_2_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         # (201, 3, 0.3, 0.10): _kward_201_3_03_010(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         # (200, 4, 0.3, 0.10): _kward_200_4_03_010(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         # (200, 4, 0.3, 0.15): _kward_200_4_03_015(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
-        (200, 2, 0.3, 0.15): _kward_200_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         (201, 3, 0.3, 0.10): _kward_200_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         (200, 4, 0.3, 0.10): _kward_200_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs),
         (200, 4, 0.3, 0.15): _kward_200_2_03_005(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)

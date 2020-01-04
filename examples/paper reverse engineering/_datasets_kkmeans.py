@@ -6,10 +6,8 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
 
-import numpy as np
 from tqdm import tqdm
 from sklearn.metrics import adjusted_rand_score
-from joblib import Parallel, delayed
 
 from pygraphs.graphs.dataset import Datasets
 from pygraphs.measure import kernels
@@ -24,7 +22,7 @@ logger = logging.getLogger()
 
 
 @load_or_calc_and_save('cache/kkmeans_datasets.pkl')
-def datasets_kkmeans(n_graphs=None, n_params=101, n_jobs=6):
+def _datasets_kkmeans(n_graphs=None, n_params=101, n_jobs=6):
     classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False)
 
     def perform(classic_plot, dataset):
@@ -32,12 +30,16 @@ def datasets_kkmeans(n_graphs=None, n_params=101, n_jobs=6):
         graphs, info = dataset
         print(info)
         for measure_class in tqdm(kernels, desc=info['name']):
-            x, y, error = classic_plot.perform(KKMeans, measure_class, graphs, info['k'], n_jobs=1)
+            x, y, error = classic_plot.perform(KKMeans, measure_class, graphs * 10, info['k'], n_jobs=n_jobs)
             dataset_results[measure_class.name] = (x, y)
         print(f'COMPLETED {info["name"]}')
         return info['name'], dataset_results
 
-    return dict(Parallel(n_jobs=n_jobs)(delayed(perform)(classic_plot, dataset) for dataset in Datasets().all))
+    return dict([perform(classic_plot, dataset) for dataset in Datasets().all])
+
+
+def datasets_kkmeans(n_params=101, n_jobs=6):
+    return _datasets_kkmeans(n_graphs=None, n_params=n_params, n_jobs=n_jobs)
 
 
 if __name__ == '__main__':
