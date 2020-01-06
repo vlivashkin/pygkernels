@@ -13,7 +13,7 @@ from collections import defaultdict
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import *
 from pygraphs.scenario import RejectCurve, d3_colors
-from _classic_plot_kkmeans import classic_plots_kkmeans
+from _generated_kkmeans import generated_kkmeans
 
 distances_kernels_pairs = [
     ('pWalk', pWalk_H, pWalk_D),
@@ -136,7 +136,7 @@ def _draw_4best(results_rc, out_name):
 
 
 def calc_part4(n_graphs=100):
-    cache_kkmeans, init = classic_plots_kkmeans(), 'k-means++'
+    cache_kkmeans, init = generated_kkmeans(), 'k-means++'
     result_params = defaultdict(lambda: defaultdict(dict))  # choose k-means++ init
     for column in cache_kkmeans.keys():
         for kernel_name in cache_kkmeans[column].keys():

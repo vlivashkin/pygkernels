@@ -10,8 +10,8 @@ from collections import defaultdict
 from itertools import product
 import matplotlib.pyplot as plt
 
-from _classic_plot_kkmeans import classic_plots_kkmeans
-from _classic_plot_kward import classic_plots_kward
+from _generated_kkmeans import generated_kkmeans
+from _generated_kward import generated_kward
 from pygraphs.measure import kernels
 from pygraphs.scenario import plot_results
 
@@ -76,8 +76,8 @@ def _plot_log_results4(results, img_path):
 
 def calc_part2(n_graphs=200, n_jobs=6):
     # classic_plots: [column][kernel_name][init][feature]
-    cache_kkmeans = classic_plots_kkmeans(n_graphs=n_graphs, n_jobs=n_jobs)
-    cache_kward = classic_plots_kward(n_graphs=n_graphs, n_jobs=n_jobs)
+    cache_kkmeans = generated_kkmeans(n_graphs=n_graphs, n_jobs=n_jobs)
+    cache_kward = generated_kward(n_graphs=n_graphs, n_jobs=n_jobs)
 
     init = 'k-means++'
     columns = [

@@ -2,8 +2,8 @@ import os
 import sys
 import warnings
 
-from _classic_plot_kkmeans import classic_plots_kkmeans
-from _classic_plot_kward import classic_plots_kward
+from _generated_kkmeans import generated_kkmeans
+from _generated_kward import generated_kward
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 warnings.filterwarnings("ignore")
@@ -151,8 +151,8 @@ def _print_results(results, filename):
 
 def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
     # classic_plots: [column][kernel_name][init][feature]
-    cache_kkmeans = classic_plots_kkmeans(n_graphs=n_graphs_train, n_jobs=n_jobs)
-    cache_kward = classic_plots_kward(n_graphs=n_graphs_train, n_jobs=n_jobs)
+    cache_kkmeans = generated_kkmeans(n_graphs=n_graphs_train, n_jobs=n_jobs)
+    cache_kward = generated_kward(n_graphs=n_graphs_train, n_jobs=n_jobs)
 
     print('SAVE BEST PARAMS')
     # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
