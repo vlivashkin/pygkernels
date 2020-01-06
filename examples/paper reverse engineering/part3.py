@@ -156,17 +156,25 @@ def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
 
     print('SAVE BEST PARAMS')
     # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, 'k-means++', ['best_param', 'best_ari'],
+    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'best_param',
                           filename='results/p3-KKMeans-params_best.tsv')
-    _print_params_kward(cache_kward, ['best_param', 'best_ari'],
+    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'best_ari',
+                          filename='results/p3-KKMeans-params_ari_best.tsv')
+    _print_params_kward(cache_kward, 'best_param',
                         filename='results/p3-KWard-params_best.tsv')
+    _print_params_kward(cache_kward, 'best_ari',
+                        filename='results/p3-KWard-params_ari_best.tsv')
 
     print('SAVE PERCENTILE PARAMS')
     # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, 'k-means++', ['percentile_param', 'percentile_ari'],
+    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'percentile_param',
                           filename='results/p3-KKMeans-params_percentile.tsv')
-    _print_params_kward(cache_kward, ['percentile_param', 'percentile_ari'],
+    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'percentile_ari',
+                          filename='results/p3-KKMeans-params_ari_percentile.tsv')
+    _print_params_kward(cache_kward, 'percentile_param',
                         filename='results/p3-KWard-params_percentile.tsv')
+    _print_params_kward(cache_kward, 'percentile_ari',
+                        filename='results/p3-KWard-params_ari_percentile.tsv')
 
     print('CALC COMPETITIONS KKMEANS')
     init = 'k-means++'
@@ -181,4 +189,4 @@ def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
 
 
 if __name__ == '__main__':
-    calc_part3(n_graphs_inference=1)
+    calc_part3(n_graphs_inference=50)

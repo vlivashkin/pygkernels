@@ -195,4 +195,4 @@ class RejectCurve:
                     D = distance.get_D(best_param)
                     tpr, fpr = self._reject_curve(D, nodes, need_shuffle=need_shuffle)
                     results[column][distance_class.name].append((tpr, fpr))
-        return results
+        return ddict2dict(results)

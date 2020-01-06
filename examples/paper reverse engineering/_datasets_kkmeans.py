@@ -28,7 +28,9 @@ def _calc_best_params(dataset, n_params, n_jobs):
     classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False)
     for measure_class in tqdm(kernels, desc=info['name']):
         x, y, error = classic_plot.perform(KKMeans, measure_class, graphs * 10, info['k'], n_jobs=n_jobs)
-        dataset_results[measure_class.name] = (x, y)
+        dataset_results[measure_class.name] = {
+            'x': x, 'y': y, 'error': error
+        }
     print(f'COMPLETED {info["name"]}')
     return info['name'], dataset_results
 

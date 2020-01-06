@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
+from pygraphs.util import load_or_calc_and_save
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import *
 from pygraphs.scenario import RejectCurve, d3_colors
@@ -46,6 +47,25 @@ all_measures = [x[1] for x in distances_kernels_pairs]
 all_distances = [x[2] for x in distances_kernels_pairs]
 
 
+@load_or_calc_and_save('cache/p4_rc.pkl')
+def _calc(n_graphs=100, n_params=None, n_jobs=None):
+    cache_kkmeans, init = generated_kkmeans(), 'k-means++'
+    result_params = defaultdict(lambda: defaultdict(dict))  # choose k-means++ init
+    for column in cache_kkmeans.keys():
+        for kernel_name in cache_kkmeans[column].keys():
+            result_params[column][kernel_name] = cache_kkmeans[column][kernel_name][init]['best_param']
+
+    columns = [  # n_nodes, n_classes, p_in, p_out
+        (100, 2, 0.3, 0.05),
+        (100, 2, 0.3, 0.1),
+        (100, 2, 0.3, 0.15),
+    ]
+
+    rc = RejectCurve(columns, all_distances, StochasticBlockModel, result_params)
+    results_rc = rc.perform(n_graphs=n_graphs)
+    return results_rc
+
+
 def _draw_one_by_one(results_rc, out_name):
     print(f'_draw_one_by_one: out_name={out_name}')
 
@@ -70,7 +90,7 @@ def _draw_g100_2_03_01(results_rc, out_name):
         axi = ax[measure_name_idx // 5][measure_name_idx % 5]
         for graph_idx, (tpr, fpr) in enumerate(results_rc[column][measure_name]):
             axi.plot(tpr, fpr, color='black', alpha=0.1)
-        axi.set_title("G({}, ({}){}, {}), {}".format(*column, measure_name))
+        axi.set_title(measure_name)
         axi.set_xlim(0, 1)
         axi.set_ylim(0, 1)
     plt.savefig(out_name, bbox_inches='tight')
@@ -119,7 +139,7 @@ def _draw_4best(results_rc, out_name):
         for bucket, fis in tpr_all.items():
             tpr_all[bucket] = np.mean(fis)
 
-        if measure_name not in ['logComm', 'logFor', 'logHeat', 'SCCT']:
+        if measure_name not in ['SCCT', 'HeatPPR', 'logNHeat', 'logComm']:
             continue
 
         axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, list(tpr_all.values()),
@@ -136,20 +156,7 @@ def _draw_4best(results_rc, out_name):
 
 
 def calc_part4(n_graphs=100):
-    cache_kkmeans, init = generated_kkmeans(), 'k-means++'
-    result_params = defaultdict(lambda: defaultdict(dict))  # choose k-means++ init
-    for column in cache_kkmeans.keys():
-        for kernel_name in cache_kkmeans[column].keys():
-            result_params[column][kernel_name] = cache_kkmeans[column][kernel_name][init]['best_param']
-
-    columns = [  # n_nodes, n_classes, p_in, p_out
-        (100, 2, 0.3, 0.05),
-        (100, 2, 0.3, 0.1),
-        (100, 2, 0.3, 0.15),
-    ]
-
-    rc = RejectCurve(columns, all_distances, StochasticBlockModel, result_params)
-    results_rc = rc.perform(n_graphs=n_graphs)
+    results_rc = _calc(n_graphs=n_graphs, n_params=None, n_jobs=None)
 
     _draw_one_by_one(results_rc, 'results/p4-one_by_one.png')  # draw all rc
     _draw_g100_2_03_01(results_rc, 'results/p4-g100_2_0.3_0.1.png')  # draw (100, 2, 0.3, 0.1) for all measures
@@ -158,4 +165,4 @@ def calc_part4(n_graphs=100):
 
 
 if __name__ == '__main__':
-    calc_part4(n_graphs=10)
+    calc_part4(n_graphs=100)

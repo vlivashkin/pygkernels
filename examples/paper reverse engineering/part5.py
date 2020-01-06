@@ -19,14 +19,14 @@ from pygraphs.scenario import ParallelByGraphs, d3_colors
 from pygraphs.util import load_or_calc_and_save, ddict2dict
 
 
-@load_or_calc_and_save('cache/5_2class.pkl')
+@load_or_calc_and_save('./cache/p5_2class.pkl')
 def _calc51(n_graphs=200, n_params=101, n_jobs=6):
     results = defaultdict(lambda: defaultdict(list))
-    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True)
-    for first_class in tqdm([1, 2, 3, 7] + list(range(0, 51, 5))):
+    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False)
+    for first_class in tqdm(sorted([1, 2, 3, 7] + list(range(0, 51, 5)))):
         graphs, info = StochasticBlockModel(100, 2, p_in=0.3, p_out=0.1, cluster_sizes=[first_class, 100 - first_class]) \
             .generate_graphs(n_graphs)
-        for measure_class in kernels:
+        for measure_class in tqdm(kernels, desc=str(first_class)):
             x, y, error = classic_plot.perform(KKMeans, measure_class, graphs, 2, n_jobs=n_jobs)
             _, best_y = sorted(zip(x, y), key=lambda x: -x[1])[0]
             mean_y = np.mean(y)
@@ -57,7 +57,7 @@ def _draw51(results, out_name):
     plt.savefig(out_name, bbox_inches='tight', dpi=400)
 
 
-@load_or_calc_and_save('cache/5_six.pkl')
+@load_or_calc_and_save('./cache/p5_six.pkl')
 def _calc52_6_clusters(n_graphs=100, n_params=101, n_jobs=6):
     cluster_sizes = [65, 35, 25, 13, 8, 4]
     probability_matrix = np.array([
@@ -89,13 +89,13 @@ def _draw52(results, out_name):
     plt.savefig(out_name, bbox_inches='tight', dpi=400)
 
 
-def calc_part5(n_jobs=6):
+def calc_part5(n_graphs=200, n_params=101, n_jobs=6):
     # 5.1 Vary first class
-    results = _calc51(n_graphs=200, n_jobs=n_jobs)
+    results = _calc51(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
     _draw51(results, out_name='./results/51.png')
 
     # 5.2 6 clusters
-    results = _calc52_6_clusters(n_graphs=200, n_jobs=n_jobs)
+    results = _calc52_6_clusters(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
     _draw52(results, out_name='./results/52.png')
 
 
