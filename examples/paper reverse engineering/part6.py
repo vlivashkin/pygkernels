@@ -51,7 +51,7 @@ def _plot_sorted(results, img_path):
         ax[idx // 3][idx % 3].set_xlim(0, 101)
         ax[idx // 3][idx % 3].set_ylim(0, 1)
         if idx // 3 == 4:
-            ax[idx // 3][idx % 3].set_xlabel('param idx')
+            ax[idx // 3][idx % 3].set_xlabel('param, sorted desc')
         if idx % 3 == 0:
             ax[idx // 3][idx % 3].set_ylabel('ARI')
         ax[idx // 3][idx % 3].set_title(dataset_name)

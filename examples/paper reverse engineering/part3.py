@@ -21,16 +21,16 @@ from pygraphs.cluster import KKMeans_vanilla as KKMeans, KWard
 from pygraphs.scorer import copeland
 
 
-def _print_params_kkmeans(results, inits, features, filename):
+def _print_params_kkmeans(results, inits, features, filename, append=False):
     print(f'_print_params_kkmeans: inits={inits}, features={features}')
 
     columns = list(results.keys())
     inits = inits if type(inits) == list else [inits]
     features = features if type(features) == list else [features]
 
-    with open(filename, 'w') as f:
-        f.write('column' + (''.join(['\t'] * len(inits) * len(features))).join([str(x) for x in columns]) + '\n')
-        f.write('init' + (''.join(['\t'] * len(features))).join(inits * len(columns)) + '\n')
+    with open(filename, 'a' if append else 'w') as f:
+        f.write('column\t' + (''.join(['\t'] * len(inits) * len(features))).join([str(x) for x in columns]) + '\n')
+        f.write('init\t' + (''.join(['\t'] * len(features))).join(inits * len(columns)) + '\n')
         f.write('\t' + '\t'.join(features * len(columns) * len(inits)) + '\n')
 
         for kernel in kernels:
@@ -119,7 +119,7 @@ def calc_competitions(estimator, classic_plots, n_graphs_inference):
     # percentile
     print(f'calc_competitions, percentile: estimator={estimator.name}')
     results = _calc_competitions(estimator, percentile_params, n_graphs=n_graphs_inference)
-    _print_results(results, f'./results/p3_{estimator.name}-competitions_percentile.tsv')
+    _print_results(results, f'./results/p3-{estimator.name}-competitions_percentile.tsv')
 
 
 def _print_results(results, filename):
@@ -154,27 +154,12 @@ def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
     cache_kkmeans = generated_kkmeans(n_graphs=n_graphs_train, n_jobs=n_jobs)
     cache_kward = generated_kward(n_graphs=n_graphs_train, n_jobs=n_jobs)
 
-    print('SAVE BEST PARAMS')
+    print('SAVE PARAMS KKMEANS')
     # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'best_param',
+    _print_params_kkmeans(cache_kkmeans, ['one', 'all', 'k-means++'], 'best_ari',
                           filename='results/p3-KKMeans-params_best.tsv')
-    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'best_ari',
-                          filename='results/p3-KKMeans-params_ari_best.tsv')
-    _print_params_kward(cache_kward, 'best_param',
-                        filename='results/p3-KWard-params_best.tsv')
-    _print_params_kward(cache_kward, 'best_ari',
-                        filename='results/p3-KWard-params_ari_best.tsv')
-
-    print('SAVE PERCENTILE PARAMS')
-    # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'percentile_param',
-                          filename='results/p3-KKMeans-params_percentile.tsv')
-    _print_params_kkmeans(cache_kkmeans, 'k-means++', 'percentile_ari',
-                          filename='results/p3-KKMeans-params_ari_percentile.tsv')
-    _print_params_kward(cache_kward, 'percentile_param',
-                        filename='results/p3-KWard-params_percentile.tsv')
-    _print_params_kward(cache_kward, 'percentile_ari',
-                        filename='results/p3-KWard-params_ari_percentile.tsv')
+    _print_params_kkmeans(cache_kkmeans, ['one', 'all', 'k-means++'], 'percentile_ari',
+                          filename='results/p3-KKMeans-params_90p.tsv')
 
     print('CALC COMPETITIONS KKMEANS')
     init = 'k-means++'
@@ -183,6 +168,17 @@ def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
         for kernel_name in cache_kkmeans[column].keys():
             kkmeans_plots[column][kernel_name] = cache_kkmeans[column][kernel_name][init]
     calc_competitions(KKMeans, kkmeans_plots, n_graphs_inference)
+
+
+    print('SAVE PARAMS KWARD')
+    _print_params_kward(cache_kward, 'best_param',
+                        filename='results/p3-KWard-params_best.tsv')
+    _print_params_kward(cache_kward, 'best_ari',
+                        filename='results/p3-KWard-params_ari_best.tsv')
+    _print_params_kward(cache_kward, 'percentile_param',
+                        filename='results/p3-KWard-params_percentile.tsv')
+    _print_params_kward(cache_kward, 'percentile_ari',
+                        filename='results/p3-KWard-params_ari_percentile.tsv')
 
     print('CALC COMPETITIONS KWARD')
     calc_competitions(KWard, cache_kward, n_graphs_inference)

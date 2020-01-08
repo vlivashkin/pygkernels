@@ -31,7 +31,7 @@ distances_kernels_pairs = [
     ('SCCT', SCCT_H, SCCT_D),
     ('RSP', RSP_K, RSP_D),
     ('FE', FE_K, FE_D),
-    ('logPPR', PPR_H, PPR_D),
+    ('PPR', PPR_H, PPR_D),
     ('logPPR', logPPR_H, logPPR_D),
     ('ModifPPR', ModifPPR_H, ModifPPR_D),
     ('logModifPPR', logModifPPR_H, logModifPPR_D),
@@ -96,53 +96,15 @@ def _draw_g100_2_03_01(results_rc, out_name):
     plt.savefig(out_name, bbox_inches='tight')
 
 
-def _draw_all(results_rc, out_name):
-    print(f'_draw_all: out_name={out_name}')
+def _draw_avg(tpr_all, out_name, allowed_measures=None):
+    print(f'_draw_avg: out_name={out_name}, allowed_measures={allowed_measures}')
 
     fig, axi = plt.subplots(1, figsize=(5, 4))
-    for measure_name_idx, measure_name in enumerate(all_names):
-        tpr_all = defaultdict(list)
-        for graph_idx, (tpr, fpr) in enumerate(results_rc[(100, 2, 0.3, 0.10)][measure_name]):
-            tprg = defaultdict(list)
-            for ti, fi in zip(fpr, tpr):
-                tprg[np.floor(fi * 100)].append(ti)
-            for bucket, fis in tprg.items():
-                tpr_all[bucket].append(np.mean(fis))
-        for bucket, fis in tpr_all.items():
-            tpr_all[bucket] = np.mean(fis)
-
-        axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, list(tpr_all.values()),
-                 label=measure_name, color=d3_colors[measure_name])
-    axi.set_xlabel("nodes from different classes")
-    axi.set_ylabel("nodes from the same class")
-
-    box = axi.get_position()
-    axi.set_position([box.x0, box.y0, box.width * 0.8, box.height])
-    axi.set_xlim(0, 1)
-    axi.set_ylim(0, 1)
-    axi.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-    plt.savefig(out_name, bbox_inches='tight')
-
-
-def _draw_4best(results_rc, out_name):
-    print(f'_draw_4best: out_name={out_name}')
-
-    fig, axi = plt.subplots(1, figsize=(5, 4))
-    for measure_name_idx, measure_name in enumerate(all_names):
-        tpr_all = defaultdict(list)
-        for graph_idx, (tpr, fpr) in enumerate(results_rc[(100, 2, 0.3, 0.10)][measure_name]):
-            tprg = defaultdict(list)
-            for ti, fi in zip(fpr, tpr):
-                tprg[np.floor(fi * 100)].append(ti)
-            for bucket, fis in tprg.items():
-                tpr_all[bucket].append(np.mean(fis))
-        for bucket, fis in tpr_all.items():
-            tpr_all[bucket] = np.mean(fis)
-
-        if measure_name not in ['SCCT', 'HeatPPR', 'logNHeat', 'logComm']:
+    for measure_name in all_names:
+        if allowed_measures is not None and measure_name not in allowed_measures:
             continue
-
-        axi.plot(np.array(list(tpr_all.keys()), dtype=np.float) / 100, list(tpr_all.values()),
+        tpr_measure = tpr_all[measure_name]
+        axi.plot(np.array(list(tpr_measure.keys()), dtype=np.float) / 100, list(tpr_measure.values()),
                  label=measure_name, color=d3_colors[measure_name])
     axi.set_xlabel("nodes from different classes")
     axi.set_ylabel("nodes from the same class")
@@ -153,15 +115,39 @@ def _draw_4best(results_rc, out_name):
     axi.set_ylim(0, 1)
     axi.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.savefig(out_name, bbox_inches='tight')
+
+
+def _print_avg_results(tpr_all, filename):
+    with open(filename, 'w') as f:
+        for measure_name in all_names:
+            tpr_measure = tpr_all[measure_name]
+            auc = np.mean(list(tpr_measure.values()))
+            f.write(f'{measure_name}\t{auc:0.4f}\n')
 
 
 def calc_part4(n_graphs=100):
     results_rc = _calc(n_graphs=n_graphs, n_params=None, n_jobs=None)
 
-    _draw_one_by_one(results_rc, 'results/p4-one_by_one.png')  # draw all rc
-    _draw_g100_2_03_01(results_rc, 'results/p4-g100_2_0.3_0.1.png')  # draw (100, 2, 0.3, 0.1) for all measures
-    _draw_all(results_rc, 'results/p4-all.png')  # draw all in one pic
-    _draw_4best(results_rc, 'results/p4-4best.png')  # draw 4 best measures
+    _draw_one_by_one(results_rc, './results/p4-one_by_one.png')  # draw all rc
+    _draw_g100_2_03_01(results_rc, './results/p4-g100_2_0.3_0.1.png')  # draw (100, 2, 0.3, 0.1) for all measures
+
+    tpr_all = defaultdict(dict)
+    for measure_name in all_names:
+        measure_results = results_rc[(100, 2, 0.3, 0.10)][measure_name]
+
+        tpr_measure = []
+        for graph_idx, (tpr, fpr) in enumerate(measure_results):
+            tpr_graph = defaultdict(list)
+            for ti, fi in zip(fpr, tpr):
+                tpr_graph[np.floor(fi * 100)].append(ti)
+            tpr_graph = dict([(bucket, np.mean(values)) for bucket, values in tpr_graph.items()])
+            tpr_measure.append(tpr_graph)
+        for bucket in range(101):
+            tpr_all[measure_name][bucket] = np.mean([x[bucket] for x in tpr_measure])
+
+    _draw_avg(tpr_all, './results/p4-avg.png')  # draw all in one pic
+    _draw_avg(tpr_all, './results/p4-avg-4best.png', ['SCCT', 'HeatPPR', 'logNHeat', 'logComm'])  # draw 4 best measures
+    _print_avg_results(tpr_all, './results/p4-auc.tsv')
 
 
 if __name__ == '__main__':
