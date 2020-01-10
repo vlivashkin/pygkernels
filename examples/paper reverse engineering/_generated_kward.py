@@ -56,7 +56,7 @@ def _column(column, n_graphs=100, n_params=31, n_jobs=-1):
     return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
 
 
-def generated_kkmeans(n_graphs=200, n_params=101, n_jobs=1):
+def generated_kward(n_graphs=200, n_params=101, n_jobs=1):
     columns = [
         (100, 2, 0.2, 0.05),
         (100, 2, 0.3, 0.05),

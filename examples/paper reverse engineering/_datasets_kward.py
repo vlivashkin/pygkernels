@@ -61,8 +61,7 @@ def datasets_kward(n_params=101, n_jobs=6):
         'news_5cl_3',
         # 'eu-core',
     ]
-    params = {'n_graphs': None, 'n_params': n_params, 'n_jobs': n_jobs}
-    return dict([(dataset, _dataset(dataset, **params)) for dataset in datasets])
+    return dict([(dataset, _dataset(dataset, n_params, n_jobs)) for dataset in datasets])
 
 
 if __name__ == '__main__':

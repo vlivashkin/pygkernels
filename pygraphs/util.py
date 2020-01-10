@@ -41,7 +41,7 @@ def load_or_calc_and_save(filename):
     def my_decorator(func):
         def wrapped(n_graphs, n_params, n_jobs):
             if os.path.exists(filename):
-                print(f'{func.__name__}: cache file found! Skip calculations')
+                print(f'{func.__name__}: cache file {filename} found! Skip calculations')
                 with open(filename, 'rb') as f:
                     result = pickle.load(f)
             else:
