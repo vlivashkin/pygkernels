@@ -169,7 +169,6 @@ def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
             kkmeans_plots[column][kernel_name] = cache_kkmeans[column][kernel_name][init]
     calc_competitions(KKMeans, kkmeans_plots, n_graphs_inference)
 
-
     print('SAVE PARAMS KWARD')
     _print_params_kward(cache_kward, 'best_param',
                         filename='results/p3-KWard-params_best.tsv')

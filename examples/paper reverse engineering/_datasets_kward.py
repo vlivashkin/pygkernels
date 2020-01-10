@@ -20,9 +20,9 @@ configure_logging()
 logger = logging.getLogger()
 
 
-def _calc_best_params(dataset, n_params, n_jobs):
+def _calc_best_params(dataset_name, n_params, n_jobs):
     dataset_results = {}
-    graphs, info = dataset
+    graphs, info = Datasets()[dataset_name]
     print(info)
 
     classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False)
@@ -35,100 +35,34 @@ def _calc_best_params(dataset, n_params, n_jobs):
     return info['name'], dataset_results
 
 
-@load_or_calc_and_save('cache/datasets_kward/dolphins.pkl')
-def _dataset_dolphins(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['dolphins'], n_params, n_jobs=n_jobs)
+def _dataset(dataset_name, n_params=101, n_jobs=-1):
+    @load_or_calc_and_save(f'./cache/datasets_kward/{dataset_name}.pkl')
+    def _calc(n_graphs=None, n_params=101, n_jobs=-1):
+        return _calc_best_params(dataset_name, n_params, n_jobs=n_jobs)
 
-
-@load_or_calc_and_save('cache/datasets_kward/eucore.pkl')
-def _dataset_eucore(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['eu-core'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/football.pkl')
-def _dataset_football(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['football'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/football_old.pkl')
-def _dataset_football_old(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['football_old'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/karate.pkl')
-def _dataset_karate(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['karate'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_2cl_1.pkl')
-def _dataset_news_2cl_1(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_2cl_2.pkl')
-def _dataset_news_2cl_2(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_2cl_3.pkl')
-def _dataset_news_2cl_3(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_3cl_1.pkl')
-def _dataset_news_3cl_1(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_3cl_2.pkl')
-def _dataset_news_3cl_2(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_3cl_3.pkl')
-def _dataset_news_3cl_3(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_5cl_1.pkl')
-def _dataset_news_5cl_1(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_5cl_2.pkl')
-def _dataset_news_5cl_2(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/news_5cl_3.pkl')
-def _dataset_news_5cl_3(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['news_2cl_1'], n_params, n_jobs=n_jobs)
-
-
-@load_or_calc_and_save('cache/datasets_kward/polbooks.pkl')
-def _dataset_polbooks(n_graphs=None, n_params=101, n_jobs=-1):
-    return _calc_best_params(Datasets()['polbooks'], n_params, n_jobs=n_jobs)
+    return _calc(n_graphs=None, n_params=n_params, n_jobs=n_jobs)
 
 
 def datasets_kward(n_params=101, n_jobs=6):
+    datasets = [
+        'dolphins',
+        'polbooks',
+        'football',
+        'football_old',
+        'karate',
+        'news_2cl_1',
+        'news_2cl_2',
+        'news_2cl_3',
+        'news_3cl_1',
+        'news_3cl_2',
+        'news_3cl_3',
+        'news_5cl_1',
+        'news_5cl_2',
+        'news_5cl_3',
+        # 'eu-core',
+    ]
     params = {'n_graphs': None, 'n_params': n_params, 'n_jobs': n_jobs}
-    return {
-        'dolphins': _dataset_dolphins(**params),
-        'eu-core': _dataset_eucore(**params),
-        'football': _dataset_football(**params),
-        'football_old': _dataset_football_old(**params),
-        'karate': _dataset_karate(**params),
-        'news_2cl_1': _dataset_news_2cl_1(**params),
-        'news_2cl_2': _dataset_news_2cl_2(**params),
-        'news_2cl_3': _dataset_news_2cl_3(**params),
-        'news_3cl_1': _dataset_news_3cl_1(**params),
-        'news_3cl_2': _dataset_news_3cl_2(**params),
-        'news_3cl_3': _dataset_news_3cl_3(**params),
-        'news_5cl_1': _dataset_news_5cl_1(**params),
-        'news_5cl_2': _dataset_news_5cl_2(**params),
-        'news_5cl_3': _dataset_news_5cl_3(**params),
-        'polbooks': _dataset_polbooks(**params)
-    }
+    return dict([(dataset, _dataset(dataset, **params)) for dataset in datasets])
 
 
 if __name__ == '__main__':

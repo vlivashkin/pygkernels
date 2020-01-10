@@ -45,89 +45,36 @@ def _calc_best_params(column, n_graphs=100, n_params=31, n_jobs=-1):
     return ddict2dict(best_params)
 
 
-@load_or_calc_and_save(f'cache/generated_kward/100_2_02_005.pkl')
-def _kward_100_2_02_005(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.2, 0.05), n_graphs, n_params, n_jobs)
+def _column(column, n_graphs=100, n_params=31, n_jobs=-1):
+    n, k, p_in, p_out = column
+    column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
+
+    @load_or_calc_and_save(f'cache/generated_kward/{column_str}.pkl')
+    def _calc(n_graphs=100, n_params=31, n_jobs=-1):
+        return _calc_best_params(column, n_graphs, n_params, n_jobs)
+
+    return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
 
 
-@load_or_calc_and_save(f'cache/generated_kward/100_2_03_005.pkl')
-def _kward_100_2_03_005(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.3, 0.05), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/100_2_03_010.pkl')
-def _kward_100_2_03_010(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.3, 0.1), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/100_2_03_015.pkl')
-def _kward_100_2_03_015(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((100, 2, 0.3, 0.15), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/102_3_03_010.pkl')
-def _kward_102_3_03_010(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((102, 3, 0.3, 0.1), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/100_4_03_010.pkl')
-def _kward_100_4_03_010(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((100, 4, 0.3, 0.1), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/100_4_03_015.pkl')
-def _kward_100_4_03_015(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((100, 4, 0.3, 0.15), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/200_2_03_005.pkl')
-def _kward_200_2_03_005(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.3, 0.05), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/200_2_03_010.pkl')
-def _kward_200_2_03_010(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.3, 0.1), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/200_2_03_015.pkl')
-def _kward_200_2_03_015(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((200, 2, 0.3, 0.15), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/201_3_03_010.pkl')
-def _kward_201_3_03_010(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((201, 3, 0.3, 0.1), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/200_4_03_010.pkl')
-def _kward_200_4_03_010(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((200, 4, 0.3, 0.1), n_graphs, n_params, n_jobs)
-
-
-@load_or_calc_and_save(f'cache/generated_kward/200_4_03_015.pkl')
-def _kward_200_4_03_015(n_graphs=100, n_params=31, n_jobs=-1):
-    return _calc_best_params((200, 4, 0.3, 0.15), n_graphs, n_params, n_jobs)
-
-
-def generated_kward(n_graphs=200, n_params=101, n_jobs=1):
+def generated_kkmeans(n_graphs=200, n_params=101, n_jobs=1):
+    columns = [
+        (100, 2, 0.2, 0.05),
+        (100, 2, 0.3, 0.05),
+        (100, 2, 0.3, 0.10),
+        (100, 2, 0.3, 0.15),
+        (102, 3, 0.3, 0.10),
+        (100, 4, 0.3, 0.10),
+        (100, 4, 0.3, 0.15),
+        (200, 2, 0.3, 0.05),
+        (200, 2, 0.3, 0.10),
+        (200, 2, 0.3, 0.15),
+        (201, 3, 0.3, 0.10),
+        (200, 4, 0.3, 0.10),
+        (200, 4, 0.3, 0.15)
+    ]
     params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs}
-    return {
-        (100, 2, 0.2, 0.05): _kward_100_2_02_005(**params),
-        (100, 2, 0.3, 0.05): _kward_100_2_03_005(**params),
-        (100, 2, 0.3, 0.10): _kward_100_2_03_010(**params),
-        (100, 2, 0.3, 0.15): _kward_100_2_03_015(**params),
-        (102, 3, 0.3, 0.10): _kward_102_3_03_010(**params),
-        (100, 4, 0.3, 0.10): _kward_100_4_03_010(**params),
-        (100, 4, 0.3, 0.15): _kward_100_4_03_015(**params),
-        (200, 2, 0.3, 0.05): _kward_200_2_03_005(**params),
-        (200, 2, 0.3, 0.10): _kward_200_2_03_010(**params),
-        (200, 2, 0.3, 0.15): _kward_200_2_03_015(**params),
-        (201, 3, 0.3, 0.10): _kward_201_3_03_010(**params),
-        (200, 4, 0.3, 0.10): _kward_200_4_03_010(**params),
-        (200, 4, 0.3, 0.15): _kward_200_4_03_015(**params)
-    }
+    return dict([(column, _column(column, **params)) for column in columns])
 
 
 if __name__ == '__main__':
-    generated_kward()
+    generated_kkmeans()
