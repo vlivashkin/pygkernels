@@ -8,8 +8,8 @@ from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=15, max_rerun=100, max_iter=100, init='k-means++', random_state=None,
-                 backend='pytorch', device='cpu'):
+    def __init__(self, n_clusters, n_init=15, max_rerun=100, max_iter=100, init='any', random_state=None,
+                 backend='pytorch', device='cuda:0'):
         super().__init__(n_clusters, device=device)
 
         self.init_names = ['one', 'all', 'k-means++']
@@ -49,7 +49,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         return h
 
     def _init_h(self, K: np.array):
-        init = random.choice(self.init_names) if self.init == 'random' else self.init
+        init = random.choice(self.init_names) if self.init == 'any' else self.init
         if init in ['one', 'all']:
             h = self._init_simple(K, init='one')
         elif init == 'k-means++':

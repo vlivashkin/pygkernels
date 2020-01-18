@@ -232,9 +232,9 @@ class TestTable3_SpectralClustering_rubanov(TestTable1, unittest.TestCase):
 
 
 @unittest.skip
-class TestTable3_SklearnKMeans_random(TestTable1, unittest.TestCase):
+class TestTable3_SklearnKMeans_any(TestTable1, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KMeans_sklearn, init='random')
+        estimator = partial(KMeans_sklearn, init='any')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 

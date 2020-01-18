@@ -1,20 +1,17 @@
-import os
 import sys
 import warnings
-
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-warnings.filterwarnings("ignore")
-sys.path.append('../..')
-
-import numpy as np
-import matplotlib.pyplot as plt
 from collections import defaultdict
 
-from pygraphs.util import load_or_calc_and_save
+import matplotlib.pyplot as plt
+import numpy as np
+
+warnings.filterwarnings("ignore")
+sys.path.append('../..')
+from _generated_kkmeans import generated_kkmeans_any
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import *
 from pygraphs.scenario import RejectCurve, d3_colors
-from _generated_kkmeans import generated_kkmeans
+from pygraphs.util import load_or_calc_and_save
 
 distances_kernels_pairs = [
     ('pWalk', pWalk_H, pWalk_D),
@@ -49,7 +46,7 @@ all_distances = [x[2] for x in distances_kernels_pairs]
 
 @load_or_calc_and_save('cache/p4_rc.pkl')
 def _calc(n_graphs=100, n_params=None, n_jobs=None):
-    cache_kkmeans, init = generated_kkmeans(), 'k-means++'
+    cache_kkmeans, init = generated_kkmeans_any(), 'k-means++'
     result_params = defaultdict(lambda: defaultdict(dict))  # choose k-means++ init
     for column in cache_kkmeans.keys():
         for kernel_name in cache_kkmeans[column].keys():

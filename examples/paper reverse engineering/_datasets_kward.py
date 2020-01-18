@@ -1,18 +1,15 @@
-import os
+import logging
 import sys
 import warnings
 
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
+from sklearn.metrics import adjusted_rand_score
+from tqdm import tqdm
+
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-
-from tqdm import tqdm
-import logging
-from sklearn.metrics import adjusted_rand_score
-
+from pygraphs.cluster import KWard
 from pygraphs.graphs.dataset import Datasets
 from pygraphs.measure import kernels
-from pygraphs.cluster import KWard
 from pygraphs.scenario import ParallelByGraphs
 from pygraphs.util import load_or_calc_and_save, configure_logging
 
@@ -27,7 +24,7 @@ def _calc_best_params(dataset_name, n_params, n_jobs):
 
     classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False)
     for measure_class in tqdm(kernels, desc=info['name']):
-        x, y, error = classic_plot.perform(KWard, measure_class, graphs * 10, info['k'], n_jobs=n_jobs)
+        x, y, error = classic_plot.perform(KWard, measure_class, graphs, info['k'], n_jobs=n_jobs)
         dataset_results[measure_class.name] = {
             'x': x, 'y': y, 'error': error
         }

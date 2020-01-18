@@ -1,17 +1,14 @@
-import os
 import sys
 import warnings
+from collections import defaultdict
 
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import adjusted_rand_score
+from tqdm import tqdm
+
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-
-import numpy as np
-from collections import defaultdict
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-from sklearn.metrics import adjusted_rand_score
-
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.cluster.kkmeans import KKMeans_vanilla as KKMeans

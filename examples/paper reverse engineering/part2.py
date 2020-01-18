@@ -1,16 +1,13 @@
-import os
 import sys
 import warnings
-
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-warnings.filterwarnings("ignore")
-sys.path.append('../..')
-
 from collections import defaultdict
 from itertools import product
+
 import matplotlib.pyplot as plt
 
-from _generated_kkmeans import generated_kkmeans
+warnings.filterwarnings("ignore")
+sys.path.append('../..')
+from _generated_kkmeans import generated_kkmeans_any
 from _generated_kward import generated_kward
 from pygraphs.measure import kernels
 from pygraphs.scenario import plot_results
@@ -76,10 +73,10 @@ def _plot_log_results4(results, img_path):
 
 def calc_part2(n_graphs=200, n_jobs=6):
     # classic_plots: [column][kernel_name][init][feature]
-    cache_kkmeans = generated_kkmeans(n_graphs=n_graphs, n_jobs=n_jobs)
+    cache_kkmeans = generated_kkmeans_any(n_graphs=n_graphs, n_jobs=n_jobs)
     cache_kward = generated_kward(n_graphs=n_graphs, n_jobs=n_jobs)
 
-    init = 'k-means++'
+    init = 'any'
     columns = [
         (100, 2, 0.2, 0.05),
         (102, 3, 0.3, 0.1),

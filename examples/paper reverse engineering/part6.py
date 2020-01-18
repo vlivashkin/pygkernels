@@ -1,30 +1,27 @@
-import os
+import logging
 import sys
 import warnings
 
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
+import matplotlib.pyplot as plt
+import numpy as np
+
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-
-import numpy as np
-import matplotlib.pyplot as plt
-import logging
-
+from _datasets_kkmeans import datasets_kkmeans_any
 from pygraphs.measure import kernels
 from pygraphs.scenario import d3_colors
 from pygraphs.util import configure_logging
-from _datasets_kkmeans import datasets_kkmeans
 
 configure_logging()
 logger = logging.getLogger()
 
 dataset_names = [
     'dolphins',
-    'eu-core',
+    # 'eu-core',
     'football',
     'karate',
     'polbooks',
-    '',
+    # '',
     'news_2cl_1',
     'news_2cl_2',
     'news_2cl_3',
@@ -44,9 +41,9 @@ def _plot_sorted(results, img_path):
     for idx, dataset_name in enumerate(dataset_names):
         if dataset_name == '':
             continue
-        measure_results = results[dataset_name]
-        for measure_name in measure_results.keys():
-            x, y = measure_results[measure_name]
+        dataset_results = results[dataset_name]
+        for measure_name, measure_results in dataset_results.items():
+            x, y = measure_results['x'], measure_results['y']
             ax[idx // 3][idx % 3].plot(range(len(y)), sorted(y, reverse=True), color=d3_colors[measure_name])
         ax[idx // 3][idx % 3].set_xlim(0, 101)
         ax[idx // 3][idx % 3].set_ylim(0, 1)
@@ -69,7 +66,8 @@ def _print_results(results, filename):
             for dataset_name in dataset_names:
                 if dataset_name == '':
                     continue
-                x, y = results[dataset_name][kernel.name]
+                measure_results = results[dataset_name][kernel.name]
+                x, y = measure_results['x'], measure_results['y']
                 best_idx = np.argmax(y)
                 best_param, best_ari = x[best_idx], y[best_idx]
                 f.write(f'{best_ari:.2f}\t')
@@ -77,7 +75,7 @@ def _print_results(results, filename):
 
 
 def calc_part6(n_jobs=6):
-    results = datasets_kkmeans(n_params=101, n_jobs=n_jobs)
+    results = datasets_kkmeans_any(n_params=101, n_jobs=n_jobs)
 
     _plot_sorted(results, './results/p6_sorted.png')
     _print_results(results, './results/p6_results.tsv')

@@ -1,19 +1,17 @@
-import os
 import sys
 import warnings
 from functools import partial
-
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-warnings.filterwarnings("ignore")
-sys.path.append('../..')
+from itertools import product
 
 import numpy as np
-from tqdm import tqdm
 from sklearn.metrics import adjusted_rand_score
+from tqdm import tqdm
 
+warnings.filterwarnings("ignore")
+sys.path.append('../..')
+from pygraphs.cluster import KKMeans_vanilla as KKMeans
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans_vanilla as KKMeans
 from pygraphs.scenario import ParallelByGraphs
 from pygraphs.util import load_or_calc_and_save
 
@@ -57,7 +55,56 @@ def _column(column, init, n_graphs=100, n_params=31, n_jobs=-1):
     return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
 
 
-def generated_kkmeans(n_graphs=200, n_params=101, n_jobs=1):
+def _print_params_kkmeans(results, inits, features, filename, append=False):
+    print(f'_print_params_kkmeans: inits={inits}, features={features}')
+
+    columns = list(results.keys())
+    inits = inits if type(inits) == list else [inits]
+    features = features if type(features) == list else [features]
+
+    with open(filename, 'a' if append else 'w') as f:
+        f.write('column\t' + (''.join(['\t'] * len(inits) * len(features))).join([str(x) for x in columns]) + '\n')
+        f.write('init\t' + (''.join(['\t'] * len(features))).join(inits * len(columns)) + '\n')
+        f.write('\t' + '\t'.join(features * len(columns) * len(inits)) + '\n')
+
+        for kernel in kernels:
+            # TODO: temp crutch for typo
+            # values = [kernel.name] + [f'{results[column][kernel.name][init][feature]:.2f}'
+            #                           for column, init, feature in product(columns, inits, features)]
+            values = [kernel.name]
+            for column, init, feature in product(columns, inits, features):
+                keys = results[column][kernel.name].keys()  # [init]
+                if feature not in keys:  # check typo
+                    if feature == 'percentile_param':
+                        feature = 'precentile_param'
+                    elif feature == 'percentile_ari':
+                        feature = 'precentile_ari'
+                values += [f'{results[column][kernel.name][feature]:.2f}']  # [init]
+            f.write('\t'.join(values) + '\n')
+
+
+# def generated_kkmeans(n_graphs=200, n_params=101, n_jobs=1):
+#     columns = [
+#         (100, 2, 0.2, 0.05),
+#         (100, 2, 0.3, 0.05),
+#         (100, 2, 0.3, 0.10),
+#         (100, 2, 0.3, 0.15),
+#         (102, 3, 0.3, 0.10),
+#         (100, 4, 0.3, 0.10),
+#         (100, 4, 0.3, 0.15),
+#         (200, 2, 0.3, 0.05),
+#         (200, 2, 0.3, 0.10),
+#         (200, 2, 0.3, 0.15),
+#         (201, 3, 0.3, 0.10),
+#         (200, 4, 0.3, 0.10),
+#         (200, 4, 0.3, 0.15)
+#     ]
+#     init = ['one', 'all', 'k-means++']
+#     params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs}
+#     return dict([(column, _column(column, init, **params)) for column in columns])
+
+
+def generated_kkmeans_any(n_graphs=200, n_params=101, n_jobs=1):
     columns = [
         (100, 2, 0.2, 0.05),
         (100, 2, 0.3, 0.05),
@@ -73,10 +120,20 @@ def generated_kkmeans(n_graphs=200, n_params=101, n_jobs=1):
         (200, 4, 0.3, 0.10),
         (200, 4, 0.3, 0.15)
     ]
-    init = 'random'
+    init = 'any'
     params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs}
-    return dict([(column, _column(column, init, **params)) for column in columns])
+    cache_kkmeans = dict([(column, _column(column, init, **params)) for column in columns])
+
+    print('SAVE PARAMS KKMEANS')
+    # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
+    _print_params_kkmeans(cache_kkmeans, init, 'best_ari',
+                          filename='results/p3-KKMeans-params_best.tsv')
+    _print_params_kkmeans(cache_kkmeans, init, 'percentile_ari',
+                          filename='results/p3-KKMeans-params_90p.tsv')
+
+    return cache_kkmeans
 
 
 if __name__ == '__main__':
-    generated_kkmeans()
+    # generated_kkmeans()
+    generated_kkmeans_any()

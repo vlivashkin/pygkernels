@@ -1,23 +1,18 @@
-import os
 import sys
 import warnings
-
-from _generated_kkmeans import generated_kkmeans
-from _generated_kward import generated_kward
-
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-warnings.filterwarnings("ignore")
-sys.path.append('../..')
-
 from collections import defaultdict
 from itertools import product
-from tqdm import tqdm
-from sklearn.metrics import adjusted_rand_score
-from scipy import stats
 
+from scipy import stats
+from sklearn.metrics import adjusted_rand_score
+from tqdm import tqdm
+
+warnings.filterwarnings("ignore")
+sys.path.append('../..')
+from _generated_kward import generated_kward
+from pygraphs.cluster import KWard
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans_vanilla as KKMeans, KWard
 from pygraphs.scorer import copeland
 
 
@@ -39,13 +34,13 @@ def _print_params_kkmeans(results, inits, features, filename, append=False):
             #                           for column, init, feature in product(columns, inits, features)]
             values = [kernel.name]
             for column, init, feature in product(columns, inits, features):
-                keys = results[column][kernel.name][init].keys()
+                keys = results[column][kernel.name].keys()  # [init]
                 if feature not in keys:  # check typo
                     if feature == 'percentile_param':
                         feature = 'precentile_param'
                     elif feature == 'percentile_ari':
                         feature = 'precentile_ari'
-                values += [f'{results[column][kernel.name][init][feature]:.2f}']
+                values += [f'{results[column][kernel.name][feature]:.2f}']  # [init]
             f.write('\t'.join(values) + '\n')
 
 
@@ -74,9 +69,9 @@ def _calc_competitions(estimator, best_params, n_graphs=600):
     results = defaultdict(lambda: defaultdict(lambda: 0))
     for column in tqdm(list(product([100, 200], [2, 4], [0.3], [0.1, 0.15]))):
         n_nodes, n_classes, p_in, p_out = column
-        graphs, info = StochasticBlockModel(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
+        graphs, info = StochasticBlockModel(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs * 2)
         success = 0
-        for edges, nodes in tqdm(graphs, desc=str(column)):
+        for edges, nodes in tqdm(graphs, desc=str(column), total=n_graphs):
             try:
                 single_competition_best = {}
                 for kernel_class in kernels:
@@ -94,7 +89,7 @@ def _calc_competitions(estimator, best_params, n_graphs=600):
                 success += 1
             except Exception or FloatingPointError as e:
                 print(e)
-            if success == 200:
+            if success == n_graphs:
                 break
     return results
 
@@ -151,37 +146,11 @@ def _print_results(results, filename):
 
 def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
     # classic_plots: [column][kernel_name][init][feature]
-    cache_kkmeans = generated_kkmeans(n_graphs=n_graphs_train, n_jobs=n_jobs)
     cache_kward = generated_kward(n_graphs=n_graphs_train, n_jobs=n_jobs)
-
-    print('SAVE PARAMS KKMEANS')
-    # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, ['one', 'all', 'k-means++'], 'best_ari',
-                          filename='results/p3-KKMeans-params_best.tsv')
-    _print_params_kkmeans(cache_kkmeans, ['one', 'all', 'k-means++'], 'percentile_ari',
-                          filename='results/p3-KKMeans-params_90p.tsv')
-
-    print('CALC COMPETITIONS KKMEANS')
-    init = 'k-means++'
-    kkmeans_plots = defaultdict(lambda: defaultdict(dict))  # choose k-means++ init
-    for column in cache_kkmeans.keys():
-        for kernel_name in cache_kkmeans[column].keys():
-            kkmeans_plots[column][kernel_name] = cache_kkmeans[column][kernel_name][init]
-    calc_competitions(KKMeans, kkmeans_plots, n_graphs_inference)
-
-    print('SAVE PARAMS KWARD')
-    _print_params_kward(cache_kward, 'best_param',
-                        filename='results/p3-KWard-params_best.tsv')
-    _print_params_kward(cache_kward, 'best_ari',
-                        filename='results/p3-KWard-params_ari_best.tsv')
-    _print_params_kward(cache_kward, 'percentile_param',
-                        filename='results/p3-KWard-params_percentile.tsv')
-    _print_params_kward(cache_kward, 'percentile_ari',
-                        filename='results/p3-KWard-params_ari_percentile.tsv')
 
     print('CALC COMPETITIONS KWARD')
     calc_competitions(KWard, cache_kward, n_graphs_inference)
 
 
 if __name__ == '__main__':
-    calc_part3(n_graphs_inference=50)
+    calc_part3(n_graphs_inference=500)

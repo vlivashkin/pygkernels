@@ -1,19 +1,17 @@
-import os
 import sys
 import warnings
+from collections import defaultdict
+from itertools import product
 
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
+import numpy as np
+from sklearn.metrics import adjusted_rand_score
+from tqdm import tqdm
+
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-
-from collections import defaultdict
-import numpy as np
-from tqdm import tqdm
-from sklearn.metrics import adjusted_rand_score
-
+from pygraphs.cluster import KWard
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.cluster import KWard
 from pygraphs.scenario import ParallelByGraphs
 from pygraphs.util import load_or_calc_and_save, ddict2dict
 
@@ -56,6 +54,22 @@ def _column(column, n_graphs=100, n_params=31, n_jobs=-1):
     return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
 
 
+def _print_params_kward(results, features, filename):
+    print(f'_print_params_kward: features={features}')
+
+    columns = list(results.keys())
+    features = features if type(features) == list else [features]
+
+    with open(filename, 'w') as f:
+        f.write('\t' + (''.join(['\t'] * len(features))).join([str(x) for x in columns]) + '\n')
+        f.write('\t' + '\t'.join(features * len(columns)) + '\n')
+
+        for kernel in kernels:
+            values = [kernel.name] + [f'{results[column][kernel.name][feature]:.2f}'
+                                      for column, feature in product(columns, features)]
+            f.write('\t'.join(values) + '\n')
+
+
 def generated_kward(n_graphs=200, n_params=101, n_jobs=1):
     columns = [
         (100, 2, 0.2, 0.05),
@@ -73,8 +87,20 @@ def generated_kward(n_graphs=200, n_params=101, n_jobs=1):
         (200, 4, 0.3, 0.15)
     ]
     params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs}
-    return dict([(column, _column(column, **params)) for column in columns])
+    cache_kward = dict([(column, _column(column, **params)) for column in columns])
+
+    print('SAVE PARAMS KWARD')
+    _print_params_kward(cache_kward, 'best_param',
+                        filename='results/p3-KWard-params_best.tsv')
+    _print_params_kward(cache_kward, 'best_ari',
+                        filename='results/p3-KWard-params_ari_best.tsv')
+    _print_params_kward(cache_kward, 'percentile_param',
+                        filename='results/p3-KWard-params_percentile.tsv')
+    _print_params_kward(cache_kward, 'percentile_ari',
+                        filename='results/p3-KWard-params_ari_percentile.tsv')
+
+    return cache_kward
 
 
 if __name__ == '__main__':
-    generated_kkmeans()
+    generated_kward()
