@@ -1,4 +1,3 @@
-import random
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -10,7 +9,7 @@ from pygraphs.cluster.base import KernelEstimator
 class KMeans_Fouss(KernelEstimator, ABC):
     def __init__(self, n_clusters, n_init=15, max_rerun=100, max_iter=100, init='any', random_state=None,
                  backend='pytorch', device='cuda:0'):
-        super().__init__(n_clusters, device=device)
+        super().__init__(n_clusters, device=device, random_state=random_state)
 
         self.init_names = ['one', 'all', 'k-means++']
         self.eps = 10 ** -10
@@ -19,7 +18,6 @@ class KMeans_Fouss(KernelEstimator, ABC):
         self.max_rerun = max_rerun
         self.max_iter = max_iter
         self.init = init
-        self.random_state = random_state
 
         if backend == 'numpy':
             self.backend = _kmeans_numpy
@@ -49,11 +47,11 @@ class KMeans_Fouss(KernelEstimator, ABC):
         return h
 
     def _init_h(self, K: np.array):
-        init = random.choice(self.init_names) if self.init == 'any' else self.init
+        init = np.random.choice(self.init_names) if self.init == 'any' else self.init
         if init in ['one', 'all']:
             h = self._init_simple(K, init='one')
         elif init == 'k-means++':
-            h = self.backend._kmeanspp(K, self.n_clusters, device=self.device)
+            h = self.backend.kmeanspp(K, self.n_clusters, device=self.device)
         else:
             raise NotImplementedError()
         return h
@@ -95,7 +93,7 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
-        result = self.backend._vanilla_predict(K, h_init, self.max_iter, device=self.device)
+        result = self.backend.vanilla_predict(K, h_init, self.max_iter, device=self.device)
         return result
 
 
@@ -112,5 +110,5 @@ class KKMeans_iterative(KMeans_Fouss):
 
     def _predict_once(self, K: np.array):
         h_init = self._init_h(K)
-        result = self.backend._iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
+        result = self.backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
         return result

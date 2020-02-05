@@ -75,44 +75,65 @@ class ParallelByGraphs:
     High-level class for calculate "quality vs. param" plots
     """
 
-    def __init__(self, scorer, params_flat, progressbar=False, verbose=False):
+    def __init__(self, scorer, params_flat, progressbar=False, verbose=False, ignore_errors=False):
         self.scorer = scorer
         self.params_flat = params_flat if type(params_flat) == list else np.linspace(0, 1, params_flat)
         self.progressbar = progressbar
         self.verbose = verbose
+        self.ignore_errors = ignore_errors
 
-    def _calc_graph(self, graph, kernel_class, clf, graph_idx):
+    def _calc_param(self, param_flat, kernel, clf, nodes):
+        param = kernel.scaler.scale(param_flat)
+        K = kernel.get_K(param)
+        y_pred = clf.fit_predict(K)
+        ari = self.scorer(nodes, y_pred)
+        return ari
+
+    def _calc_graph(self, graph, kernel_class, clf, graph_idx, single_graph=False):
         edges, nodes = graph
         kernel = kernel_class(edges)
         graph_results = {}
-        for param_flat in self.params_flat:
+
+        params = self.params_flat
+        if single_graph and self.progressbar:
+            params = tqdm(params, desc=kernel_class.name)
+        for param_flat in params:
             param = -1
-            try:
-                param = kernel.scaler.scale(param_flat)
-                K = kernel.get_K(param)
-                y_pred = clf.fit_predict(K)
-                ari = self.scorer(nodes, y_pred)
+            if self.ignore_errors:
+                try:
+                    ari = self._calc_param(param_flat, kernel, clf, nodes)
+                    graph_results[param_flat] = ari
+                except Exception or FloatingPointError as e:
+                    if self.verbose:
+                        logging.error("{}, {:.2f}, graph {}: {}".format(kernel_class.name, param, graph_idx, e))
+            else:
+                ari = self._calc_param(param_flat, kernel, clf, nodes)
                 graph_results[param_flat] = ari
-            except Exception or FloatingPointError as e:
-                if self.verbose:
-                    logging.error("{}, {:.2f}, graph {}: {}".format(kernel_class.name, param, graph_idx, e))
         return graph_results
 
     def perform(self, estimator_class, kernel_class, graphs, n_classes, n_jobs=1):
-        if self.progressbar:
-            graphs = tqdm(graphs, desc=kernel_class.name)
-
         raw_param_dict = defaultdict(list)
-        if n_jobs > 1:  # parallel
+        if len(graphs) == 1:  # single graph scenario
+            graph_results = self._calc_graph(
+                graphs[0], kernel_class, estimator_class(n_classes, random_state=2000), 0, single_graph=True)
+            for param_flat, ari in graph_results.items():
+                raw_param_dict[param_flat].append(ari)
+        elif n_jobs > 1:  # parallel
+            if self.progressbar:
+                graphs = tqdm(graphs, desc=kernel_class.name)
             all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(
-                graph, kernel_class, estimator_class(n_classes, device=graph_idx % 2), graph_idx  # TODO: fix if < 2 gpu
+                graph, kernel_class, estimator_class(n_classes, device=graph_idx % 2, random_state=2000 + graph_idx),
+                graph_idx  # TODO: fix if < 2 gpu
             ) for graph_idx, graph in enumerate(graphs))
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
         else:
+            if self.progressbar:
+                graphs = tqdm(graphs, desc=kernel_class.name)
             for graph_idx, graph in enumerate(graphs):
-                graph_results = self._calc_graph(graph, kernel_class, estimator_class(n_classes, device=0), graph_idx)
+                graph_results = self._calc_graph(
+                    graph, kernel_class, estimator_class(n_classes, random_state=2000 + graph_idx), graph_idx)
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
 

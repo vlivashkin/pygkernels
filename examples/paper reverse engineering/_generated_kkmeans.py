@@ -23,7 +23,7 @@ def _calc_best_params(column, init, n_graphs=100, n_params=31, n_jobs=-1):
 
     n_nodes, n_classes, p_in, p_out = column
     graphs, _ = StochasticBlockModel(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
-    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False, verbose=True)
+    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False, verbose=False)
 
     best_params = {}
     for measure_class in tqdm(kernels, desc=str(column)):
@@ -44,12 +44,12 @@ def _calc_best_params(column, init, n_graphs=100, n_params=31, n_jobs=-1):
     return best_params
 
 
-def _column(column, init, n_graphs=100, n_params=31, n_jobs=-1):
+def _column(column, init, n_graphs=100, n_params=101, n_jobs=-1, root='./cache/generated_kkmeans'):
     n, k, p_in, p_out = column
     column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
 
-    @load_or_calc_and_save(f'cache/generated_kkmeans/{column_str}_{init}.pkl')
-    def _calc(n_graphs=100, n_params=31, n_jobs=-1):
+    @load_or_calc_and_save(f'{root}/{column_str}-{init}.pkl')
+    def _calc(n_graphs=100, n_params=101, n_jobs=-1):
         return _calc_best_params(column, init, n_graphs, n_params, n_jobs)
 
     return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
@@ -104,7 +104,7 @@ def _print_params_kkmeans(results, inits, features, filename, append=False):
 #     return dict([(column, _column(column, init, **params)) for column in columns])
 
 
-def generated_kkmeans_any(n_graphs=200, n_params=101, n_jobs=1):
+def generated_kkmeans_any(n_graphs=200, n_params=31, n_jobs=1):
     columns = [
         (100, 2, 0.2, 0.05),
         (100, 2, 0.3, 0.05),
@@ -121,16 +121,19 @@ def generated_kkmeans_any(n_graphs=200, n_params=101, n_jobs=1):
         (200, 4, 0.3, 0.15)
     ]
     init = 'any'
-    params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs}
+    params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs, 'root': './cache/generated_kkmeans'}
     cache_kkmeans = dict([(column, _column(column, init, **params)) for column in columns])
 
     print('SAVE PARAMS KKMEANS')
     # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, init, 'best_ari',
+    _print_params_kkmeans(cache_kkmeans, init, 'best_param',
                           filename='results/p3-KKMeans-params_best.tsv')
-    _print_params_kkmeans(cache_kkmeans, init, 'percentile_ari',
+    _print_params_kkmeans(cache_kkmeans, init, 'best_ari',
+                          filename='results/p3-KKMeans-params_best.tsv', append=True)
+    _print_params_kkmeans(cache_kkmeans, init, 'percentile_param',
                           filename='results/p3-KKMeans-params_90p.tsv')
-
+    _print_params_kkmeans(cache_kkmeans, init, 'percentile_ari',
+                          filename='results/p3-KKMeans-params_90p.tsv', append=True)
     return cache_kkmeans
 
 

@@ -3,7 +3,7 @@ import sys
 import warnings
 from functools import partial
 
-from sklearn.metrics import adjusted_rand_score
+from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
@@ -34,15 +34,15 @@ def _calc_best_params(dataset_name, init, n_params, n_jobs):
     return info['name'], dataset_results
 
 
-def _dataset(dataset_name, init, n_params=101, n_jobs=-1):
-    @load_or_calc_and_save(f'./cache/datasets_kkmeans/{dataset_name}_{init}.pkl')
+def _dataset(dataset_name, init, n_params=101, n_jobs=-1, root='./cache/datasets_kkmeans'):
+    @load_or_calc_and_save(f'{root}/{dataset_name}-{init}.pkl')
     def _calc(n_graphs=None, n_params=101, n_jobs=-1):
         return _calc_best_params(dataset_name, init, n_params, n_jobs=n_jobs)
 
     return _calc(n_graphs=None, n_params=n_params, n_jobs=n_jobs)
 
 
-def datasets_kkmeans_any(n_params=101, n_jobs=6):
+def datasets_kkmeans_any(n_params=51, n_jobs=6):
     datasets = [
         'dolphins',
         'polbooks',
@@ -58,7 +58,7 @@ def datasets_kkmeans_any(n_params=101, n_jobs=6):
         'news_5cl_1',
         'news_5cl_2',
         'news_5cl_3',
-        # 'eu-core',
+        'eu-core',
     ]
     init = 'any'
     return dict([(_dataset(dataset, init, n_params, n_jobs)) for dataset in datasets])

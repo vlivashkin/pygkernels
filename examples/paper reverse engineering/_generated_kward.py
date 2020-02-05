@@ -4,7 +4,7 @@ from collections import defaultdict
 from itertools import product
 
 import numpy as np
-from sklearn.metrics import adjusted_rand_score
+from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
@@ -43,11 +43,11 @@ def _calc_best_params(column, n_graphs=100, n_params=31, n_jobs=-1):
     return ddict2dict(best_params)
 
 
-def _column(column, n_graphs=100, n_params=31, n_jobs=-1):
+def _column(column, n_graphs=100, n_params=31, n_jobs=-1, root='./cache/generated_kward'):
     n, k, p_in, p_out = column
     column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
 
-    @load_or_calc_and_save(f'cache/generated_kward/{column_str}.pkl')
+    @load_or_calc_and_save(f'{root}/{column_str}.pkl')
     def _calc(n_graphs=100, n_params=31, n_jobs=-1):
         return _calc_best_params(column, n_graphs, n_params, n_jobs)
 

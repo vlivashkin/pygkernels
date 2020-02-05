@@ -77,8 +77,8 @@ def _print_results(results, filename):
 def calc_part6(n_jobs=6):
     results = datasets_kkmeans_any(n_params=101, n_jobs=n_jobs)
 
-    _plot_sorted(results, './results/p6_sorted.png')
-    _print_results(results, './results/p6_results.tsv')
+    _plot_sorted(results, './results/p6-KKMeans-sorted.png')
+    _print_results(results, './results/p6-KKMeans-results.tsv')
 
 
 if __name__ == '__main__':

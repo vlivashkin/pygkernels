@@ -29,7 +29,7 @@ def _inertia(h, e, K, labels):
 
 
 @torch_func
-def _kmeanspp(K, n_clusters, device):
+def kmeanspp(K, n_clusters, device):
     n = K.shape[0]
     e = torch.eye(n, dtype=torch.float32).to(device)
     h = torch.zeros((n_clusters, n), dtype=torch.float32).to(device)
@@ -49,7 +49,7 @@ def _kmeanspp(K, n_clusters, device):
 
 
 @torch_func
-def _vanilla_predict(K, h, max_iter: int, device=0):
+def vanilla_predict(K, h, max_iter: int, device=0):
     n_clusters, n = h.shape
     e = torch.eye(n, dtype=torch.float32).to(device)
 
@@ -74,7 +74,7 @@ def _vanilla_predict(K, h, max_iter: int, device=0):
 
 
 @torch_func
-def _iterative_predict(K, h, max_iter: int, eps: float, device=0):
+def iterative_predict(K, h, max_iter: int, eps: float, device):
     n_clusters, n = h.shape
     e = torch.eye(n, dtype=torch.float32).to(device)
 

@@ -1,7 +1,6 @@
 # Python compiled
 __pycache__/
 *.pyc
-.pytest_cache
 
 # JetBrains
 .idea/
@@ -28,7 +27,7 @@ __pycache__/
 *.out
 *.aux
 *.toc
-*.pkl
 *.xlsx
 *.png
 .Rproj.user
+*.pkl

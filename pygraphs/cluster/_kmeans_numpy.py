@@ -11,7 +11,7 @@ def _inertia(h: np.array, e, K: np.array, labels: np.array):
     return np.einsum('ij,jk,ki->', h_e, K, h_e)
 
 
-def _kmeanspp(K, n_clusters):
+def kmeanspp(K, n_clusters):
     n = K.shape[0]
     e = np.eye(n, dtype=np.float64)
     h = np.zeros((n_clusters, n), dtype=np.float64)
@@ -32,7 +32,7 @@ def _kmeanspp(K, n_clusters):
     return h
 
 
-def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
+def vanilla_predict(K: np.array, h: np.array, max_iter: int):
     n_clusters, n = h.shape
     e = np.eye(n, dtype=np.float64)
 
@@ -56,7 +56,7 @@ def _vanilla_predict(K: np.array, h: np.array, max_iter: int):
     return labels, inertia, success
 
 
-def _iterative_predict(K: np.array, h: np.array, max_iter: int, eps: float):
+def iterative_predict(K: np.array, h: np.array, max_iter: int, eps: float):
     n_clusters, n = h.shape
     e = np.eye(n, dtype=np.float64)
 
