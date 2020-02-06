@@ -13,6 +13,8 @@ class Kernel(ABC):
     parent_distance_class, parent_kernel_class = None, None
 
     def __init__(self, A):
+        self.eps = 10 ** -10
+
         self.scaler = self.default_scaler(A)
 
         assert not self.parent_distance_class or not self.parent_kernel_class
@@ -134,7 +136,7 @@ class SCT_H(Kernel):
         super().__init__(A)
         self.K_CT = np.linalg.pinv(get_L(self.A))
         self.sigma = self.K_CT.std()
-        self.Kds = self.K_CT / self.sigma
+        self.Kds = self.K_CT / (self.sigma + self.eps)
 
     def get_K(self, alpha):
         """

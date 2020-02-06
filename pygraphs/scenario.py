@@ -77,7 +77,9 @@ class ParallelByGraphs:
 
     def __init__(self, scorer, params_flat, progressbar=False, verbose=False, ignore_errors=False):
         self.scorer = scorer
-        self.params_flat = params_flat if type(params_flat) == list else np.linspace(0, 1, params_flat)
+        self.params_flat = params_flat \
+            if type(params_flat) == list or type(params_flat) == tuple \
+            else np.linspace(0, 1, params_flat)
         self.progressbar = progressbar
         self.verbose = verbose
         self.ignore_errors = ignore_errors
