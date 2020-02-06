@@ -1,5 +1,5 @@
-import json
 import sys
+from collections import defaultdict
 from itertools import product
 
 import matplotlib.pyplot as plt
@@ -13,7 +13,7 @@ sys.path.append('../..')
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.cluster import KKMeans_vanilla as KKMeans
-from pygraphs.scenario import ParallelByGraphs
+from pygraphs.scenario import ParallelByGraphs, d3_colors
 
 # Experiment 1
 # Calc a 2d field p_in vs p_out for several n and k(balanced classes)
@@ -97,47 +97,142 @@ def calc(n, k, estimator, p_ins, p_outs, pin_pout_step, experiment_name):
     return _calc(n_graphs=10, n_params=31, n_jobs=6)
 
 
-def draw(picture_results, p_ins, p_outs, img_path):
-    colors, ari = picture_results.best_measure_map(kernel_colors)
+def draw(plot_results: PlotResults, p_ins, p_outs,
+         plot1_name='./results/pin_vs_pout-top.png',
+         plot2_name='./results/pin_vs_pout-legend.png',
+         plot3_name='./results/pin_vs_pout-maxari.png',
+         plot4_name='./results/pin_vs_pout-rating.png'):
+    kernel_name_to_id = dict([(k.name, i) for i, k in enumerate(kernels)])
+    kernel_id_to_name = list(kernel_name_to_id.keys())
+    print(kernel_name_to_id, kernel_id_to_name)
 
-    fig, ax = plt.subplots(1, 2, figsize=(15, 15))
+    side_len = p_ins.shape[0]
+    best_measure, best_ari = np.full((side_len, side_len), np.nan), np.full((side_len, side_len), np.nan)
+    measure_counter = defaultdict(lambda: 0)
+    global_ratings = defaultdict(lambda: 0)
+    global_ratings_upper = defaultdict(lambda: 0)
+    global_ratings_lower = defaultdict(lambda: 0)
 
-    ax[0].imshow(colors)
-    ax[0].set_xticks(range(p_ins.shape[0]))
-    ax[0].set_yticks(range(p_outs.shape[0]))
-    ax[0].set_xticklabels([f'{x:.1f}' for x in p_ins])
-    ax[0].set_yticklabels([f'{x:.1f}' for x in p_outs])
-    ax[0].set_xlabel('$p_{in}$')
-    ax[0].set_ylabel('$p_{out}$')
+    measure_ratings = np.full((side_len, side_len, len(kernel_name_to_id)), np.nan)
+    for pin_idx in range(side_len):
+        for pout_idx in range(side_len):
+            cell_results = plot_results.results[pin_idx][pout_idx]
 
-    ax[1].imshow(ari, vmin=0, vmax=1)
-    ax[1].set_xticks(range(p_ins.shape[0]))
-    ax[1].set_yticks(range(p_outs.shape[0]))
-    ax[1].set_xticklabels([f'{x:.1f}' for x in p_ins])
-    ax[1].set_yticklabels([f'{x:.1f}' for x in p_outs])
-    ax[1].set_xlabel('$p_{in}$')
-    ax[1].set_ylabel('$p_{out}$')
+            measure_best_ari = []
+            for measure_name, measure_results in cell_results.measure_results.items():
+                if len(measure_results.ari) > 0:
+                    best_ari_of_measure = measure_results.mari()
+                    if ~np.isnan(best_ari_of_measure):
+                        measure_best_ari.append((measure_name, best_ari_of_measure))
+            measure_best_ari = sorted(measure_best_ari, key=lambda x: x[1], reverse=True)
 
-    plt.savefig(img_path, bbox_inches='tight')
+            for current_name, current_ari in measure_best_ari:
+                better_than, worse_than = 0, 0
+                for measure_name, measure_ari in measure_best_ari:
+                    if current_ari > measure_ari:
+                        better_than += 1
+                    if current_ari < measure_ari:
+                        worse_than += 1
+                measure_ratings[pin_idx, pout_idx, kernel_name_to_id[current_name]] = worse_than + 1
+                if pin_idx != pout_idx:
+                    global_ratings[current_name] += better_than - worse_than
+                if pin_idx > pout_idx:
+                    global_ratings_upper[current_name] += better_than - worse_than
+                if pin_idx < pout_idx:
+                    global_ratings_lower[current_name] += better_than - worse_than
 
+            if np.sum(np.array([x[1] for x in measure_best_ari]) == 1) < 2:
+                best_measure[pin_idx, pout_idx] = kernel_name_to_id[measure_best_ari[0][0]]
+                best_ari[pin_idx, pout_idx] = measure_best_ari[0][1]
+                measure_counter[measure_best_ari[0][0]] += 1
 
-def save_to_json(picture_results, p_ins, p_outs, pin_pout_step, experiment_name, filename):
-    jjson = {}
-    for p_in, p_out in tqdm(list(product(p_ins, p_outs)), desc=experiment_name):  # one pixel
-        p_in_idx, p_out_idx = int(p_in / pin_pout_step), int(p_out / pin_pout_step)
-        cell_results = picture_results.results[p_in_idx][p_out_idx]
+    best_measure_color = np.zeros((side_len, side_len, 3), dtype=np.uint8)
+    for i in range(side_len):
+        for j in range(side_len):
+            if not np.isnan(best_measure[i][j]):
+                color = d3_colors[kernel_id_to_name[int(best_measure[i][j])]]
+                color = tuple(int(color[1:][i:i + 2], 16) for i in (0, 2, 4))
+                best_measure_color[i][j] = np.array(color)
 
-        jcell = {}
-        for measure_result in cell_results.measure_results.values():
-            jcell[measure_result.measure_name] = {
-                'params': measure_result.params.tolist() if type(measure_result.params) != list else [],
-                'ari': measure_result.ari.tolist() if type(measure_result.ari) != list else [],
-                'error': measure_result.error.tolist() if type(measure_result.error) != list else [],
-            }
-        jjson[f'{p_in}, {p_out}'] = jcell
+    p_ins = [f'{x:.2}' for x in np.arange(0, 1.0001, 0.1)]
+    p_outs = [f'{x:.2}' for x in np.arange(0, 1.0001, 0.1)]
 
-    with open(filename, 'w') as f:
-        json.dump(jjson, f, indent=4, sort_keys=True)
+    colors_legend, names_legend = [], []
+    for measure_name in list(kernel_name_to_id.keys()):
+        color = d3_colors[measure_name]
+        color = tuple(int(color[1:][i:i + 2], 16) for i in (0, 2, 4))
+        name = f'{measure_name} ({measure_counter[measure_name]})'
+        colors_legend.append(color)
+        names_legend.append(name)
+    colors_legend, names_legend = np.array(colors_legend), np.array(names_legend)
+
+    # plot 1
+    fig, ax = plt.subplots(1, 1, figsize=(4, 4))
+
+    ax.imshow(best_measure_color[::-1])
+    ax.set_yticks(range(0, len(p_ins), 1))  # * 2, 2
+    ax.set_xticks(range(0, len(p_outs), 1))
+    ax.set_yticklabels(p_ins[::-1])
+    ax.set_xticklabels(p_outs)
+    ax.set_ylabel('$p_{in}$')
+    ax.set_xlabel('$p_{out}$')
+
+    for i in range(side_len):
+        for j in range(side_len):
+            if not np.isnan(best_measure[i][j]):
+                ax.text(j - 0.29, side_len - i - 0.75, str(int(best_measure[i][j])).rjust(2))
+    plt.savefig(plot1_name, bbox_inches='tight')
+
+    # plot 2
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+
+    ax.imshow(colors_legend[:, None, :])
+    ax.set_yticks(range(len(names_legend)))
+    ax.tick_params(
+        axis='x',  # changes apply to the x-axis
+        which='both',  # both major and minor ticks are affected
+        bottom=False,  # ticks along the bottom edge are off
+        top=False,  # ticks along the top edge are off
+        labelbottom=False)  # labels along the bottom edge are off
+    ax.yaxis.tick_right()
+    ax.set_yticklabels(names_legend)
+
+    for i in range(len(names_legend)):
+        ax.text(-0.4, i + 0.3, str(i).rjust(2))
+
+    plt.savefig(plot2_name, bbox_inches='tight')
+
+    # plot 3
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+
+    a = ax.imshow(best_ari[::-1], vmin=0, vmax=1)
+    ax.set_yticks(range(0, len(p_ins), 1))  # * 2, 2
+    ax.set_xticks(range(0, len(p_outs), 1))
+    ax.set_yticklabels(p_ins[::-1])
+    ax.set_xticklabels(p_outs)
+    ax.set_ylabel('$p_{in}$')
+    ax.set_xlabel('$p_{out}$')
+    plt.colorbar(a)
+
+    plt.savefig(plot3_name, bbox_inches='tight')
+
+    # plot 4
+    fig, ax = plt.subplots(4, 6, figsize=(18, 12), sharex=True, sharey=True)
+    for measure_name, measure_idx in kernel_name_to_id.items():
+        axi = ax[measure_idx // 6][measure_idx % 6]
+        axi.imshow(measure_ratings[::-1, :, measure_idx], cmap='viridis_r')
+
+        axi.set_yticks(range(0, len(p_ins), 1))  # * 2, 2
+        axi.set_xticks(range(0, len(p_outs), 1))
+        axi.set_yticklabels(p_ins[::-1])
+        axi.set_xticklabels(p_outs)
+        axi.set_ylabel('$p_{in}$')
+        axi.set_xlabel('$p_{out}$')
+
+        axi.set_title(measure_name)
+        axi.plot(range(side_len)[::-1], range(side_len), color='black')
+
+    plt.savefig(plot4_name, bbox_inches='tight')
 
 
 if __name__ == '__main__':
@@ -154,5 +249,4 @@ if __name__ == '__main__':
                     if len(content_xy_measure.ari) == 0:
                         content_xy_measure.ari = [0]
 
-        draw(picture_results, p_ins, p_outs, './results/pin_pout-100_2.png')
-        save_to_json(picture_results, p_ins, p_outs, pin_pout_step, experiment_name, './results/pin_pout-100_2.json')
+        draw(picture_results, p_ins, p_outs)
