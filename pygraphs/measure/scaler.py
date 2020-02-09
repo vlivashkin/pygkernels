@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Scaler(ABC):
-    def __init__(self, A=None):
+    def __init__(self, A: np.ndarray = None):
         self.eps = 10 ** -10
         self.A = A
 
@@ -21,7 +21,7 @@ class Linear(Scaler):  # no transformation, for SP-CT
 
 
 class AlphaToT(Scaler):  # α > 0 -> 0 < t < α^{-1}
-    def __init__(self, A=None):
+    def __init__(self, A: np.ndarray = None):
         super().__init__(A)
         cfm = np.linalg.eigvals(self.A)
         self.rho = np.max(np.abs(cfm))
@@ -31,7 +31,7 @@ class AlphaToT(Scaler):  # α > 0 -> 0 < t < α^{-1}
 
 
 class Rho(Scaler):  # pWalk, Walk
-    def __init__(self, A=None):
+    def __init__(self, A: np.ndarray = None):
         super().__init__(A)
         cfm = np.linalg.eigvals(self.A)
         self.rho = np.max(np.abs(cfm))

@@ -66,8 +66,24 @@ def _calc_competitions(estimator, best_params, n_graphs=600):
     :return dict[column][kernel] -> score
     """
 
+    columns = [
+        (100, 2, 0.2, 0.05),
+        (100, 2, 0.3, 0.05),
+        (100, 2, 0.3, 0.10),
+        (100, 2, 0.3, 0.15),
+        (102, 3, 0.3, 0.10),
+        (100, 4, 0.3, 0.10),
+        (100, 4, 0.3, 0.15),
+        (200, 2, 0.3, 0.05),
+        (200, 2, 0.3, 0.10),
+        (200, 2, 0.3, 0.15),
+        (201, 3, 0.3, 0.10),
+        (200, 4, 0.3, 0.10),
+        (200, 4, 0.3, 0.15)
+    ]
+
     results = defaultdict(lambda: defaultdict(lambda: 0))
-    for column in tqdm(list(product([100, 200], [2, 4], [0.3], [0.1, 0.15]))):
+    for column in tqdm(columns):
         n_nodes, n_classes, p_in, p_out = column
         graphs, info = StochasticBlockModel(n_nodes, n_classes, p_in=p_in, p_out=p_out).generate_graphs(n_graphs * 2)
         success = 0
@@ -119,13 +135,18 @@ def calc_competitions(estimator, classic_plots, n_graphs_inference):
 
 def _print_results(results, filename):
     columns_order = [
-        (100, 2, 0.3, 0.1),
+        (100, 2, 0.2, 0.05),
+        (100, 2, 0.3, 0.05),
+        (100, 2, 0.3, 0.10),
         (100, 2, 0.3, 0.15),
-        (100, 4, 0.3, 0.1),
+        (102, 3, 0.3, 0.10),
+        (100, 4, 0.3, 0.10),
         (100, 4, 0.3, 0.15),
-        (200, 2, 0.3, 0.1),
+        (200, 2, 0.3, 0.05),
+        (200, 2, 0.3, 0.10),
         (200, 2, 0.3, 0.15),
-        (200, 4, 0.3, 0.1),
+        (201, 3, 0.3, 0.10),
+        (200, 4, 0.3, 0.10),
         (200, 4, 0.3, 0.15),
         'sum'
     ]
@@ -144,7 +165,7 @@ def _print_results(results, filename):
                                                     for col_name in columns_order]) + '\n')
 
 
-def calc_part3(n_graphs_train=100, n_graphs_inference=600, n_jobs=1):
+def calc_part3(n_graphs_train=100, n_graphs_inference=500, n_jobs=1):
     # classic_plots: [column][kernel_name][init][feature]
     cache_kward = generated_kward(n_graphs=n_graphs_train, n_jobs=n_jobs)
 

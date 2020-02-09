@@ -5,6 +5,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from pygraphs.measure import scaler
+from pygraphs.measure.scaler import Scaler
 from pygraphs.measure.shortcuts import get_D, get_L, get_normalized_L, D_to_K, H0_to_H
 
 
@@ -12,10 +13,10 @@ class Kernel(ABC):
     name, default_scaler = None, None
     parent_distance_class, parent_kernel_class = None, None
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         self.eps = 10 ** -10
 
-        self.scaler = self.default_scaler(A)
+        self.scaler: Scaler = self.default_scaler(A)
 
         assert not self.parent_distance_class or not self.parent_kernel_class
         self.parent_distance = self.parent_distance_class(A) if self.parent_distance_class else None
@@ -104,7 +105,7 @@ class Comm_H(Kernel):
 class Heat_H(Kernel):
     name, default_scaler = 'Heat', scaler.Fraction
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.L = get_L(self.A)
 
@@ -118,7 +119,7 @@ class Heat_H(Kernel):
 class NHeat_H(Kernel):
     name, default_scaler = 'NHeat', scaler.Fraction
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.nL = get_normalized_L(A)
 
@@ -132,7 +133,7 @@ class NHeat_H(Kernel):
 class SCT_H(Kernel):
     name, default_scaler = 'SCT', scaler.Fraction
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.K_CT = np.linalg.pinv(get_L(self.A))
         self.sigma = self.K_CT.std()
@@ -148,13 +149,13 @@ class SCT_H(Kernel):
 class SCCT_H(Kernel):
     name, default_scaler = 'SCCT', scaler.Fraction
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.K_CCT = self.H_CCT(A)
         self.sigma = self.K_CCT.std()
         self.Kds = self.K_CCT / self.sigma
 
-    def H_CCT(self, A):
+    def H_CCT(self, A: np.ndarray):
         """
         H = I - E / n
         M = D^{-1/2}(A - dd^T/vol(G))D^{-1/2},
@@ -181,7 +182,7 @@ class SCCT_H(Kernel):
 class PPR_H(Kernel):
     name, default_scaler = 'PPR', scaler.Linear
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.I = np.eye(A.shape[0])
         self.P = np.linalg.inv(get_D(A)).dot(A)
@@ -193,7 +194,7 @@ class PPR_H(Kernel):
 class ModifPPR_H(Kernel):
     name, default_scaler = 'ModifPPR', scaler.Linear
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.D = get_D(A)
 
@@ -204,7 +205,7 @@ class ModifPPR_H(Kernel):
 class HeatPPR_H(Kernel):
     name, default_scaler = 'HeatPPR', scaler.Fraction
 
-    def __init__(self, A):
+    def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.I = np.eye(A.shape[0])
         self.P = np.linalg.inv(get_D(A)).dot(A)

@@ -4,7 +4,7 @@ from collections import defaultdict
 from itertools import product
 
 import numpy as np
-from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
@@ -54,19 +54,25 @@ def _column(column, n_graphs=100, n_params=31, n_jobs=-1, root='./cache/generate
     return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
 
 
-def _print_params_kward(results, features, filename):
+def _print_params_kward(results, features, filename, transform_params=False, append=False):
     print(f'_print_params_kward: features={features}')
 
     columns = list(results.keys())
     features = features if type(features) == list else [features]
 
-    with open(filename, 'w') as f:
+    with open(filename, 'a' if append else 'w') as f:
+        if append:
+            f.write('\n')
+
         f.write('\t' + (''.join(['\t'] * len(features))).join([str(x) for x in columns]) + '\n')
         f.write('\t' + '\t'.join(features * len(columns)) + '\n')
 
         for kernel in kernels:
-            values = [kernel.name] + [f'{results[column][kernel.name][feature]:.2f}'
-                                      for column, feature in product(columns, features)]
+            kernel_object = kernel(np.eye(100))
+            values = [kernel.name]
+            for column, feature in product(columns, features):
+                v = results[column][kernel.name][feature]
+                values += [f'{kernel_object.scaler.scale(v):.2e}'] if transform_params else [f'{v:.2f}']
             f.write('\t'.join(values) + '\n')
 
 
@@ -88,19 +94,17 @@ def generated_kward(n_graphs=200, n_params=101, n_jobs=1):
     ]
     params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs}
     cache_kward = dict([(column, _column(column, **params)) for column in columns])
-
-    print('SAVE PARAMS KWARD')
-    _print_params_kward(cache_kward, 'best_param',
-                        filename='results/p3-KWard-params_best.tsv')
-    _print_params_kward(cache_kward, 'best_ari',
-                        filename='results/p3-KWard-params_ari_best.tsv')
-    _print_params_kward(cache_kward, 'percentile_param',
-                        filename='results/p3-KWard-params_percentile.tsv')
-    _print_params_kward(cache_kward, 'percentile_ari',
-                        filename='results/p3-KWard-params_ari_percentile.tsv')
-
     return cache_kward
 
 
 if __name__ == '__main__':
-    generated_kward()
+    cache_kward = generated_kward()
+
+    print('SAVE PARAMS KWARD')
+    best_fn, p90_fn = 'results/p0-KWard-params_best.tsv', 'results/p0-KWard-params_90p.tsv'
+    _print_params_kward(cache_kward, 'best_param', filename=best_fn)
+    _print_params_kward(cache_kward, 'best_param', filename=best_fn, transform_params=True, append=True)
+    _print_params_kward(cache_kward, 'best_ari', filename=best_fn, append=True)
+    _print_params_kward(cache_kward, 'percentile_param', filename=p90_fn)
+    _print_params_kward(cache_kward, 'percentile_param', filename=p90_fn, transform_params=True, append=True)
+    _print_params_kward(cache_kward, 'percentile_ari', filename=p90_fn, append=True)

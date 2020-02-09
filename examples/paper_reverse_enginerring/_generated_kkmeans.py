@@ -55,7 +55,7 @@ def _column(column, init, n_graphs=100, n_params=101, n_jobs=-1, root='./cache/g
     return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
 
 
-def _print_params_kkmeans(results, inits, features, filename, append=False):
+def _print_params_kkmeans(results, inits, features, filename, transform_param=False, append=False):
     print(f'_print_params_kkmeans: inits={inits}, features={features}')
 
     columns = list(results.keys())
@@ -63,6 +63,9 @@ def _print_params_kkmeans(results, inits, features, filename, append=False):
     features = features if type(features) == list else [features]
 
     with open(filename, 'a' if append else 'w') as f:
+        if append:
+            f.write('\n')
+
         f.write('column\t' + (''.join(['\t'] * len(inits) * len(features))).join([str(x) for x in columns]) + '\n')
         f.write('init\t' + (''.join(['\t'] * len(features))).join(inits * len(columns)) + '\n')
         f.write('\t' + '\t'.join(features * len(columns) * len(inits)) + '\n')
@@ -71,6 +74,7 @@ def _print_params_kkmeans(results, inits, features, filename, append=False):
             # TODO: temp crutch for typo
             # values = [kernel.name] + [f'{results[column][kernel.name][init][feature]:.2f}'
             #                           for column, init, feature in product(columns, inits, features)]
+            kernel_object = kernel(np.eye(100))
             values = [kernel.name]
             for column, init, feature in product(columns, inits, features):
                 keys = results[column][kernel.name].keys()  # [init]
@@ -79,7 +83,8 @@ def _print_params_kkmeans(results, inits, features, filename, append=False):
                         feature = 'precentile_param'
                     elif feature == 'percentile_ari':
                         feature = 'precentile_ari'
-                values += [f'{results[column][kernel.name][feature]:.2f}']  # [init]
+                v = results[column][kernel.name][feature]
+                values += [f'{kernel_object.scaler.scale(v):.2e}'] if transform_param else [f'{v:.2f}']
             f.write('\t'.join(values) + '\n')
 
 
@@ -104,7 +109,7 @@ def _print_params_kkmeans(results, inits, features, filename, append=False):
 #     return dict([(column, _column(column, init, **params)) for column in columns])
 
 
-def generated_kkmeans_any(n_graphs=200, n_params=31, n_jobs=1):
+def generated_kkmeans_any(n_graphs=200, n_params=31, n_jobs=1, init='any'):
     columns = [
         (100, 2, 0.2, 0.05),
         (100, 2, 0.3, 0.05),
@@ -120,23 +125,22 @@ def generated_kkmeans_any(n_graphs=200, n_params=31, n_jobs=1):
         (200, 4, 0.3, 0.10),
         (200, 4, 0.3, 0.15)
     ]
-    init = 'any'
     params = {'n_graphs': n_graphs, 'n_params': n_params, 'n_jobs': n_jobs, 'root': './cache/generated_kkmeans'}
     cache_kkmeans = dict([(column, _column(column, init, **params)) for column in columns])
-
-    print('SAVE PARAMS KKMEANS')
-    # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
-    _print_params_kkmeans(cache_kkmeans, init, 'best_param',
-                          filename='results/p3-KKMeans-params_best.tsv')
-    _print_params_kkmeans(cache_kkmeans, init, 'best_ari',
-                          filename='results/p3-KKMeans-params_best.tsv', append=True)
-    _print_params_kkmeans(cache_kkmeans, init, 'percentile_param',
-                          filename='results/p3-KKMeans-params_90p.tsv')
-    _print_params_kkmeans(cache_kkmeans, init, 'percentile_ari',
-                          filename='results/p3-KKMeans-params_90p.tsv', append=True)
     return cache_kkmeans
 
 
 if __name__ == '__main__':
     # generated_kkmeans()
-    generated_kkmeans_any()
+    init = 'any'
+    cache_kkmeans = generated_kkmeans_any(init=init)
+
+    print('SAVE PARAMS KKMEANS')
+    # _print_params_kkmeans(results, ['one', 'all', 'k-means++'], ['best_param', 'best_ari'])
+    best_fn, p90_fn = 'results/p0-KKMeans-params_best.tsv', 'results/p0-KKMeans-params_90p.tsv'
+    _print_params_kkmeans(cache_kkmeans, init, 'best_param', filename=best_fn)
+    _print_params_kkmeans(cache_kkmeans, init, 'best_param', filename=best_fn, transform_param=True, append=True)
+    _print_params_kkmeans(cache_kkmeans, init, 'best_ari', filename=best_fn, append=True)
+    _print_params_kkmeans(cache_kkmeans, init, 'percentile_param', filename=p90_fn)
+    _print_params_kkmeans(cache_kkmeans, init, 'percentile_param', filename=p90_fn, transform_param=True, append=True)
+    _print_params_kkmeans(cache_kkmeans, init, 'percentile_ari', filename=p90_fn, append=True)
