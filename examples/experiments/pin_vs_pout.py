@@ -236,8 +236,17 @@ def draw(plot_results: PlotResults, p_ins, p_outs,
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('pin_offset', type=float)
+    parser.add_argument('pout_offset', type=float)
+    args = parser.parse_args()
+
+    pin_offset, pout_offset = args.pin_offset, args.pout_offset
+
     ns, ks, estimators, pin_pout_step = [100], [2], [KKMeans], 0.1
-    p_ins, p_outs = np.arange(0.0, 1.0001, pin_pout_step), np.arange(0.0, 1.0001, pin_pout_step)
+    p_ins, p_outs = np.arange(0.0 + pin_offset, 1.0001, pin_pout_step), np.arange(0.0 + pout_offset, 1.0001, pin_pout_step)
 
     for n, k, estimator in product(ns, ks, estimators):  # one picture
         experiment_name = f'{n}_{k}_{estimator.name}'
