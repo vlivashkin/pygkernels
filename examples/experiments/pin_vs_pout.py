@@ -86,7 +86,7 @@ def calc_one_pixel(n, k, p_in, p_out, estimator, n_graphs, n_params, n_jobs, n_g
 def calc(n, k, estimator, p_ins, p_outs, pin_pout_step, experiment_name):
     n_graphs = 50
     n_params = 31
-    n_jobs = 6
+    n_jobs = 12
     n_gpu = 4
 
     picture_results = PlotResults(experiment_name, p_ins.shape[0], p_outs.shape[0])
