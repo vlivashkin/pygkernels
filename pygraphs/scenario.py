@@ -121,7 +121,7 @@ class ParallelByGraphs:
                 graph_results[param_flat] = score
         return graph_results
 
-    def perform(self, estimator_class, kernel_class, graphs, n_classes, n_jobs=1):
+    def perform(self, estimator_class, kernel_class, graphs, n_classes, n_jobs=1, n_gpu=2):
         raw_param_dict = defaultdict(list)
         if len(graphs) == 1:  # single graph scenario
             graph_results = self._calc_graph(
@@ -132,8 +132,8 @@ class ParallelByGraphs:
             if self.progressbar:
                 graphs = tqdm(graphs, desc=kernel_class.name)
             all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(
-                graph, kernel_class, estimator_class(n_classes, device=graph_idx % 2, random_state=2000 + graph_idx),
-                graph_idx  # TODO: fix if < 2 gpu
+                graph, kernel_class,
+                estimator_class(n_classes, device=graph_idx % n_gpu, random_state=2000 + graph_idx), graph_idx
             ) for graph_idx, graph in enumerate(graphs))
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
