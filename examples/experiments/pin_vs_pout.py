@@ -7,9 +7,8 @@ import numpy as np
 from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm
 
-from pygraphs.util import load_or_calc_and_save
-
 sys.path.append('../..')
+from pygraphs.util import load_or_calc_and_save
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.cluster import KKMeans_vanilla as KKMeans
@@ -69,32 +68,33 @@ class PlotResults:
         return measure_map, ari_map
 
 
-def calc(n, k, estimator, p_ins, p_outs, pin_pout_step, experiment_name):
-    @load_or_calc_and_save(f'./cache/pin_vs_pout_{n}_{k}.pkl')
-    def _calc(n_graphs=10, n_params=21, n_jobs=6):
-        classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False)
-
-        all_graphs = {}
-        for p_in, p_out in product(p_ins, p_outs):  # one pixel
-            graphs, info = StochasticBlockModel(n, k, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
-            all_graphs[(p_in, p_out)] = graphs
-
-        picture_results = PlotResults(experiment_name, p_ins.shape[0], p_outs.shape[0])
-        for p_in, p_out, kernel in tqdm(list(product(p_ins, p_outs, kernels)), desc=experiment_name):  # one pixel
-            p_in_idx, p_out_idx = int(p_in / pin_pout_step), int(p_out / pin_pout_step)
-            graphs = all_graphs[(p_in, p_out)]
-            try:
-                params, ari, error = classic_plot.perform(estimator, kernel, graphs, k, n_jobs=n_jobs)
-            except KeyboardInterrupt:
-                exit(1)
-            except:
-                print(f'{p_in}, {p_out}, {kernel.name} -- error')
-                params, ari, error = [], [], []
-            cell_results = picture_results.results[p_in_idx][p_out_idx]
+def calc_one_pixel(p_in, p_out, estimator, graphs, classic_plot, n_graphs, n_params, n_jobs):
+    @load_or_calc_and_save(f'./cache/pin_vs_pout/{p_in:.2f}_{p_out:.2f}.pkl')
+    def _calc(n_graphs=100, n_params=21, n_jobs=6):
+        cell_results = PlotCellResults()
+        for kernel in tqdm(list(kernels), desc=f'{p_in}, {p_out}'):
+            params, ari, error = classic_plot.perform(estimator, kernel, graphs, k, n_jobs=n_jobs)
             cell_results.measure_results[kernel.name] = CellMeasureResults(kernel.name, params, ari, error)
-        return picture_results
+        return cell_results
 
-    return _calc(n_graphs=10, n_params=31, n_jobs=6)
+    return _calc(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
+
+
+def calc(n, k, estimator, p_ins, p_outs, pin_pout_step, experiment_name):
+    n_graphs = 50
+    n_params = 31
+    n_jobs = 6
+
+    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False, ignore_errors=True)
+
+    picture_results = PlotResults(experiment_name, p_ins.shape[0], p_outs.shape[0])
+    for p_in, p_out in tqdm(list(product(p_ins, p_outs)), desc=experiment_name):  # one pixel
+        graphs, info = StochasticBlockModel(n, k, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
+
+        p_in_idx, p_out_idx = int(p_in / pin_pout_step), int(p_out / pin_pout_step)
+        cell_results = calc_one_pixel(p_in, p_out, estimator, graphs, classic_plot, n_graphs, n_params, n_jobs)
+        picture_results.results[p_in_idx][p_out_idx] = cell_results
+    return picture_results
 
 
 def draw(plot_results: PlotResults, p_ins, p_outs,

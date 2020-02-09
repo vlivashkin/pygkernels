@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from functools import partial
 from itertools import combinations
 from random import shuffle
 
@@ -78,39 +79,46 @@ class ParallelByGraphs:
     def __init__(self, scorer, params_flat, progressbar=False, verbose=False, ignore_errors=False):
         self.scorer = scorer
         self.params_flat = params_flat \
-            if type(params_flat) == list or type(params_flat) == tuple \
+            if type(params_flat) == list or type(params_flat) == np.array \
             else np.linspace(0, 1, params_flat)
         self.progressbar = progressbar
         self.verbose = verbose
         self.ignore_errors = ignore_errors
 
-    def _calc_param(self, param_flat, kernel, clf, nodes):
+    def _calc_param(self, param_flat, kernel, estimator, y_true):
         param = kernel.scaler.scale(param_flat)
         K = kernel.get_K(param)
-        y_pred = clf.fit_predict(K)
-        ari = self.scorer(nodes, y_pred)
-        return ari
+        y_pred = estimator.fit_predict(K)
+        score = self.scorer(y_true, y_pred)
+        return score
 
-    def _calc_graph(self, graph, kernel_class, clf, graph_idx, single_graph=False):
-        edges, nodes = graph
-        kernel = kernel_class(edges)
+    def secure_run(self, func, error_prefix):
+        if self.ignore_errors:
+            try:
+                return func()
+            except Exception or FloatingPointError or np.linalg.LinAlgError as e:
+                if self.verbose:
+                    logging.error(f'{error_prefix}: {e}')
+                return None
+        else:
+            return func()
+
+    def _calc_graph(self, graph, kernel_class, estimator, graph_idx, single_graph=False):
+        edges, y_true = graph
         graph_results = {}
+
+        kernel = self.secure_run(partial(kernel_class, edges), f'{kernel_class.name}, graph {graph_idx}')
+        if kernel is None:
+            return graph_results
 
         params = self.params_flat
         if single_graph and self.progressbar:
             params = tqdm(params, desc=kernel_class.name)
         for param_flat in params:
-            param = -1
-            if self.ignore_errors:
-                try:
-                    ari = self._calc_param(param_flat, kernel, clf, nodes)
-                    graph_results[param_flat] = ari
-                except Exception or FloatingPointError as e:
-                    if self.verbose:
-                        logging.error("{}, {:.2f}, graph {}: {}".format(kernel_class.name, param, graph_idx, e))
-            else:
-                ari = self._calc_param(param_flat, kernel, clf, nodes)
-                graph_results[param_flat] = ari
+            score = self.secure_run(partial(self._calc_param, param_flat, kernel, estimator, y_true),
+                                    f'{kernel_class.name}, graph {graph_idx}')
+            if score is not None:
+                graph_results[param_flat] = score
         return graph_results
 
     def perform(self, estimator_class, kernel_class, graphs, n_classes, n_jobs=1):
