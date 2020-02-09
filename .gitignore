@@ -30,4 +30,4 @@ __pycache__/
 *.xlsx
 *.png
 .Rproj.user
-*.pkl
+#*.pkl
