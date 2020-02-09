@@ -68,9 +68,12 @@ class PlotResults:
         return measure_map, ari_map
 
 
-def calc_one_pixel(p_in, p_out, estimator, graphs, classic_plot: ParallelByGraphs, n_graphs, n_params, n_jobs, n_gpu):
+def calc_one_pixel(n, k, p_in, p_out, estimator, n_graphs, n_params, n_jobs, n_gpu):
     @load_or_calc_and_save(f'./cache/pin_vs_pout/{p_in:.2f}_{p_out:.2f}.pkl')
     def _calc(n_graphs=100, n_params=21, n_jobs=6):
+        graphs, _ = StochasticBlockModel(n, k, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
+        classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False, ignore_errors=True)
+
         cell_results = PlotCellResults()
         for kernel in tqdm(list(kernels), desc=f'{p_in}, {p_out}'):
             params, ari, error = classic_plot.perform(estimator, kernel, graphs, k, n_jobs=n_jobs, n_gpu=n_gpu)
@@ -86,14 +89,10 @@ def calc(n, k, estimator, p_ins, p_outs, pin_pout_step, experiment_name):
     n_jobs = 6
     n_gpu = 4
 
-    classic_plot = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=False, ignore_errors=True)
-
     picture_results = PlotResults(experiment_name, p_ins.shape[0], p_outs.shape[0])
     for p_in, p_out in tqdm(list(product(p_ins, p_outs)), desc=experiment_name):  # one pixel
-        graphs, info = StochasticBlockModel(n, k, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
-
         p_in_idx, p_out_idx = int(p_in / pin_pout_step), int(p_out / pin_pout_step)
-        cell_results = calc_one_pixel(p_in, p_out, estimator, graphs, classic_plot, n_graphs, n_params, n_jobs, n_gpu)
+        cell_results = calc_one_pixel(n, k, p_in, p_out, estimator, n_graphs, n_params, n_jobs, n_gpu)
         picture_results.results[p_in_idx][p_out_idx] = cell_results
     return picture_results
 
