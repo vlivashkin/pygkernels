@@ -93,7 +93,8 @@ def draw(plot_results: PlotResults, p_ins, p_outs,
          plot2_name='./results/pin_vs_pout-legend.png',
          plot3_name='./results/pin_vs_pout-maxari.png',
          plot4_name='./results/pin_vs_pout-rating.png',
-         plot5_name='./results/pin_vs_pout-ari.png'):
+         plot5_name='./results/pin_vs_pout-ari.png',
+         plot6_name='./results/pin_vs_pout-param.png'):
     kernel_name_to_id = dict([(k.name, i) for i, k in enumerate(kernels)])
     kernel_id_to_name = list(kernel_name_to_id.keys())
     print(kernel_name_to_id, kernel_id_to_name)
@@ -235,7 +236,7 @@ def draw(plot_results: PlotResults, p_ins, p_outs,
         for i in range(side_len):
             for j in range(side_len):
                 a = plot_results.results[i][j].measure_results
-                if measure_name in a:
+                if measure_name in a and len(a[measure_name].params) > 0:
                     grid[i, j] = a[measure_name].mari()
 
         axi = ax[measure_idx // 6][measure_idx % 6]
@@ -254,6 +255,34 @@ def draw(plot_results: PlotResults, p_ins, p_outs,
         axi.plot(range(side_len)[::-1], range(side_len), color='black')
 
     plt.savefig(plot5_name, bbox_inches='tight')
+
+    # plot 6
+    fig, ax = plt.subplots(4, 6, figsize=(18, 12), sharex=True, sharey=True)
+    for measure_name, measure_idx in kernel_name_to_id.items():
+        grid = np.full((side_len, side_len), np.nan)
+        for i in range(side_len):
+            for j in range(side_len):
+                a = plot_results.results[i][j].measure_results
+                if measure_name in a and len(a[measure_name].params) > 0:
+                    param_idx = np.nanargmax(a[measure_name].ari)
+                    grid[i, j] = a[measure_name].params[param_idx]
+
+        axi = ax[measure_idx // 6][measure_idx % 6]
+        axi.imshow(grid[::-1], cmap='viridis', vmin=0, vmax=1)
+
+        axi.set_yticks(range(0, len(p_ins) * 2, 2))  # * 2, 2
+        axi.set_xticks(range(0, len(p_outs) * 2, 2))
+        axi.set_yticklabels(p_ins[::-1])
+        axi.set_xticklabels(p_outs, rotation=90)
+        if measure_idx % 6 == 0:
+            axi.set_ylabel('$p_{in}$')
+        if measure_idx // 6 == 3:
+            axi.set_xlabel('$p_{out}$')
+
+        axi.set_title(measure_name)
+        axi.plot(range(side_len)[::-1], range(side_len), color='black')
+
+    plt.savefig(plot6_name, bbox_inches='tight')
 
 
 if __name__ == '__main__':
