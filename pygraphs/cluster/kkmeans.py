@@ -46,38 +46,54 @@ class KMeans_Fouss(KernelEstimator, ABC):
             raise NotImplementedError()
         return h
 
-    def _init_h(self, K: np.array):
-        init = np.random.choice(self.init_names) if self.init == 'any' else self.init
+    def _init_h(self, K: np.array, init: str):
         if init in ['one', 'all']:
-            h = self._init_simple(K, init='one')
+            h = self._init_simple(K, init=init)
         elif init == 'k-means++':
             h = self.backend.kmeanspp(K, self.n_clusters, device=self.device)
         else:
             raise NotImplementedError()
         return h
 
-    def _predict_successful_once(self, K: np.array):
+    def _predict_successful_once(self, K: np.array, init: str):
         for i in range(self.max_rerun):
             K = K.astype(np.float64)
-            labels, inertia, success = self._predict_once(K)
+            labels, inertia, success = self._predict_once(K, init)
             if success:
                 return labels, inertia
         # print('reruns exceeded, take last result')
         return labels, inertia
 
     @abstractmethod
-    def _predict_once(self, K: np.array):
+    def _predict_once(self, K: np.array, init: str):
         pass
 
     def predict(self, K):
         np.random.seed(self.random_state)
         best_labels, best_inertia = [], np.inf
         for i in range(self.n_init):
-            labels, inertia = self._predict_successful_once(K)
+            init = np.random.choice(self.init_names) if self.init == 'any' else self.init
+            labels, inertia = self._predict_successful_once(K, init)
             if inertia < best_inertia or len(best_labels) == 0:
                 best_labels = labels
 
         return best_labels
+
+    def predict_explicit(self, K):
+        np.random.seed(self.random_state)
+        inits = []
+        for init in self.init_names:
+            for _ in range(self.n_init):
+                try:
+                    labels, inertia = self._predict_successful_once(K, init)
+                    inits.append({
+                        'labels': labels,
+                        'inertia': inertia,
+                        'init': init
+                    })
+                except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
+                    pass
+        return inits
 
 
 class KKMeans_vanilla(KMeans_Fouss):
@@ -91,8 +107,8 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     name = 'KKMeans'
 
-    def _predict_once(self, K: np.array):
-        h_init = self._init_h(K)
+    def _predict_once(self, K: np.array, init: str):
+        h_init = self._init_h(K, init)
         result = self.backend.vanilla_predict(K, h_init, self.max_iter, device=self.device)
         return result
 
@@ -108,7 +124,7 @@ class KKMeans_iterative(KMeans_Fouss):
 
     name = 'KKMeans_iterative'
 
-    def _predict_once(self, K: np.array):
-        h_init = self._init_h(K)
+    def _predict_once(self, K: np.array, init: str):
+        h_init = self._init_h(K, init)
         result = self.backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
         return result
