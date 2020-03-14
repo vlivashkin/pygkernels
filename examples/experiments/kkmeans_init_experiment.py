@@ -1,13 +1,17 @@
-from joblib import Parallel, delayed
+import sys
+
 import numpy as np
+from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
+sys.path.append('../..')
 from pygraphs.cluster import KKMeans_vanilla
 from pygraphs.graphs import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.util import load_or_calc_and_save
 
+CACHE_ROOT = '/media/illusionww/68949C3149F4E819/pygraphs/kkmeans_init_experiments'
 columns = [
     (100, 2, 0.2, 0.05),
     (100, 2, 0.3, 0.05),
@@ -16,16 +20,16 @@ columns = [
     (102, 3, 0.3, 0.1),
     (100, 4, 0.3, 0.1),
     (100, 4, 0.3, 0.15),
-    (200, 2, 0.3, 0.05),
-    (200, 2, 0.3, 0.1),
-    (200, 2, 0.3, 0.15),
-    (201, 3, 0.3, 0.1),
-    (200, 4, 0.3, 0.1),
-    (200, 4, 0.3, 0.15)
+    # (200, 2, 0.3, 0.05),
+    # (200, 2, 0.3, 0.1),
+    # (200, 2, 0.3, 0.15),
+    # (201, 3, 0.3, 0.1),
+    # (200, 4, 0.3, 0.1),
+    # (200, 4, 0.3, 0.15)
 ]
 
 
-def generate_graphs(column, n_graphs, root='./cache/kkmeans_init_experiments/graphs'):
+def generate_graphs(column, n_graphs, root=f'{CACHE_ROOT}/graphs'):
     n, k, p_in, p_out = column
     column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
 
@@ -37,7 +41,7 @@ def generate_graphs(column, n_graphs, root='./cache/kkmeans_init_experiments/gra
     return _calc(n_graphs=n_graphs, n_params=None, n_jobs=None)
 
 
-def perform_graph(graph, kernel_class, estimator, n_params=31):
+def perform_graph(graph, kernel_class, estimator, n_params=51):
     edges, y_true = graph
     kernel = kernel_class(edges)
 
@@ -63,15 +67,14 @@ def perform_graph(graph, kernel_class, estimator, n_params=31):
     return results
 
 
-def perform_kernel(column, graphs, kernel_class, n_jobs=6, n_gpu=2, root='./cache/kkmeans_init_experiments/by_column_and_kernel'):
+def perform_kernel(column, graphs, kernel_class, n_jobs=6, n_gpu=2, root=f'{CACHE_ROOT}/by_column_and_kernel'):
     n, k, p_in, p_out = column
     column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
 
     @load_or_calc_and_save(f'{root}/{column_str}_{kernel_class.name}_results.pkl')
     def _calc(n_graphs=None, n_params=None, n_jobs=n_jobs):
         return Parallel(n_jobs=n_jobs)(delayed(perform_graph)(
-            graph, kernel_class,
-            KKMeans_vanilla(k, device=graph_idx % n_gpu, random_state=2000 + graph_idx, n_init=10), graph_idx
+            graph, kernel_class, KKMeans_vanilla(k, device=graph_idx % n_gpu, random_state=2000 + graph_idx, n_init=10)
         ) for graph_idx, graph in enumerate(graphs))
 
     return _calc(n_graphs=None, n_params=None, n_jobs=n_jobs)
@@ -80,11 +83,8 @@ def perform_kernel(column, graphs, kernel_class, n_jobs=6, n_gpu=2, root='./cach
 def perform_column(column, graphs):
     n, k, p_in, p_out = column
     column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
-
-    results = {}
     for kernel_class in tqdm(kernels, desc=column_str):
-        results[kernel_class.name] = perform_kernel(column, graphs, kernel_class)
-    return results
+        perform_kernel(column, graphs, kernel_class)
 
 
 def perform(n_graphs=100):
