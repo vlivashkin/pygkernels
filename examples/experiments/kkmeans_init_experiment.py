@@ -11,7 +11,7 @@ from pygraphs.graphs import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.util import load_or_calc_and_save
 
-CACHE_ROOT = '/media/illusionww/68949C3149F4E819/pygraphs/kkmeans_init_experiments'
+CACHE_ROOT = '/media/illusionww/68949C3149F4E819/pygraphs/kkmeans_init_experiments2'
 columns = [
     (100, 2, 0.2, 0.05),
     (100, 2, 0.3, 0.05),
@@ -67,17 +67,19 @@ def perform_graph(graph, kernel_class, estimator, n_params=51):
     return results
 
 
-def perform_kernel(column, graphs, kernel_class, n_jobs=6, n_gpu=2, root=f'{CACHE_ROOT}/by_column_and_kernel'):
+def perform_kernel(column, graphs, kernel_class, n_params=51, n_jobs=6, n_gpu=2,
+                   root=f'{CACHE_ROOT}/by_column_and_kernel'):
     n, k, p_in, p_out = column
     column_str = f'{n}_{k}_{p_in:.1f}_{p_out:.2f}'
 
     @load_or_calc_and_save(f'{root}/{column_str}_{kernel_class.name}_results.pkl')
-    def _calc(n_graphs=None, n_params=None, n_jobs=n_jobs):
+    def _calc(n_graphs=None, n_params=n_params, n_jobs=n_jobs):
         return Parallel(n_jobs=n_jobs)(delayed(perform_graph)(
-            graph, kernel_class, KKMeans_vanilla(k, device=graph_idx % n_gpu, random_state=2000 + graph_idx, n_init=10)
+            graph, kernel_class, KKMeans_vanilla(k, device=graph_idx % n_gpu, random_state=2000 + graph_idx, n_init=10),
+            n_params=n_params
         ) for graph_idx, graph in enumerate(graphs))
 
-    return _calc(n_graphs=None, n_params=None, n_jobs=n_jobs)
+    return _calc(n_graphs=None, n_params=n_params, n_jobs=n_jobs)
 
 
 def perform_column(column, graphs):
