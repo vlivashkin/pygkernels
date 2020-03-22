@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from joblib import Parallel, delayed
 
 from pygraphs.cluster import _kmeans_numpy, _kmeans_pytorch
 from pygraphs.cluster.base import KernelEstimator
@@ -68,32 +69,27 @@ class KMeans_Fouss(KernelEstimator, ABC):
     def _predict_once(self, K: np.array, init: str):
         pass
 
-    def predict(self, K):
-        np.random.seed(self.random_state)
-        best_labels, best_inertia = [], np.inf
-        for i in range(self.n_init):
-            init = np.random.choice(self.init_names) if self.init == 'any' else self.init
+    def predict_init(self, K, init_idx, override_init=None):
+        init = override_init if override_init else self.init
+        np.random.seed(self.random_state + init_idx)
+        try:
             labels, inertia = self._predict_successful_once(K, init)
-            if inertia < best_inertia or len(best_labels) == 0:
-                best_labels = labels
+        except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
+            labels, inertia = None, np.inf
+        return labels, inertia
 
-        return best_labels
-
-    def predict_explicit(self, K):
-        np.random.seed(self.random_state)
-        inits = []
-        for init in self.init_names:
-            for _ in range(self.n_init):
-                try:
-                    labels, inertia = self._predict_successful_once(K, init)
-                    inits.append({
-                        'labels': labels,
-                        'inertia': inertia,
-                        'init': init
-                    })
-                except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
-                    pass
-        return inits
+    def predict(self, K, explicit=False):
+        inits, best_labels, best_inertia = [], None, np.inf
+        init_names = self.init_names if self.init == 'any' else [self.init]
+        for init in init_names:
+            results = [self.predict_init(K, i, override_init=init) for i in range(self.n_init)]
+            for labels, inertia in results:
+                if explicit:
+                    inits.append({'labels': labels, 'inertia': inertia, 'init': init})
+                else:
+                    if inertia < best_inertia or best_labels is None:
+                        best_inertia, best_labels = inertia, labels
+        return inits if explicit else best_labels
 
 
 class KKMeans_vanilla(KMeans_Fouss):
