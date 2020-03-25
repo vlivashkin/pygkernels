@@ -7,11 +7,12 @@ from tqdm import tqdm
 
 sys.path.append('../..')
 from pygraphs.cluster import KKMeans_vanilla
-from pygraphs.graphs import StochasticBlockModel, Datasets
+from pygraphs.graphs import Datasets
 from pygraphs.measure import kernels
 from pygraphs.util import load_or_calc_and_save
+import networkx as nx
 
-CACHE_ROOT = '/media/illusionww/68949C3149F4E819/pygraphs/kkmeans_init_datasets2'
+CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygraphs/kkmeans_init_datasets_modularity'
 dataset_names = [
     'dolphins',
     'football',
@@ -28,15 +29,16 @@ dataset_names = [
     'news_5cl_3',
 ]
 
+
 def perform_param(param_flat, graph, kernel_class, estimator):
-    edges, y_true = graph
-    kernel = kernel_class(edges)
+    A, y_true, G = graph
+    kernel = kernel_class(A)
 
     param_results = []
     try:
         param = kernel.scaler.scale(param_flat)
         K = kernel.get_K(param)
-        inits = estimator.predict(K, explicit=True)
+        inits = estimator.predict(K, explicit=True, G=G)
         for init in inits:
             y_pred = init['labels']
             param_results.append({
@@ -54,9 +56,11 @@ def perform_param(param_flat, graph, kernel_class, estimator):
 
 def perform_graph(graph, kernel_class, k, n_params=51, n_jobs=6, n_gpu=2):
     params = np.linspace(0, 1, n_params)
+    graph = graph[0], graph[1], nx.from_numpy_matrix(graph[0])
 
     results = dict(Parallel(n_jobs=n_jobs)(delayed(perform_param)(
-        param_flat, graph, kernel_class, KKMeans_vanilla(k, device=param_idx % n_gpu, random_state=2000 + param_idx, n_init=10)
+        param_flat, graph, kernel_class,
+        KKMeans_vanilla(k, device=param_idx % n_gpu, random_state=2000 + param_idx, n_init=10)
     ) for param_idx, param_flat in enumerate(params)))
 
     return results

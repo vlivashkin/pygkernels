@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
+from collections import defaultdict
 
+import networkx as nx
 import numpy as np
-from joblib import Parallel, delayed
 
 from pygraphs.cluster import _kmeans_numpy, _kmeans_pytorch
 from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=15, max_rerun=100, max_iter=100, init='any', random_state=None,
-                 backend='pytorch', device='cuda:0'):
+    def __init__(self, n_clusters, n_init=15, max_rerun=100, max_iter=100, init='any', init_measure='modularity',
+                 random_state=None, backend='pytorch', device='cuda:0'):
         super().__init__(n_clusters, device=device, random_state=random_state)
 
         self.init_names = ['one', 'all', 'k-means++']
@@ -19,6 +20,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         self.max_rerun = max_rerun
         self.max_iter = max_iter
         self.init = init
+        self.init_measure = init_measure
 
         if backend == 'numpy':
             self.backend = _kmeans_numpy
@@ -56,33 +58,39 @@ class KMeans_Fouss(KernelEstimator, ABC):
             raise NotImplementedError()
         return h
 
-    def _predict_successful_once(self, K: np.array, init: str):
-        for i in range(self.max_rerun):
-            K = K.astype(np.float64)
-            labels, inertia, success = self._predict_once(K, init)
-            if success:
-                return labels, inertia
-        # print('reruns exceeded, take last result')
-        return labels, inertia
+    def _predict_successful_once(self, K: np.array, init_idx: int, init: str, G: nx.Graph = None):
+        np.random.seed(self.random_state + init_idx)
+        labels, quality = None, np.nan
+        for _ in range(self.max_rerun):
+            try:
+                K = K.astype(np.float64)
+                labels, inertia, success = self._predict_once(K, init)
+                if success:
+                    if self.init_measure == 'inertia':
+                        quality = inertia
+                    elif self.init_measure == 'modularity':
+                        quality = -self._calc_modularity_slow(G, labels)
+                    return labels, quality
+            except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
+                pass
+        return labels, quality
 
     @abstractmethod
     def _predict_once(self, K: np.array, init: str):
         pass
 
-    def predict_init(self, K, init_idx, override_init=None):
-        init = override_init if override_init else self.init
-        np.random.seed(self.random_state + init_idx)
-        try:
-            labels, inertia = self._predict_successful_once(K, init)
-        except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
-            labels, inertia = None, np.inf
-        return labels, inertia
+    def _calc_modularity_slow(self, G, labels):
+        communities = defaultdict(list)
+        for idx, label in enumerate(labels):
+            communities[label].append(idx)
+        communities = list(communities.values())
+        return nx.community.modularity(G, communities)
 
-    def predict(self, K, explicit=False):
+    def predict(self, K, explicit=False, G: nx.Graph = None):
         inits, best_labels, best_inertia = [], None, np.inf
         init_names = self.init_names if self.init == 'any' else [self.init]
         for init in init_names:
-            results = [self.predict_init(K, i, override_init=init) for i in range(self.n_init)]
+            results = [self._predict_successful_once(K, i, init, G=G) for i in range(self.n_init)]
             for labels, inertia in results:
                 if explicit:
                     inits.append({'labels': labels, 'inertia': inertia, 'init': init})
@@ -105,8 +113,8 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     def _predict_once(self, K: np.array, init: str):
         h_init = self._init_h(K, init)
-        result = self.backend.vanilla_predict(K, h_init, self.max_iter, device=self.device)
-        return result
+        labels, inertia, is_ok = self.backend.vanilla_predict(K, h_init, self.max_iter, device=self.device)
+        return labels, inertia, is_ok
 
 
 class KKMeans_iterative(KMeans_Fouss):
@@ -122,5 +130,5 @@ class KKMeans_iterative(KMeans_Fouss):
 
     def _predict_once(self, K: np.array, init: str):
         h_init = self._init_h(K, init)
-        result = self.backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
-        return result
+        labels, inertia, is_ok = self.backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
+        return labels, inertia, is_ok

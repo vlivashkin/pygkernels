@@ -15,7 +15,7 @@ from sklearn.metrics import normalized_mutual_info_score
 from pygraphs import util
 from pygraphs.cluster import KKMeans_vanilla
 from pygraphs.graphs import Datasets
-from pygraphs.measure import *
+from pygraphs.measure import SCCT_H, FE_K, logFor_H, RSP_K, SCT_H, SPCT_H
 
 
 class TestTable3(ABC):
@@ -26,7 +26,6 @@ class TestTable3(ABC):
         util.configure_logging()
         self.etalon = {  # CCT, FE, logFor, RSP, SCT, SP
             'football': (0.7928, 0.9061, 0.9028, 0.9092, 0.8115, 0.8575),
-            'football/_old': (0.7928, 0.9061, 0.9028, 0.9092, 0.8115, 0.8575),
             'news_2cl_1': (0.7944, 0.8050, 0.8381, 0.7966, 0.8174, 0.6540),
             'news_2cl_2': (0.5819, 0.5909, 0.5844, 0.5797, 0.5523, 0.5159),
             'news_2cl_3': (0.7577, 0.8107, 0.7482, 0.7962, 0.7857, 0.8592),
@@ -45,23 +44,26 @@ class TestTable3(ABC):
     def dataset_results(self, measure_class, best_param, etalon_idx):
         pass
 
-    def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init_inertia=10,
-                         n_init_nmi=1, parallel=False):
+    def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init_inertia=3,
+                         n_init_nmi=1, parallel=False, start_random_seed=5003):
         results = []
-        for graphs, info in [
-            self.datasets['football'], self.datasets['football_old'], self.datasets['karate'],
+        for graphs, Gs, info in [
+            self.datasets['football'], self.datasets['karate'],
             self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
             self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
             self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
             A, labels_true = graphs[0]
+            G = Gs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
             if parallel:
                 def whole_kmeans_run(i_run):
-                    kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=i_run)
-                    labels_pred = kkmeans.fit_predict(K)
+                    kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=i_run,
+                                              device=i_run % 2)
+                    labels_pred = kkmeans.predict(K, G=G)
+                    assert (len(labels_true) == len(labels_pred))
                     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                     return item_nmi
 
@@ -69,8 +71,10 @@ class TestTable3(ABC):
             else:
                 init_nmi = []
                 for i_run in range(n_init_nmi):
-                    kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=i_run)
-                    labels_pred = kkmeans.fit_predict(K)
+                    kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia,
+                                              random_state=start_random_seed + i_run, device='cpu')
+                    labels_pred = kkmeans.predict(K, G=G)
+                    assert (len(labels_true) == len(labels_pred))
                     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                     init_nmi.append(item_nmi)
 
@@ -92,10 +96,10 @@ class TestTable3(ABC):
                 'diff': diff
             })
 
-        # for result in results:
-        #     self.assertTrue(result['true_nmi'] - result['test_nmi'] < .11,
-        #                     f'{result["graph_name"]}, {result["measure_name"]}. true:{result["true_nmi"]:0.4f} != '
-        #                     f'test:{result["test_nmi"]:0.4f}, diff:{result["diff"]:0.4f}')
+        for result in results:
+            self.assertTrue(result['true_nmi'] - result['test_nmi'] < .11,
+                            f'{result["graph_name"]}, {result["measure_name"]}. true:{result["true_nmi"]:0.4f} != '
+                            f'test:{result["test_nmi"]:0.4f}, diff:{result["diff"]:0.4f}')
 
     def test_CCT(self):
         self.dataset_results(SCCT_H, 26, 0)
@@ -105,10 +109,6 @@ class TestTable3(ABC):
 
     def test_logForH(self):
         self.dataset_results(logFor_H, 1.0, 2)
-
-    # @unittest.skip
-    # def test_logForK(self):
-    #     self.dataset_results(logFor_K, 1.0, 2)
 
     def test_RSP(self):
         self.dataset_results(RSP_K, 0.03, 3)
@@ -130,18 +130,18 @@ class TestTable3(ABC):
 #     def dataset_results(self, measure_class, best_param, etalon_idx):
 #         estimator = partial(KKMeans_vanilla, init='all', backend='pytorch')
 #         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
-#
-#
-# class TestTable3_KKMeans_vanilla_kmpp_pytorch(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         estimator = partial(KKMeans_vanilla, init='k-means++', backend='pytorch')
-#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
 
 
-class TestTable3_KKMeans_vanilla_any_pytorch(TestTable3, unittest.TestCase):
+class TestTable3_KKMeans_vanilla_kmpp_pytorch(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='any', backend='pytorch')
-        return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=False)
+        estimator = partial(KKMeans_vanilla, init='k-means++', backend='pytorch')
+        self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=False, start_random_seed=5014)
+
+
+# class TestTable3_KKMeans_vanilla_any_pytorch(TestTable3, unittest.TestCase):
+#     def dataset_results(self, measure_class, best_param, etalon_idx):
+#         estimator = partial(KKMeans_vanilla, init='any', backend='pytorch')
+#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
 
 
 if __name__ == "__main__":

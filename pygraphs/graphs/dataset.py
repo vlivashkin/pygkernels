@@ -1,6 +1,7 @@
 import os
 from os.path import join as pj
 
+import networkx as nx
 import numpy as np
 
 
@@ -64,9 +65,17 @@ class ImportedGraphBuilder:
                         self.edges[i, j] = value
         return self
 
+    def import_gml(self, filename):
+        G = nx.read_gml(filename)
+        nodelist, class_ = zip(*nx.get_node_attributes(G, 'value').items())
+        self.nodes_class = class_
+        self.edges = np.array(nx.adjacency_matrix(G, nodelist=nodelist).todense())
+        return self
+
     def build(self):
         if self.name is None or self.nodes_class is None or self.edges is None:
             raise NotImplementedError()
+        G = nx.from_numpy_matrix(self.edges)
         info = {
             'name': self.name,
             'count': 1,
@@ -75,7 +84,7 @@ class ImportedGraphBuilder:
             'p_in': None,
             'p_out': None
         }
-        return [(self.edges, self.nodes_class)], info
+        return [(self.edges, self.nodes_class)], [G], info
 
 
 class Datasets:
@@ -87,9 +96,7 @@ class Datasets:
         # 'cora_full': lambda: Datasets._load_altsoph('cora_full', '_old.clusters', '_old.edges'),  # TOO BIG
         'dolphins': lambda: Datasets._load_altsoph('dolphins', 'dolphins.clusters', 'dolphins.edges'),
         'eu-core': lambda: Datasets._load_altsoph('eu-core', 'eu-core.clusters', 'eu-core.edges'),
-        'football': lambda: Datasets._load_altsoph('football', 'football.clusters', 'football.edges'),
-        'football_old': lambda: Datasets._load_polbooks_or_football('football/_old', 'football_nodes.csv',
-                                                                    'football_edges.csv'),
+        'football': lambda: Datasets._load_gml('football', 'football.gml'),
         'karate': lambda: Datasets._load_altsoph('karate', 'karate.clusters', 'karate.edges'),
         'news_2cl_1': lambda: Datasets._load_newsgroup('news_2cl_1', 'news_2cl_1_classeo.csv', 'news_2cl_1_Docr.csv'),
         'news_2cl_2': lambda: Datasets._load_newsgroup('news_2cl_2', 'news_2cl_2_classeo.csv', 'news_2cl_2_Docr.csv'),
@@ -100,8 +107,8 @@ class Datasets:
         'news_5cl_1': lambda: Datasets._load_newsgroup('news_5cl_1', 'news_5cl_1_classeo.csv', 'news_5cl_1_Docr.csv'),
         'news_5cl_2': lambda: Datasets._load_newsgroup('news_5cl_2', 'news_5cl_2_classeo.csv', 'news_5cl_2_Docr.csv'),
         'news_5cl_3': lambda: Datasets._load_newsgroup('news_5cl_3', 'news_5cl_3_classeo.csv', 'news_5cl_3_Docr.csv'),
-        # 'polblogs': lambda: Datasets._load_altsoph('polblogs', 'polblogs.clusters', 'polblogs.edges'),  # TOO BIG
-        'polbooks': lambda: Datasets._load_altsoph('polbooks', 'polbooks.clusters', 'polbooks.edges'),
+        'polblogs': lambda: Datasets._load_gml('polblogs', 'polblogs.gml'),
+        'polbooks': lambda: Datasets._load_gml('polbooks', 'polbooks.gml'),
         # 'webkb_cornel': lambda: Datasets._load_webkb('webkb_cornell', 'cornell/webkb-cornell.nodes',
         #                                              'cornell/webkb-cornell.edges'),  # POSSIBLY BROKEN
         # 'webkb_texas': lambda: Datasets._load_webkb('webkb_texas', 'texas/webkb-texas.nodes',
@@ -180,6 +187,13 @@ class Datasets:
                           startline=2, name_col_idx=0, class_col_idx=-1) \
             .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path),
                           startline=3, node1_col_idx=1, node2_col_idx=3) \
+            .build()
+
+    @staticmethod
+    def _load_gml(name, filename):
+        return ImportedGraphBuilder() \
+            .set_name(name) \
+            .import_gml(pj(Datasets.DATASETS_ROOT_PATH, name, filename)) \
             .build()
 
     def __getitem__(self, item):
