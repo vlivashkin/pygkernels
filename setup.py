@@ -19,5 +19,6 @@ setup(
         'scikit-learn',
         'scipy',
         'tqdm',
+        'torch'
     ]
 )
