@@ -4,22 +4,7 @@ from itertools import combinations
 import numpy as np
 import torch
 
-
-def torch_func(func):
-    def wrapper(*args, **kwargs):
-        with torch.no_grad():
-            args = [torch.from_numpy(x).float().to(kwargs['device'])
-                    if type(x) in [np.ndarray, np.memmap] and x.dtype in [np.float32, np.float64] else x
-                    for x in args]
-            results = func(*args, **kwargs)
-            if type(results) == tuple:
-                results = tuple(x.cpu().numpy() if type(x) == torch.Tensor else x for x in results)
-            else:
-                results = results.cpu().numpy() if type(results) == torch.Tensor else results
-            torch.cuda.empty_cache()
-        return results
-
-    return wrapper
+from pygraphs.cluster.base import torch_func
 
 
 def calc_cache_batch(Ck_n, Cl_n, Ck_h, Cl_h, K, device):

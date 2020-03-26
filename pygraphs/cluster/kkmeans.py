@@ -4,13 +4,13 @@ from collections import defaultdict
 import networkx as nx
 import numpy as np
 
-from pygraphs.cluster import _kmeans_numpy, _kmeans_pytorch
+from pygraphs.cluster import _kmeans_pytorch as _backend
 from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
     def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='any', init_measure='modularity',
-                 random_state=42, backend='pytorch', device='cuda:0'):
+                 random_state=42, device='cuda:0'):
         super().__init__(n_clusters, device=device, random_state=random_state)
 
         self.init_names = ['one', 'all', 'k-means++']
@@ -21,11 +21,6 @@ class KMeans_Fouss(KernelEstimator, ABC):
         self.max_iter = max_iter
         self.init = init
         self.init_measure = init_measure
-
-        if backend == 'numpy':
-            self.backend = _kmeans_numpy
-        elif backend == 'pytorch':
-            self.backend = _kmeans_pytorch
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)
@@ -53,7 +48,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         if init in ['one', 'all']:
             h = self._init_simple(K, init=init)
         elif init == 'k-means++':
-            h = self.backend.kmeanspp(K, self.n_clusters, device=self.device)
+            h = _backend.kmeanspp(K, self.n_clusters, device=self.device)
         else:
             raise NotImplementedError()
         return h
@@ -100,7 +95,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         return inits if explicit else best_labels
 
 
-class KKMeans_vanilla(KMeans_Fouss):
+class KKMeans(KMeans_Fouss):
     """Kernel K-means clustering
     Reference
     ---------
@@ -113,7 +108,7 @@ class KKMeans_vanilla(KMeans_Fouss):
 
     def _predict_once(self, K: np.array, init: str):
         h_init = self._init_h(K, init)
-        labels, inertia, is_ok = self.backend.vanilla_predict(K, h_init, self.max_iter, device=self.device)
+        labels, inertia, is_ok = _backend.predict(K, h_init, self.max_iter, device=self.device)
         return labels, inertia, is_ok
 
 
@@ -130,5 +125,5 @@ class KKMeans_iterative(KMeans_Fouss):
 
     def _predict_once(self, K: np.array, init: str):
         h_init = self._init_h(K, init)
-        labels, inertia, is_ok = self.backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
+        labels, inertia, is_ok = _backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
         return labels, inertia, is_ok

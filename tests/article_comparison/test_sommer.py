@@ -13,7 +13,7 @@ from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import SCCT_H, FE_K, logFor_H, RSP_K, SCT_H, SPCT_H
 
@@ -121,7 +121,7 @@ class TestTable3(ABC):
 
 class TestTable3_KKMeans_vanilla_kmpp_pytorch(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='k-means++', backend='pytorch')
+        estimator = partial(KKMeans, init='k-means++', backend='pytorch')
         self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=False, start_random_seed=5014)
 
 

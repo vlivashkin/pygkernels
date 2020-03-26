@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
 sys.path.append('../..')
-from pygraphs.cluster import KKMeans_vanilla
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import kernels
 from pygraphs.util import load_or_calc_and_save
@@ -60,7 +60,7 @@ def perform_graph(graph, kernel_class, k, n_params=51, n_jobs=6, n_gpu=2):
 
     results = dict(Parallel(n_jobs=n_jobs)(delayed(perform_param)(
         param_flat, graph, kernel_class,
-        KKMeans_vanilla(k, device=param_idx % n_gpu, random_state=2000 + param_idx, n_init=10)
+        KKMeans(k, device=param_idx % n_gpu, random_state=2000 + param_idx, n_init=10)
     ) for param_idx, param_flat in enumerate(params)))
 
     return results

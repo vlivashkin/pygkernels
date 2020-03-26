@@ -5,7 +5,7 @@ import unittest
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla as KKMeans, SpectralClustering_rubanov
+from pygraphs.cluster import KKMeans, SpectralClustering_rubanov
 from pygraphs.cluster.kward import KWard
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import kernels

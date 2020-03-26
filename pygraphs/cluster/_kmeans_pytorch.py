@@ -1,21 +1,7 @@
 import numpy as np
 import torch
 
-
-def torch_func(func):
-    def wrapper(*args, **kwargs):
-        with torch.no_grad():
-            args = [torch.from_numpy(x).float().to(kwargs['device'])
-                    if type(x) in [np.ndarray, np.memmap] and x.dtype in [np.float32, np.float64] else x
-                    for x in args]
-            results = func(*args, **kwargs)
-            if type(results) == tuple:
-                results = tuple(x.cpu().numpy() if type(x) == torch.Tensor else x for x in results)
-            else:
-                results = results.cpu().numpy() if type(results) == torch.Tensor else results
-        return results
-
-    return wrapper
+from pygraphs.cluster.base import torch_func
 
 
 def _hKh(hk, ei, K):
@@ -49,7 +35,7 @@ def kmeanspp(K, n_clusters, device):
 
 
 @torch_func
-def vanilla_predict(K, h, max_iter: int, device=0):
+def predict(K, h, max_iter: int, device=0):
     n_clusters, n = h.shape
     e = torch.eye(n, dtype=torch.float32).to(device)
 

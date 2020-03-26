@@ -6,6 +6,7 @@ from os.path import join as pj
 
 import numpy as np
 import pandas as pd
+import torch
 from sklearn.base import BaseEstimator, ClusterMixin
 
 
@@ -43,3 +44,19 @@ class REstimatorWrapper(KernelEstimator, ABC):
             os.remove(temp_name)
             os.remove(temp_name + '_result.csv')
         return result
+
+
+def torch_func(func):
+    def wrapper(*args, **kwargs):
+        with torch.no_grad():
+            args = [torch.from_numpy(x).float().to(kwargs['device'])
+                    if type(x) in [np.ndarray, np.memmap] and x.dtype in [np.float32, np.float64] else x
+                    for x in args]
+            results = func(*args, **kwargs)
+            if type(results) == tuple:
+                results = tuple(x.cpu().numpy() if type(x) == torch.Tensor else x for x in results)
+            else:
+                results = results.cpu().numpy() if type(results) == torch.Tensor else results
+        return results
+
+    return wrapper

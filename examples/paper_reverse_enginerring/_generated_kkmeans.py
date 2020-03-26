@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-from pygraphs.cluster import KKMeans_vanilla as KKMeans
+from pygraphs.cluster import KKMeans as KKMeans
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.scenario import ParallelByGraphs

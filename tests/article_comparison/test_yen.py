@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla as KKMeans
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 from pygraphs.scorer import rand_index

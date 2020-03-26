@@ -9,7 +9,7 @@ from tqdm import tqdm
 sys.path.append('../..')
 from pygraphs.util import load_or_calc_and_save
 from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans_vanilla as KKMeans
+from pygraphs.cluster import KKMeans as KKMeans
 from pygraphs.scenario import d3_colors
 
 # Experiment 1

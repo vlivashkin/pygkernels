@@ -3,7 +3,7 @@ import unittest
 from tqdm import tqdm
 
 from pygraphs.cluster import KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn, \
-    KKMeans_vanilla, KKMeans_iterative
+    KKMeans, KKMeans_iterative
 from pygraphs.graphs import Datasets
 from pygraphs.measure import logComm_K
 
@@ -15,7 +15,7 @@ class TestEstimators(unittest.TestCase):
         self.datasets = Datasets()
         self.estimators = [
             # KKMeans,
-            KKMeans_vanilla,
+            KKMeans,
             KKMeans_iterative,
             # KKMeans_kernlab,
             KWard,

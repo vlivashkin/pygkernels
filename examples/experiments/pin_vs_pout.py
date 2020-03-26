@@ -11,7 +11,7 @@ sys.path.append('../..')
 from pygraphs.util import load_or_calc_and_save
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans_vanilla as KKMeans
+from pygraphs.cluster import KKMeans as KKMeans
 from pygraphs.scenario import ParallelByGraphs, d3_colors
 
 # Experiment 1

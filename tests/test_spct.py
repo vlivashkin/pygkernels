@@ -3,7 +3,7 @@ import unittest
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla as KKMeans
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *

@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
 sys.path.append('../..')
-from pygraphs.cluster import KKMeans_vanilla
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import StochasticBlockModel
 from pygraphs.measure import kernels
 from pygraphs.util import load_or_calc_and_save
@@ -75,7 +75,7 @@ def perform_kernel(column, graphs, kernel_class, n_params=51, n_jobs=6, n_gpu=2,
     @load_or_calc_and_save(f'{root}/{column_str}_{kernel_class.name}_results.pkl')
     def _calc(n_graphs=None, n_params=n_params, n_jobs=n_jobs):
         return Parallel(n_jobs=n_jobs)(delayed(perform_graph)(
-            graph, kernel_class, KKMeans_vanilla(k, device=graph_idx % n_gpu, random_state=2000 + graph_idx, n_init=10),
+            graph, kernel_class, KKMeans(k, device=graph_idx % n_gpu, random_state=2000 + graph_idx, n_init=10),
             n_params=n_params
         ) for graph_idx, graph in enumerate(graphs))
 

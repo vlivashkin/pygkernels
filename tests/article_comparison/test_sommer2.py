@@ -11,7 +11,7 @@ from functools import partial
 from sklearn.metrics import normalized_mutual_info_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_vanilla
+from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
 
@@ -143,7 +143,7 @@ class TestTable1(ABC):
 
 class TestTable3_KKMeans_vanilla_kmeanspp(TestTable1, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='k-means++', device='cpu')
+        estimator = partial(KKMeans, init='k-means++', device='cpu')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 
