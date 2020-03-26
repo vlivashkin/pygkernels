@@ -38,7 +38,7 @@ class TestWorkflow(unittest.TestCase):
         self.datasets = Datasets()
 
     def test_ward_clustering(self):
-        graphs, info = self.datasets.polbooks
+        graphs, _, info = self.datasets.polbooks
         for measure in kernels:
             measureparamdict = {}
             mean = []
