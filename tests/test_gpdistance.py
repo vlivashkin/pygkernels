@@ -65,7 +65,7 @@ class TestGPDistance(unittest.TestCase):
         self.assertTrue(np.array_equal(L_test, L_true))
 
     def test_compare_CT_and_Resistance(self):
-        graphs, info = Datasets().news_2cl_1
+        graphs, Gs, info = Datasets().news_2cl_1
         A, y_true = graphs[0]
         D_CT = CT_D(A).get_D(-1)
         D_R = H_to_D(CT_H(A).get_K(-1))

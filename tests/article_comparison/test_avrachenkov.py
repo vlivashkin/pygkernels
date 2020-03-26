@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from pygraphs import util
 from pygraphs.cluster import SpectralClustering_rubanov
-from pygraphs.graphs import Samples, RubanovModel
+from pygraphs.graphs import Samples, RubanovStochasticBlockModel
 from pygraphs.measure import *
 from pygraphs.measure import scaler
 from pygraphs.measure.shortcuts import *
@@ -89,16 +89,6 @@ class TestCompetition(unittest.TestCase, ABC):
     def _calc_score(self, measure, params):
         results = dict()
         for param in tqdm(params, total=len(params), desc=measure.name):
-            # param_results = []
-            # for graph_idx, (A, y_true) in enumerate(self.graphs):
-            #     mg = measure(A)
-            #     try:
-            #         K = mg.get_K(param)
-            #         y_pred = SpectralClustering_rubanov(2).fit_predict(K)
-            #         param_results.append(FC(y_true, y_pred))
-            #     except:
-            #         print(f'Exception at param {param}, graph #{graph_idx}')
-
             def whole_kmeans_run(A, y_true):
                 mg = measure(A)
                 try:
@@ -130,9 +120,10 @@ class TestCompetition(unittest.TestCase, ABC):
                         f'Test {error_test:0.4f} != True {error_true:0.4f}, diff={diff:0.4f}')
 
 
-# @unittest.skip
+@unittest.skip
 class BalancedModel(TestCompetition):
     """Fig. 1"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(0.002, *args, **kwargs)  # error bars in paper: 0.002
         util.configure_logging()
@@ -180,6 +171,7 @@ class BalancedModel(TestCompetition):
 @unittest.skip
 class TestUnbalancedModel(TestCompetition):
     """Fig. 2"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(0.006, *args, **kwargs)  # error bars in paper: 0.006
 
@@ -188,7 +180,7 @@ class TestUnbalancedModel(TestCompetition):
         sizes = np.array([50, 150])
         probs = np.array([[0.1, 0.02],
                           [0.02, 0.1]])
-        GS, _ = RubanovModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
+        GS, _ = RubanovStochasticBlockModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
         cls.graphs = GS
 
     def test_Walk(self):

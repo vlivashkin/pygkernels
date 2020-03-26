@@ -19,20 +19,15 @@ class TestFigure1Comparison(unittest.TestCase):
         self.graph = Samples.chain_graph
         util.configure_logging()
 
-    def _comparison(self, name, D, true_values, atol=0.001):
+    def _comparison(self, name, D, gt, atol=0.001):
         D *= 3. / (D[0, 1] + D[1, 2] + D[2, 3])
 
-        # logging results for report
-        logging.info('{}\tD_12\tD_23\tD_13\tD_14'.format(name))
-        logging.info("True\t{:0.5f}\t{:0.5f}\t{:0.5f}\t{:0.5f}".format(*true_values))
-        logging.info("Test\t{:0.5f}\t{:0.5f}\t{:0.5f}\t{:0.5f}".format(D[0, 1], D[1, 2], D[0, 2], D[0, 3]))
-        logging.info("{:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f}" \
-                     .format(true_values[0], D[0, 1], true_values[1], D[1, 2],
-                             true_values[2], D[0, 2], true_values[3], D[0, 3]))
+        logging.info(f'{name}\tD_12\tD_23\tD_13\tD_14')
+        logging.info(f'True\t{gt[0]:.5f}\t{gt[1]:.5f}\t{gt[2]:.5f}\t{gt[3]:.5f}')
+        logging.info(f'Test\t{D[0, 1]:.5f}\t{D[1, 2]:.5f}\t{D[0, 2]:.5f}\t{D[0, 3]:.5f}')
 
-        for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]][:len(true_values)], true_values):
-            self.assertTrue(np.isclose(d, t, atol=atol),
-                            "Test {:0.3f} != True {:0.3f}, diff={:0.3f}".format(d, t, np.abs(d - t)))
+        for d, t in zip([D[0, 1], D[1, 2], D[0, 2], D[0, 3]][:len(gt)], gt):
+            self.assertTrue(np.isclose(d, t, atol=atol), f'ours:{d:0.3f} != gt:{t:0.3f}, diff={np.abs(d - t):0.3f}')
 
     def test_chain_SP(self):
         D = SP_D(self.graph).get_D(-1)
@@ -76,7 +71,6 @@ class TestFigure1Comparison(unittest.TestCase):
         self._comparison('pWalk 1.0', D, [0.988, 1.025, 1.379, 1.416])
 
 
-#
 class TestTable1Comparison(unittest.TestCase):
     """
     Chebotarev: The Walk Distances in Graphs
@@ -88,22 +82,19 @@ class TestTable1Comparison(unittest.TestCase):
         self.graph = Samples.chain_graph
         util.configure_logging()
 
-    def _comparison(self, name, D, true_values, atol=0.01):
+    def _comparison(self, name, D, gt, atol=0.01):
         # logging results for report
 
         r1 = D[0, 1] / D[1, 2]
         r2 = (D[0, 1] + D[1, 2]) / D[0, 2]
         r3 = D[0, 3] / D[0, 2]
 
-        logging.info('{}\tD_12/D_23\t(D_12+D_23)/D_13\tD_14/D_12'.format(name))
-        logging.info("True\t{:0.4f}\t{:0.4f}\t{:0.4f}".format(*true_values))
-        logging.info("Test\t{:0.4f}\t{:0.4f}\t{:0.4f}".format(r1, r2, r3))
-        logging.info("{:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f} & {:0.5f}" \
-                     .format(true_values[0], r1, true_values[1], r2,  true_values[2], r3))
+        logging.info(f'{name}\tD_12/D_23\t(D_12+D_23)/D_13\tD_14/D_12')
+        logging.info(f'True\t{gt[0]:.4f}\t{gt[1]:.4f}\t{gt[2]:.4f}')
+        logging.info(f'Test\t{r1:.4f}\t{r2:.4f}\t{r3:.4f}')
 
-        for d, t in zip([r1, r2, r3], true_values):
-            self.assertTrue(np.isclose(d, t, atol=atol),
-                            "Test {:0.2f} != True {:0.2f}, diff={:0.2f}".format(d, t, np.abs(d - t)))
+        for d, t in zip([r1, r2, r3], gt):
+            self.assertTrue(np.isclose(d, t, atol=atol), f'Test {d:.2f} != True {t:.2f}, diff={np.abs(d - t):.2f}')
 
     def test_chain_SP(self):
         D = SP_D(self.graph).get_D(-1)

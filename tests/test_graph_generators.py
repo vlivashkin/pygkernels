@@ -3,7 +3,7 @@ from collections import Counter
 
 import numpy as np
 
-from pygraphs.graphs import StochasticBlockModel, RubanovModel
+from pygraphs.graphs import StochasticBlockModel, RubanovStochasticBlockModel
 
 
 class TestGraphGenerators(unittest.TestCase):
@@ -58,14 +58,15 @@ class TestGraphGenerators(unittest.TestCase):
         self._check_probabilities(graphs, self.p_in, self.p_out)
 
     def test_stochasticblockmodel_clustersizes(self):
-        model = StochasticBlockModel(self.n_nodes, 2, cluster_sizes=[self.n_nodes//2, self.n_nodes//2],
+        model = StochasticBlockModel(self.n_nodes, 2, cluster_sizes=[self.n_nodes // 2, self.n_nodes // 2],
                                      p_in=self.p_in, p_out=self.p_out)
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)
 
     def test_rubanovsmodel(self):
-        model = RubanovModel(np.array([50, 50]), np.array([[self.p_in, self.p_out], [self.p_out, self.p_in]]))
+        model = RubanovStochasticBlockModel(np.array([50, 50]),
+                                            np.array([[self.p_in, self.p_out], [self.p_out, self.p_in]]))
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)

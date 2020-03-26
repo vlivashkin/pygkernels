@@ -3,7 +3,7 @@ import unittest
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
-from pygraphs.cluster import KKMeans_iterative
+from pygraphs.cluster import KKMeans_vanilla as KKMeans
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import *
 from pygraphs.measure.shortcuts import *
@@ -106,11 +106,11 @@ class Figure2ComparisonTests(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
 
-        graph, info = Datasets().karate
+        graph, _, info = Datasets().karate
         self.graph, self.y_true = graph[0]
 
     def call_and_print(self, name, K):
-        ari = adjusted_rand_score(KKMeans_iterative(n_clusters=2).fit_predict(K), self.y_true)
+        ari = adjusted_rand_score(KKMeans(n_clusters=2).fit_predict(K), self.y_true)
         print('{}\t{:0.3f}'.format(name, ari))
 
     def test_CT(self):

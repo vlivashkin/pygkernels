@@ -4,7 +4,7 @@ import networkx as nx
 import numpy as np
 
 
-class RubanovModel():
+class RubanovStochasticBlockModel():
     def __init__(self, sizes, probs):
         self.sizes = sizes
         self.sums = np.cumsum(self.sizes)

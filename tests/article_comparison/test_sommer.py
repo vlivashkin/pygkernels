@@ -25,18 +25,18 @@ class TestTable3(ABC):
         super().__init__(*args, **kwargs)
         util.configure_logging()
         self.etalon = {  # CCT, FE, logFor, RSP, SCT, SP
-            'football': (0.7928, 0.9061, 0.9028, 0.9092, 0.8115, 0.8575),
-            'news_2cl_1': (0.7944, 0.8050, 0.8381, 0.7966, 0.8174, 0.6540),
-            'news_2cl_2': (0.5819, 0.5909, 0.5844, 0.5797, 0.5523, 0.5159),
-            'news_2cl_3': (0.7577, 0.8107, 0.7482, 0.7962, 0.7857, 0.8592),
-            'news_3cl_1': (0.7785, 0.7810, 0.7530, 0.7810, 0.7730, 0.7426),
-            'news_3cl_2': (0.7616, 0.7968, 0.7585, 0.7761, 0.7282, 0.6246),
-            'news_3cl_3': (0.7455, 0.7707, 0.7487, 0.7300, 0.7627, 0.7203),
-            'news_5cl_1': (0.6701, 0.6922, 0.6143, 0.7078, 0.6658, 0.6815),
-            'news_5cl_2': (0.6177, 0.6401, 0.5977, 0.6243, 0.6154, 0.5970),
-            'news_5cl_3': (0.6269, 0.6065, 0.5729, 0.5750, 0.5712, 0.4801),
-            'polblogs': (0.5525, 0.5813, 0.5811, 0.5815, 0.5757, 0.5605),
-            'karate': (1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000)
+            'football': (.7928, .9061, .9028, .9092, .8115, .8575),
+            'karate': (1., 1., 1., 1., 1., 1.),
+            'polblogs': (.5525, .5813, .5811, .5815, .5757, .5605),
+            'news_2cl_1': (.7944, .8050, .8381, .7966, .8174, .6540),
+            'news_2cl_2': (.5819, .5909, .5844, .5797, .5523, .5159),
+            'news_2cl_3': (.7577, .8107, .7482, .7962, .7857, .8592),
+            'news_3cl_1': (.7785, .7810, .7530, .7810, .7730, .7426),
+            'news_3cl_2': (.7616, .7968, .7585, .7761, .7282, .6246),
+            'news_3cl_3': (.7455, .7707, .7487, .7300, .7627, .7203),
+            'news_5cl_1': (.6701, .6922, .6143, .7078, .6658, .6815),
+            'news_5cl_2': (.6177, .6401, .5977, .6243, .6154, .5970),
+            'news_5cl_3': (.6269, .6065, .5729, .5750, .5712, .4801)
         }
         self.datasets = Datasets()
 
@@ -50,11 +50,10 @@ class TestTable3(ABC):
         for graphs, Gs, info in [
             self.datasets['football'], self.datasets['karate'],
             self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
+            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
-            A, labels_true = graphs[0]
-            G = Gs[0]
+            (A, labels_true), G = graphs[0], Gs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
@@ -97,9 +96,9 @@ class TestTable3(ABC):
             })
 
         for result in results:
-            self.assertTrue(result['true_nmi'] - result['test_nmi'] < .11,
-                            f'{result["graph_name"]}, {result["measure_name"]}. true:{result["true_nmi"]:0.4f} != '
-                            f'test:{result["test_nmi"]:0.4f}, diff:{result["diff"]:0.4f}')
+            self.assertTrue(result['test_nmi'] + .11 > result['true_nmi'],
+                            f'{result["graph_name"]}, {result["measure_name"]}. '
+                            f'ours:{result["test_nmi"]:.4f} != gt:{result["true_nmi"]:.4f}, diff:{result["diff"]:.4f}')
 
     def test_CCT(self):
         self.dataset_results(SCCT_H, 26, 0)
@@ -120,28 +119,10 @@ class TestTable3(ABC):
         self.dataset_results(SPCT_H, 1, 5)
 
 
-# class TestTable3_KKMeans_vanilla_one_pytorch(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         estimator = partial(KKMeans_vanilla, init='one', backend='pytorch')
-#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
-#
-#
-# class TestTable3_KKMeans_vanilla_all_pytorch(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         estimator = partial(KKMeans_vanilla, init='all', backend='pytorch')
-#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
-
-
 class TestTable3_KKMeans_vanilla_kmpp_pytorch(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
         estimator = partial(KKMeans_vanilla, init='k-means++', backend='pytorch')
         self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=False, start_random_seed=5014)
-
-
-# class TestTable3_KKMeans_vanilla_any_pytorch(TestTable3, unittest.TestCase):
-#     def dataset_results(self, measure_class, best_param, etalon_idx):
-#         estimator = partial(KKMeans_vanilla, init='any', backend='pytorch')
-#         return self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=True)
 
 
 if __name__ == "__main__":

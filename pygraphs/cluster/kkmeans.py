@@ -9,8 +9,8 @@ from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=15, max_rerun=100, max_iter=100, init='any', init_measure='modularity',
-                 random_state=None, backend='pytorch', device='cuda:0'):
+    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='any', init_measure='modularity',
+                 random_state=42, backend='pytorch', device='cuda:0'):
         super().__init__(n_clusters, device=device, random_state=random_state)
 
         self.init_names = ['one', 'all', 'k-means++']
