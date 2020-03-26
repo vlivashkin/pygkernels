@@ -143,7 +143,7 @@ class TestTable1(ABC):
 
 class TestTable3_KKMeans_vanilla_kmeanspp(TestTable1, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans_vanilla, init='k-means++')
+        estimator = partial(KKMeans_vanilla, init='k-means++', device='cpu')
         return self._dataset_results(measure_class, best_param, etalon_idx, estimator)
 
 

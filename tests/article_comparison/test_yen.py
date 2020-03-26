@@ -46,7 +46,7 @@ class Table1Tests(unittest.TestCase):
             K = SCT_H(A).get_K(22)
             true_nmi = self.etalon[info['name']][result_idx]
 
-            labels_pred = KKMeans(n_clusters=info['k'], n_init=30).predict(K, G=G)
+            labels_pred = KKMeans(n_clusters=info['k'], n_init=30, device='cpu').predict(K, G=G)
             test_nmi = scorer_func(labels_true, labels_pred)
             diff = np.abs(test_nmi - true_nmi)
 

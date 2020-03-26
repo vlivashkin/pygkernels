@@ -24,7 +24,7 @@ class TestEstimators(unittest.TestCase):
     def test_all_estimators(self):
         K = Samples.diploma_matrix  # this is not kernel but who cares
 
-        y_pred_kmeans = KKMeans(n_clusters=2).fit_predict(K)
+        y_pred_kmeans = KKMeans(n_clusters=2, device='cpu').fit_predict(K)
         y_pred_ward = KWard(n_clusters=2).fit_predict(K)
         y_pred_spectral = SpectralClustering_rubanov(n_clusters=2).fit_predict(K)
         logging.info('KMeans: {}'.format(y_pred_kmeans))

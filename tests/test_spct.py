@@ -110,7 +110,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         self.graph, self.y_true = graph[0]
 
     def call_and_print(self, name, K):
-        ari = adjusted_rand_score(KKMeans(n_clusters=2).fit_predict(K), self.y_true)
+        ari = adjusted_rand_score(KKMeans(n_clusters=2, device='cpu').fit_predict(K), self.y_true)
         print('{}\t{:0.3f}'.format(name, ari))
 
     def test_CT(self):
