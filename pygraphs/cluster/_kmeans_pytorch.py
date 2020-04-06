@@ -11,7 +11,7 @@ def _hKh(hk, ei, K):
 
 def _inertia(h, e, K, labels):
     h_e = h.gather(0, labels[None]) - e
-    return torch.einsum('ij,jk,ki->', [h_e, K, h_e])
+    return torch.einsum('ki,ij,kj->', [h_e, K, h_e])
 
 
 @torch_func
@@ -40,7 +40,7 @@ def predict(K, h, max_iter: int, device=0):
     e = torch.eye(n, dtype=torch.float32).to(device)
 
     labels, success = torch.zeros((n,), dtype=torch.int64).to(device), True
-    for iter in range(max_iter):
+    for _ in range(max_iter):
         h_e = h.unsqueeze(1) - e.unsqueeze(0)  # [k, n, n]
         l = torch.einsum('kni,ij,knj->kn', [h_e, K, h_e]).argmin(dim=0)
         if torch.all(labels == l):  # early stop

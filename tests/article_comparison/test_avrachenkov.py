@@ -12,16 +12,18 @@ from os.path import join as pj
 
 import networkx as nx
 import networkx.readwrite.json_graph as jg
+import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from pygraphs import util
 from pygraphs.cluster import SpectralClustering_rubanov
 from pygraphs.graphs import Samples, RubanovStochasticBlockModel
-from pygraphs.measure import *
-from pygraphs.measure import scaler
-from pygraphs.measure.shortcuts import *
+from pygraphs.measure import scaler, Walk_H, logComm_H, logHeat_H, logFor_H, logPPR_H, logModifPPR_H, logHeatPPR_H, \
+    logNHeat_H
 from pygraphs.scorer import FC
+from tests.article_comparison._kernel_rubanov import Katz_R, Estrada_R, Heat_R, RegularizedLaplacian_R, logPPR_R, \
+    logModifPPR_R, logHeatPPR_R
 
 
 class TestNewMeasuresEqualuty(unittest.TestCase):

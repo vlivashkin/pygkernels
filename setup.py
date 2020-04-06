@@ -14,7 +14,6 @@ setup(
         'matplotlib',
         'networkx',
         'numpy',
-        'orange3',
         'pandas',
         'scikit-learn',
         'scipy',

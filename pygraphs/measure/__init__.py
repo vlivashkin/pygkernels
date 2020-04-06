@@ -1,12 +1,15 @@
 from typing import List, Type
 
-from .distance import *
-from .kernel import *
-from .kernel_rubanov import *
-from .produced import *
+from .distance import SP_D, CT_D, RSP_D, FE_D, Distance
+from .kernel import CT_H, pWalk_H, For_H, Comm_H, Heat_H, NHeat_H, SCT_H, SCCT_H, PPR_H, ModifPPR_H, HeatPPR_H, Kernel
+from .produced import SPCT_D, pWalk_D, Walk_D, For_D, logFor_D, Comm_D, logComm_D, Heat_D, logHeat_D, NHeat_D, \
+    logNHeat_D, SCT_D, SCCT_D, PPR_D, logPPR_D, ModifPPR_D, logModifPPR_D, HeatPPR_D, logHeatPPR_D, SPCT_H, Walk_H, \
+    logFor_H, logComm_H, logHeat_H, logNHeat_H, logPPR_H, logModifPPR_H, logHeatPPR_H, SP_K, CT_K, SPCT_K, pWalk_K, \
+    Walk_K, For_K, logFor_K, Comm_K, logComm_K, Heat_K, logHeat_K, NHeat_K, logNHeat_K, SCT_K, SCCT_K, RSP_K, FE_K, \
+    PPR_K, logPPR_K, ModifPPR_K, logModifPPR_K, HeatPPR_K, logHeatPPR_K
 
 __all__ = [
-    # distances
+    # Distances
     "SP_D",
     "CT_D",
     "SPCT_D",
@@ -31,7 +34,7 @@ __all__ = [
     "HeatPPR_D",
     "logHeatPPR_D",
 
-    # h kernels
+    # H kernels
     "CT_H",
     "SPCT_H",
     "pWalk_H",
@@ -53,7 +56,7 @@ __all__ = [
     "HeatPPR_H",
     "logHeatPPR_H",
 
-    # k kernels
+    # K kernels
     "SP_K",
     "CT_K",
     "SPCT_K",
@@ -77,16 +80,6 @@ __all__ = [
     "logModifPPR_K",
     "HeatPPR_K",
     "logHeatPPR_K",
-
-    # Rubanov's kernels
-    "Katz_R",
-    "Estrada_R",
-    "Heat_R",
-    "NormalizedHeat_R",
-    "RegularizedLaplacian_R",
-    "logPPR_R",
-    "logModifPPR_R",
-    "logHeatPPR_R",
 
     # Lists
     "distances",
