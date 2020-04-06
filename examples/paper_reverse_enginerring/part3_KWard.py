@@ -13,7 +13,7 @@ from _generated_kward import generated_kward
 from pygraphs.cluster import KWard
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.scorer import copeland
+from pygraphs.score import copeland
 
 
 def _print_params_kkmeans(results, inits, features, filename, append=False):

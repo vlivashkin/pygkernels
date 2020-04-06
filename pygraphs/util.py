@@ -4,6 +4,7 @@ import pickle
 import sys
 
 import numpy as np
+from joblib import Parallel, delayed
 
 
 def configure_logging():
@@ -50,5 +51,7 @@ def load_or_calc_and_save(filename):
                 with open(filename, 'wb') as f:
                     pickle.dump(result, f)
             return result
+
         return wrapped
+
     return my_decorator

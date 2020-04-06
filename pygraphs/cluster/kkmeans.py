@@ -9,7 +9,7 @@ from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
-    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='any', init_measure='modularity',
+    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', init_measure='modularity',
                  random_state=42, device='cuda:0'):
         super().__init__(n_clusters, device=device, random_state=random_state)
 
@@ -55,20 +55,28 @@ class KMeans_Fouss(KernelEstimator, ABC):
 
     def _predict_successful_once(self, K: np.array, init_idx: int, init: str, G: nx.Graph = None):
         np.random.seed(self.random_state + init_idx)
-        labels, quality = None, np.nan
+        labels, inertia = None, np.nan
         for _ in range(self.max_rerun):
             try:
                 K = K.astype(np.float64)
                 labels, inertia, success = self._predict_once(K, init)
+                modularity = -np.inf
                 if success:
                     if self.init_measure == 'inertia':
-                        quality = inertia
+                        quality = -inertia
                     elif self.init_measure == 'modularity':
-                        quality = -self._calc_modularity_slow(G, labels)
-                    return labels, quality
-            except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
-                pass
-        return labels, quality
+                        modularity = self._calc_modularity_slow(G, labels)
+                        quality = modularity
+                    return labels, quality, inertia, modularity
+            except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
+                print(e)
+
+        if self.init_measure == 'inertia':
+            quality = -inertia
+        elif self.init_measure == 'modularity':
+            modularity = self._calc_modularity_slow(G, labels)
+            quality = modularity
+        return labels, quality, inertia, modularity
 
     @abstractmethod
     def _predict_once(self, K: np.array, init: str):
@@ -82,16 +90,21 @@ class KMeans_Fouss(KernelEstimator, ABC):
         return nx.community.modularity(G, communities)
 
     def predict(self, K, explicit=False, G: nx.Graph = None):
-        inits, best_labels, best_inertia = [], None, np.inf
+        inits, best_labels, best_quality = [], None, np.inf
         init_names = self.init_names if self.init == 'any' else [self.init]
         for init in init_names:
             results = [self._predict_successful_once(K, i, init, G=G) for i in range(self.n_init)]
-            for labels, inertia in results:
+            for labels, quality, inertia, modularity in results:
                 if explicit:
-                    inits.append({'labels': labels, 'inertia': inertia, 'init': init})
+                    inits.append({
+                        'labels': labels,
+                        'inertia': inertia,
+                        'modularity': modularity,
+                        'init': init
+                    })
                 else:
-                    if inertia < best_inertia or best_labels is None:
-                        best_inertia, best_labels = inertia, labels
+                    if quality > best_quality or best_labels is None:
+                        best_quality, best_labels = quality, labels
         return inits if explicit else best_labels
 
 

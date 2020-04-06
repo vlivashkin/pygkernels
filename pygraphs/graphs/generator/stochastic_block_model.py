@@ -1,5 +1,6 @@
 import logging
 
+import networkx as nx
 import numpy as np
 
 
@@ -53,7 +54,8 @@ class StochasticBlockModel:
                     edges[i][j] = 1
                     edges[j][i] = 1
 
-        return edges, nodes
+        G = nx.from_numpy_matrix(edges)
+        return (edges, nodes), G
 
     def generate_graphs(self, n_graphs):
         logging.info('StochasticBlockModel: count={}, {}'.format(n_graphs, self.name))

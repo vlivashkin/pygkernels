@@ -17,7 +17,7 @@ from _generated_kkmeans import generated_kkmeans_any
 from pygraphs.cluster import KKMeans as KKMeans
 from pygraphs.graphs.generator import StochasticBlockModel
 from pygraphs.measure import kernels
-from pygraphs.scorer import copeland
+from pygraphs.score import copeland
 
 
 def _single_competition(best_params_column, edges, nodes, estimator):

@@ -13,7 +13,7 @@ from pygraphs import util
 from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
 from pygraphs.measure import *
-from pygraphs.scorer import rand_index
+from pygraphs.score import rand_index
 
 
 # Luh Yen: Graph Nodes Clustering based on the Commute-Time Kernel
