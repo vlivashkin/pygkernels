@@ -1,4 +1,4 @@
-from .score import max_accuracy, rand_index, triplet_measure, ranking, copeland, FC
+from .score import max_accuracy, rand_index, triplet_measure, ranking, copeland, FC, modularity
 from .sns1 import sns1
 
 __all__ = [
@@ -8,5 +8,6 @@ __all__ = [
     'ranking',
     'copeland',
     'FC',
-    'sns1'
+    'sns1',
+    'modularity'
 ]

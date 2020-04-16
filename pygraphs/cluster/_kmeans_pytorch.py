@@ -14,6 +14,21 @@ def _inertia(h, e, K, labels):
     return torch.einsum('ki,ij,kj->', [h_e, K, h_e])
 
 
+def _modularity(A, labels):
+    """
+    Simplified version only for undirected graphs
+    """
+    n_edges = torch.sum(A)
+    degrees = torch.sum(A, dim=1, keepdim=True)
+
+    Q_items = A + torch.diagonal(A) - degrees.mm(degrees.transpose(1, 0)) / n_edges
+    Q = 0
+    for class_name in range(torch.max(labels).item() + 1):
+        mask = labels == class_name
+        Q += torch.sum(Q_items[mask][:, mask])
+    return Q / n_edges
+
+
 @torch_func
 def kmeanspp(K, n_clusters, device):
     n = K.shape[0]
@@ -35,7 +50,7 @@ def kmeanspp(K, n_clusters, device):
 
 
 @torch_func
-def predict(K, h, max_iter: int, device=0):
+def predict(K, h, max_iter: int, A, device):
     n_clusters, n = h.shape
     e = torch.eye(n, dtype=torch.float32).to(device)
 
@@ -56,11 +71,12 @@ def predict(K, h, max_iter: int, device=0):
         h = (U / nn).transpose(0, 1)
 
     inertia = _inertia(h, e, K, labels)
-    return labels, inertia, success
+    modularity = _modularity(A, labels) if A is not None else None
+    return labels, inertia, modularity, success
 
 
 @torch_func
-def iterative_predict(K, h, max_iter: int, eps: float, device):
+def iterative_predict(K, h, max_iter: int, eps: float, A, device):
     n_clusters, n = h.shape
     e = torch.eye(n, dtype=torch.float32).to(device)
 
@@ -91,7 +107,8 @@ def iterative_predict(K, h, max_iter: int, eps: float, device):
             if minΔJ < 0 and l[i] != k_star:
                 if nn[l[i]] == 1:  # it will cause empty cluster! exit with success=False
                     inertia = _inertia(h, e, K, labels)
-                    return labels, inertia, False
+                    modularity = _modularity(A, labels) if A is not None else None
+                    return labels, inertia, modularity, False
                 h[l[i]] = 1. / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
                 h[k_star] = 1. / (nn[k_star] + 1 + eps) * (nn[k_star] * h[k_star] + e[i])
                 U[i, l[i]], U[i, k_star] = 0, 1
@@ -103,4 +120,5 @@ def iterative_predict(K, h, max_iter: int, eps: float, device):
         labels = l.clone()
 
     inertia = _inertia(h, e, K, labels)
-    return labels, inertia, ~np.isnan(inertia)
+    modularity = _modularity(A, labels) if A is not None else None
+    return labels, inertia, modularity, ~np.isnan(inertia)

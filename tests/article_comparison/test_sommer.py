@@ -53,7 +53,7 @@ class TestTable3(ABC):
             # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
             # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
         ]:
-            (A, labels_true), G = graphs[0], Gs[0]
+            A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
@@ -61,7 +61,7 @@ class TestTable3(ABC):
                 def whole_kmeans_run(i_run):
                     kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=i_run,
                                               device=i_run % 2)
-                    labels_pred = kkmeans.predict(K, G=G)
+                    labels_pred = kkmeans.predict(K, A=A)
                     assert (len(labels_true) == len(labels_pred))
                     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                     return item_nmi
@@ -72,7 +72,7 @@ class TestTable3(ABC):
                 for i_run in range(n_init_nmi):
                     kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia,
                                               random_state=start_random_seed + i_run, device='cpu')
-                    labels_pred = kkmeans.predict(K, G=G)
+                    labels_pred = kkmeans.predict(K, A=A)
                     assert (len(labels_true) == len(labels_pred))
                     item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
                     init_nmi.append(item_nmi)

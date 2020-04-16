@@ -51,6 +51,14 @@ class logHeatPPR_H(Kernel):
     name, _parent_kernel_class = 'logHeatPPR', kernel.HeatPPR_H
 
 
+class logDF_H(Kernel):
+    name, _parent_kernel_class = 'logDF', kernel.DF_H
+
+
+class logAbs_H(Kernel):
+    name, _parent_kernel_class = 'logAbs', kernel.Abs_H
+
+
 # DISTANCES (distances derived from kernels)
 class SPCT_D(Distance):
     name, _default_scaler = 'SP-CT', scaler.Linear
@@ -136,6 +144,22 @@ class HeatPPR_D(Distance):
 
 class logHeatPPR_D(Distance):
     name, _parent_kernel_class = 'logHeatPPR', logHeatPPR_H
+
+
+class DF_D(Distance):
+    name, _parent_kernel_class = 'DF', kernel.DF_H
+
+
+class logDF_D(Distance):
+    name, _parent_kernel_class = 'logDF', logDF_H
+
+
+class Abs_D(Distance):
+    name, _parent_kernel_class = 'Abs', kernel.Abs_H
+
+
+class logAbs_D(Distance):
+    name, _parent_kernel_class = 'Abs', logAbs_H
 
 
 # K KERNELS (kernels derived from distances)

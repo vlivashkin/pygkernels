@@ -96,3 +96,17 @@ def FC(comms1, comms2):
     l = len(comms1)
     M = _getMs(comms1, comms2)
     return 1 - 1 / l * max(_getMatch(M, perm) for perm in itertools.permutations(range(max(M.shape))))
+
+def modularity(A: np.array, partition):
+    """
+    Simplified version only for undirected graphs
+    """
+    n_edges = np.sum(A)
+    degrees = np.sum(A, axis=1, keepdims=True)
+
+    Q_items = A + np.diagonal(A) - degrees.dot(degrees.T) / n_edges
+    Q = 0
+    for class_name in set(partition):
+        mask = np.array(partition) == class_name
+        Q += np.sum(Q_items[mask][:, mask])
+    return Q / n_edges

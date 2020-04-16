@@ -163,7 +163,7 @@ class SCCT_H(Kernel):
         H = I - E / n
         M = D^{-1/2}(A - dd^T/vol(G))D^{-1/2},
             d is a vector of the diagonal elements of D,
-            vol(G) is the volume of the graph
+            vol(G) is the volume of the graph (sum of all elements of A)
         K_CCT = HD^{-1/2}M(I - M)^{-1}MD^{-1/2}H
         """
         size = A.shape[0]
@@ -191,6 +191,9 @@ class PPR_H(Kernel):
         self.P = h.get_P(A)
 
     def get_K(self, alpha):
+        """
+        H = (I - αP)^{-1}
+        """
         return np.linalg.inv(self.I - alpha * self.P)
 
 
@@ -202,6 +205,9 @@ class ModifPPR_H(Kernel):
         self.D = h.get_D(A)
 
     def get_K(self, alpha):
+        """
+        H = (I - αP)^{-1}*D^{-1} = (D - αA)^{-1}
+        """
         return np.linalg.inv(self.D - alpha * self.A)
 
 
@@ -214,4 +220,43 @@ class HeatPPR_H(Kernel):
         self.P = h.get_P(A)
 
     def get_K(self, t):
+        """
+        H = expm(-t(I - P))
+        """
         return expm(-t * (self.I - self.P))
+
+
+class DF_H(Kernel):
+    name, _default_scaler = 'DF', scaler.Fraction
+
+    def __init__(self, A: np.ndarray, n_iter=30):
+        super().__init__(A)
+        self.n_iter = n_iter
+        self.dfac = self.calc_double_factorial(n_iter)
+
+    @staticmethod
+    def calc_double_factorial(max_k):
+        mem = np.zeros((max_k + 1,))
+        mem[0], mem[1] = 1, 1
+        for i in range(2, max_k + 1):
+            mem[i] = mem[i - 2] * i
+        return mem
+
+    def get_K(self, t):
+        tA = t * self.A
+        K, tA_k = np.eye(tA.shape[0]), np.eye(tA.shape[0])
+        for i in range(1, self.n_iter):
+            tA_k = tA_k.dot(tA)
+            K += tA_k / self.dfac[i]
+        return K
+
+
+class Abs_H(Kernel):
+    name, _default_scaler = 'Abs', scaler.Fraction
+
+    def __init__(self, A: np.ndarray):
+        super().__init__(A)
+        self.L = h.get_L(A)
+
+    def get_K(self, t):
+        return np.linalg.pinv(t * self.A + self.L)

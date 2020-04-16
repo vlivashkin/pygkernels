@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from collections import defaultdict
+from typing import Optional
 
-import networkx as nx
 import numpy as np
 
 from pygraphs.cluster import _kmeans_pytorch as _backend
@@ -53,50 +52,37 @@ class KMeans_Fouss(KernelEstimator, ABC):
             raise NotImplementedError()
         return h
 
-    def _predict_successful_once(self, K: np.array, init_idx: int, init: str, G: nx.Graph = None):
+    def _predict_successful_once(self, K: np.array, init_idx: int, init: str, A: Optional[np.array] = None):
         np.random.seed(self.random_state + init_idx)
-        labels, inertia = None, np.nan
+        labels, inertia, modularity = None, np.nan, np.nan
         for _ in range(self.max_rerun):
-            # try:
+            try:
                 K = K.astype(np.float64)
-                labels, inertia, success = self._predict_once(K, init)
-                modularity = -np.inf
+                labels, inertia, modularity, success = self._predict_once(K, init, A=A)
                 if success:
                     if self.init_measure == 'inertia':
                         quality = -inertia
                     elif self.init_measure == 'modularity':
-                        modularity = self._calc_modularity_slow(G, labels)
                         quality = modularity
                     return labels, quality, inertia, modularity
-            # except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
-            #     print(e)
+            except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
+                print(e)
 
         if self.init_measure == 'inertia':
             quality = -inertia
         elif self.init_measure == 'modularity':
-            modularity = self._calc_modularity_slow(G, labels)
             quality = modularity
         return labels, quality, inertia, modularity
 
     @abstractmethod
-    def _predict_once(self, K: np.array, init: str):
+    def _predict_once(self, K: np.array, init: str, A: Optional[np.array] = None):
         pass
 
-    def _calc_modularity_slow(self, G: nx.Graph, labels):
-        communities = defaultdict(list)
-        for idx, label in enumerate(labels):
-            communities[label].append(idx)
-        communities = list(communities.values())
-        return nx.community.modularity(G, communities)
-
-    def _calc_modularity(self, G, labels):
-        pass
-
-    def predict(self, K, explicit=False, G: nx.Graph = None):
+    def predict(self, K, explicit=False, A: Optional[np.array] = None):
         inits, best_labels, best_quality = [], None, np.inf
         init_names = self.INIT_NAMES if self.init == 'any' else [self.init]
         for init in init_names:
-            results = [self._predict_successful_once(K, i, init, G=G) for i in range(self.n_init)]
+            results = [self._predict_successful_once(K, i, init, A=A.astype(np.float32)) for i in range(self.n_init)]
             for labels, quality, inertia, modularity in results:
                 if explicit:
                     inits.append({
@@ -122,10 +108,10 @@ class KKMeans(KMeans_Fouss):
 
     name = 'KKMeans'
 
-    def _predict_once(self, K: np.array, init: str):
+    def _predict_once(self, K: np.array, init: str, A: Optional[np.array] = None):
         h_init = self._init_h(K, init)
-        labels, inertia, is_ok = _backend.predict(K, h_init, self.max_iter, device=self.device)
-        return labels, inertia, is_ok
+        labels, inertia, modularity, is_ok = _backend.predict(K, h_init, self.max_iter, A, device=self.device)
+        return labels, inertia, modularity, is_ok
 
 
 class KKMeans_iterative(KMeans_Fouss):
@@ -139,7 +125,8 @@ class KKMeans_iterative(KMeans_Fouss):
 
     name = 'KKMeans_iterative'
 
-    def _predict_once(self, K: np.array, init: str):
+    def _predict_once(self, K: np.array, init: str, A: Optional[np.array] = None):
         h_init = self._init_h(K, init)
-        labels, inertia, is_ok = _backend.iterative_predict(K, h_init, self.max_iter, self.EPS, device=self.device)
-        return labels, inertia, is_ok
+        labels, inertia, modularity, is_ok = _backend.iterative_predict(K, h_init, self.max_iter, self.EPS, A,
+                                                                        device=self.device)
+        return labels, inertia, modularity, is_ok

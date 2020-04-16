@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/vlivashkin/pygraphs.svg?branch=master)](https://travis-ci.com/vlivashkin/pygraphs)
 [![codecov](https://codecov.io/gh/vlivashkin/pygraphs/branch/master/graph/badge.svg)](https://codecov.io/gh/vlivashkin/pygraphs)
-# pygkernels &mdash; Kernels on graphs for Python
+# pygkernels &mdash; Kernels on Graphs for Python
 
 Framework for clustering graph nodes using various similarity/dissimilarity measures.
 
@@ -26,7 +26,7 @@ Framework for clustering graph nodes using various similarity/dissimilarity meas
 * **SP-CT**: Shortest Path, Commute Time, and their linear combination
 * logarithmic version of every measure
 
-Every measure is presented as dissimilarity (distance) and similarity (kernel/proximity measure). All of them can be used in any classification/clustering/community detection algorithm which uses kernel trick (e.g. kernel k-means).
+Every measure is presented as dissimilarity (distance) and similarity (kernel/proximity) measure. All of them can be used in any classification/clustering/community detection algorithm which uses kernel trick (e.g. kernel k-means).
 
 #### List of clustering algoritms:
 * Kernel k-means
