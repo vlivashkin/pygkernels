@@ -11,10 +11,17 @@ from sklearn.base import BaseEstimator, ClusterMixin
 
 
 class KernelEstimator(BaseEstimator, ClusterMixin, ABC):
-    def __init__(self, n_clusters, device=None, random_state=None):
+    def __init__(self, n_clusters, random_state=None, device=None):
         self.n_clusters = n_clusters
-        self.device = device
         self.random_state = random_state
+        if device is None:
+            if torch.cuda.is_available():
+                self.device = 'cuda:0'
+            else:
+                self.device = 'cpu'
+            print(f'Auto chosen device: {self.device}')
+        else:
+            self.device = device
 
     def fit(self, K, y=None, sample_weight=None):
         self.labels_ = self.predict(K)

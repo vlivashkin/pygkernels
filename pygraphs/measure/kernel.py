@@ -11,35 +11,35 @@ from pygraphs.measure.scaler import Scaler
 
 class Kernel(ABC):
     EPS = 10 ** -10
-    name, default_scaler = None, None
-    parent_distance_class, parent_kernel_class = None, None
+    name, _default_scaler = None, None
+    _parent_distance_class, _parent_kernel_class = None, None
 
     def __init__(self, A: np.ndarray):
-        assert not (self.parent_distance_class and self.parent_kernel_class)
-        if self.parent_distance_class:
-            self.parent_kernel = None
-            self.parent_distance = self.parent_distance_class(A)
-            self.default_scaler = self.parent_distance.default_scaler
-        elif self.parent_kernel_class:
-            self.parent_kernel = self.parent_kernel_class(A)
-            self.parent_distance = None
-            self.default_scaler = self.parent_kernel.default_scaler
-        self.scaler: Scaler = self.default_scaler(A)
+        assert not (self._parent_distance_class and self._parent_kernel_class)
+        if self._parent_distance_class:
+            self._parent_kernel = None
+            self._parent_distance = self._parent_distance_class(A)
+            self._default_scaler = self._parent_distance._default_scaler
+        elif self._parent_kernel_class:
+            self._parent_kernel = self._parent_kernel_class(A)
+            self._parent_distance = None
+            self._default_scaler = self._parent_kernel._default_scaler
+        self.scaler: Scaler = self._default_scaler(A)
         self.A = A
 
     def get_K(self, param):
-        if self.parent_distance:  # use D -> K transform
-            D = self.parent_distance.get_D(param)
+        if self._parent_distance:  # use D -> K transform
+            D = self._parent_distance.get_D(param)
             return h.D_to_K(D)
-        elif self.parent_kernel:  # use element-wise log transform
-            H0 = self.parent_kernel.get_K(param)
+        elif self._parent_kernel:  # use element-wise log transform
+            H0 = self._parent_kernel.get_K(param)
             return h.ewlog(H0)
         else:
             raise NotImplementedError()
 
 
 class CT_H(Kernel):
-    name, default_scaler = 'CT', scaler.Linear
+    name, _default_scaler = 'CT', scaler.Linear
 
     def CT(self):
         """
@@ -74,7 +74,7 @@ class CT_H(Kernel):
 
 
 class Katz_H(Kernel):
-    name, default_scaler = 'Katz', scaler.Rho
+    name, _default_scaler = 'Katz', scaler.Rho
 
     def get_K(self, t):
         """
@@ -85,7 +85,7 @@ class Katz_H(Kernel):
 
 
 class For_H(Kernel):
-    name, default_scaler = 'For', scaler.Fraction
+    name, _default_scaler = 'For', scaler.Fraction
 
     def get_K(self, t):
         """
@@ -96,7 +96,7 @@ class For_H(Kernel):
 
 
 class Comm_H(Kernel):
-    name, default_scaler = 'Comm', scaler.Fraction
+    name, _default_scaler = 'Comm', scaler.Fraction
 
     def get_K(self, t):
         """
@@ -106,7 +106,7 @@ class Comm_H(Kernel):
 
 
 class Heat_H(Kernel):
-    name, default_scaler = 'Heat', scaler.Fraction
+    name, _default_scaler = 'Heat', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -120,7 +120,7 @@ class Heat_H(Kernel):
 
 
 class NHeat_H(Kernel):
-    name, default_scaler = 'NHeat', scaler.Fraction
+    name, _default_scaler = 'NHeat', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -134,7 +134,7 @@ class NHeat_H(Kernel):
 
 
 class SCT_H(Kernel):
-    name, default_scaler = 'SCT', scaler.Fraction
+    name, _default_scaler = 'SCT', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -150,7 +150,7 @@ class SCT_H(Kernel):
 
 
 class SCCT_H(Kernel):
-    name, default_scaler = 'SCCT', scaler.Fraction
+    name, _default_scaler = 'SCCT', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -183,7 +183,7 @@ class SCCT_H(Kernel):
 
 
 class PPR_H(Kernel):
-    name, default_scaler = 'PPR', scaler.Linear
+    name, _default_scaler = 'PPR', scaler.Linear
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -195,7 +195,7 @@ class PPR_H(Kernel):
 
 
 class ModifPPR_H(Kernel):
-    name, default_scaler = 'ModifPPR', scaler.Linear
+    name, _default_scaler = 'ModifPPR', scaler.Linear
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -206,7 +206,7 @@ class ModifPPR_H(Kernel):
 
 
 class HeatPPR_H(Kernel):
-    name, default_scaler = 'HeatPPR', scaler.Fraction
+    name, _default_scaler = 'HeatPPR', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)

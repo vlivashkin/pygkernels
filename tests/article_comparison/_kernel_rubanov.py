@@ -13,7 +13,7 @@ import pygraphs.measure.shortcuts as h
 # Implementation by Dmytro Rubanov
 
 class _KernelR(Kernel, ABC):
-    name, default_scaler = None, None
+    name, _default_scaler = None, None
 
     @staticmethod
     def mat_exp(M, n=15):
@@ -26,7 +26,7 @@ class _KernelR(Kernel, ABC):
 
 
 class Katz_R(_KernelR):
-    name, default_scaler = 'Katz R', scaler.Rho
+    name, _default_scaler = 'Katz R', scaler.Rho
 
     def __init__(self, A):
         super().__init__(A)
@@ -46,7 +46,7 @@ class Katz_R(_KernelR):
 
 
 class Estrada_R(_KernelR):
-    name, default_scaler = 'Estrada R', scaler.Fraction
+    name, _default_scaler = 'Estrada R', scaler.Fraction
 
     def get_K(self, t):
         with warnings.catch_warnings():
@@ -57,7 +57,7 @@ class Estrada_R(_KernelR):
 
 
 class Heat_R(_KernelR):  # this is logHeat, actually
-    name, default_scaler = 'Heat R', scaler.Fraction
+    name, _default_scaler = 'Heat R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -75,7 +75,7 @@ class Heat_R(_KernelR):  # this is logHeat, actually
 
 
 class NormalizedHeat_R(_KernelR):
-    name, default_scaler = 'logNHeat R', scaler.Fraction
+    name, _default_scaler = 'logNHeat R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -96,7 +96,7 @@ class NormalizedHeat_R(_KernelR):
 
 
 class RegularizedLaplacian_R(_KernelR):
-    name, default_scaler = 'RegularizedLaplacian R', scaler.Fraction
+    name, _default_scaler = 'RegularizedLaplacian R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -115,7 +115,7 @@ class RegularizedLaplacian_R(_KernelR):
 
 
 class logPPR_R(_KernelR):
-    name, default_scaler = 'logPPR R', scaler.Linear
+    name, _default_scaler = 'logPPR R', scaler.Linear
 
     def __init__(self, A):
         super().__init__(A)
@@ -134,7 +134,7 @@ class logPPR_R(_KernelR):
 
 
 class logModifPPR_R(_KernelR):
-    name, default_scaler = 'logModifPPR R', scaler.Linear
+    name, _default_scaler = 'logModifPPR R', scaler.Linear
 
     def __init__(self, A):
         super().__init__(A)
@@ -152,7 +152,7 @@ class logModifPPR_R(_KernelR):
 
 
 class logHeatPPR_R(_KernelR):
-    name, default_scaler = 'logHeatPPR R', scaler.Fraction
+    name, _default_scaler = 'logHeatPPR R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)

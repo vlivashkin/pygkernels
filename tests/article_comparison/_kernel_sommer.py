@@ -5,7 +5,7 @@ import pygraphs.measure.shortcuts as h
 
 
 class logFor_S(Kernel):
-    name, default_scaler = 'logFor_S', scaler.FractionReversed
+    name, _default_scaler = 'logFor_S', scaler.FractionReversed
 
     def get_K(self, alpha):
         size = self.A.shape[0]

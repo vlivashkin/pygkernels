@@ -13,8 +13,8 @@ class KMeans_Fouss(KernelEstimator, ABC):
     INIT_NAMES = ['one', 'all', 'k-means++']
 
     def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', init_measure='modularity',
-                 random_state=42, device='cuda:0'):
-        super().__init__(n_clusters, device=device, random_state=random_state)
+                 random_state=42, device=None):
+        super().__init__(n_clusters, random_state=random_state, device=device)
 
         self.n_init = n_init
         self.max_rerun = max_rerun
@@ -57,7 +57,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
         np.random.seed(self.random_state + init_idx)
         labels, inertia = None, np.nan
         for _ in range(self.max_rerun):
-            try:
+            # try:
                 K = K.astype(np.float64)
                 labels, inertia, success = self._predict_once(K, init)
                 modularity = -np.inf
@@ -68,8 +68,8 @@ class KMeans_Fouss(KernelEstimator, ABC):
                         modularity = self._calc_modularity_slow(G, labels)
                         quality = modularity
                     return labels, quality, inertia, modularity
-            except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
-                print(e)
+            # except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
+            #     print(e)
 
         if self.init_measure == 'inertia':
             quality = -inertia

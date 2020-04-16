@@ -9,18 +9,18 @@ from pygraphs.measure import scaler
 
 
 class Distance(ABC):
-    name, default_scaler, power = None, None, None
-    parent_kernel_class = None
+    name, _default_scaler, power = None, None, None
+    _parent_kernel_class = None
 
     def __init__(self, A):
-        if self.parent_kernel_class:
-            self.parent_kernel = self.parent_kernel_class(A)
-            self.default_scaler = self.parent_kernel.default_scaler
-        self.scaler = self.default_scaler(A)
+        if self._parent_kernel_class:
+            self._parent_kernel = self._parent_kernel_class(A)
+            self._default_scaler = self._parent_kernel._default_scaler
+        self.scaler = self._default_scaler(A)
         self.A = A
 
     def get_D(self, param):
-        H = self.parent_kernel.get_K(param)
+        H = self._parent_kernel.get_K(param)
         D = h.K_to_D(H)
         return np.power(D, self.power) if self.power else D
 
@@ -32,7 +32,7 @@ class Distance(ABC):
 
 
 class SP_D(Distance):
-    name, default_scaler = 'SP', scaler.Linear
+    name, _default_scaler = 'SP', scaler.Linear
 
     def get_D(self, param):
         with np.errstate(divide='ignore', invalid='ignore'):
@@ -41,7 +41,7 @@ class SP_D(Distance):
 
 
 class CT_D(Distance):
-    name, default_scaler = 'CT', scaler.Linear
+    name, _default_scaler = 'CT', scaler.Linear
 
     def commute_distance(self):
         """
@@ -87,7 +87,7 @@ class RSP_vanilla_like(Distance, ABC):
 
 @deprecated()
 class RSP_vanilla_D(RSP_vanilla_like):
-    name, default_scaler = 'RSP vanilla', scaler.FractionReversed
+    name, _default_scaler = 'RSP vanilla', scaler.FractionReversed
 
     def get_D(self, beta):
         """
@@ -107,7 +107,7 @@ class RSP_vanilla_D(RSP_vanilla_like):
 
 @deprecated()
 class FE_vanilla_D(RSP_vanilla_like):
-    name, default_scaler = 'FE vanilla', scaler.FractionReversed
+    name, _default_scaler = 'FE vanilla', scaler.FractionReversed
 
     def get_D(self, beta):
         """
@@ -169,7 +169,7 @@ class _RSP_like(Distance, ABC):
 
 
 class RSP_D(_RSP_like):
-    name, default_scaler = 'RSP', scaler.FractionReversed
+    name, _default_scaler = 'RSP', scaler.FractionReversed
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -203,7 +203,7 @@ class RSP_D(_RSP_like):
 
 
 class FE_D(_RSP_like):
-    name, default_scaler = 'FE', scaler.FractionReversed
+    name, _default_scaler = 'FE', scaler.FractionReversed
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
