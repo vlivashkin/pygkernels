@@ -4,8 +4,8 @@ import numpy as np
 from scipy.sparse.csgraph import shortest_path
 from sklearn.utils import deprecated
 
+import pygraphs.measure.shortcuts as h
 from pygraphs.measure import scaler
-from pygraphs.measure.shortcuts import get_D_1, get_L, H_to_D
 
 
 class Distance(ABC):
@@ -13,13 +13,15 @@ class Distance(ABC):
     parent_kernel_class = None
 
     def __init__(self, A):
+        if self.parent_kernel_class:
+            self.parent_kernel = self.parent_kernel_class(A)
+            self.default_scaler = self.parent_kernel.default_scaler
         self.scaler = self.default_scaler(A)
-        self.parent_kernel = self.parent_kernel_class(A) if self.parent_kernel_class else None
         self.A = A
 
     def get_D(self, param):
         H = self.parent_kernel.get_K(param)
-        D = H_to_D(H)
+        D = h.K_to_D(H)
         return np.power(D, self.power) if self.power else D
 
     def grid_search(self, params=np.linspace(0, 1, 55)):
@@ -46,7 +48,7 @@ class CT_D(Distance):
         Original code copyright (C) Ulrike Von Luxburg, Python implementation by James McDermott.
         """
         size = self.A.shape[0]
-        L = get_L(self.A)
+        L = h.get_L(self.A)
 
         Linv = np.linalg.inv(L + np.ones(L.shape) / size) - np.ones(L.shape) / size
 
@@ -65,7 +67,7 @@ class CT_D(Distance):
 
 @deprecated()
 class RSP_vanilla_like(Distance, ABC):
-    def __init__(self, A, C=None):
+    def __init__(self, A):
         """
         P^{ref} = D^{-1}*A, D = Diag(A*e)
         """
@@ -74,18 +76,8 @@ class RSP_vanilla_like(Distance, ABC):
         self.size = A.shape[0]
         self.e = np.ones((self.size, 1))
         self.I = np.eye(self.size)
-        self.Pref = get_D_1(A).dot(A)
-
-        # self.C = johnson(A, directed=False)
-        eps = 0.00000001
-        max = np.finfo('d').max
-
-        if C is None:
-            self.C = A.copy()
-            self.C[A >= eps] = 1.0 / A[A >= eps]
-            self.C[A < eps] = max
-        else:
-            self.C = C
+        self.Pref = h.get_P(A)
+        self.C = shortest_path(A, directed=False)
 
     def WZ(self, beta):
         W = self.Pref * np.exp(-beta * self.C)

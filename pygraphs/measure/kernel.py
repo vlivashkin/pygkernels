@@ -4,33 +4,36 @@ import networkx as nx
 import numpy as np
 from scipy.linalg import expm
 
+import pygraphs.measure.shortcuts as h
 from pygraphs.measure import scaler
 from pygraphs.measure.scaler import Scaler
-from pygraphs.measure.shortcuts import get_D, get_L, get_normalized_L, D_to_K, H0_to_H
 
 
 class Kernel(ABC):
+    EPS = 10 ** -10
     name, default_scaler = None, None
     parent_distance_class, parent_kernel_class = None, None
 
     def __init__(self, A: np.ndarray):
-        self.eps = 10 ** -10
-
+        assert not (self.parent_distance_class and self.parent_kernel_class)
+        if self.parent_distance_class:
+            self.parent_kernel = None
+            self.parent_distance = self.parent_distance_class(A)
+            self.default_scaler = self.parent_distance.default_scaler
+        elif self.parent_kernel_class:
+            self.parent_kernel = self.parent_kernel_class(A)
+            self.parent_distance = None
+            self.default_scaler = self.parent_kernel.default_scaler
         self.scaler: Scaler = self.default_scaler(A)
-
-        assert not self.parent_distance_class or not self.parent_kernel_class
-        self.parent_distance = self.parent_distance_class(A) if self.parent_distance_class else None
-        self.parent_kernel = self.parent_kernel_class(A) if self.parent_kernel_class else None
-
         self.A = A
 
     def get_K(self, param):
         if self.parent_distance:  # use D -> K transform
             D = self.parent_distance.get_D(param)
-            return D_to_K(D)
-        elif self.parent_kernel:  # use H0 -> H transform
+            return h.D_to_K(D)
+        elif self.parent_kernel:  # use element-wise log transform
             H0 = self.parent_kernel.get_K(param)
-            return H0_to_H(H0)
+            return h.ewlog(H0)
         else:
             raise NotImplementedError()
 
@@ -53,7 +56,7 @@ class CT_H(Kernel):
         H = (L + J)^{-1}
         """
         size = self.A.shape[0]
-        L = get_L(self.A)
+        L = h.get_L(self.A)
         J = np.ones((size, size)) / size
         return np.linalg.pinv(L + J)
 
@@ -63,15 +66,15 @@ class CT_H(Kernel):
         """
         size = self.A.shape[0]
         I = np.eye(size)
-        L = get_L(self.A)
+        L = h.get_L(self.A)
         return np.linalg.pinv(I + L)
 
     def get_K(self, param):
         return self.resistance_kernel()
 
 
-class pWalk_H(Kernel):
-    name, default_scaler = 'pWalk', scaler.Rho
+class Katz_H(Kernel):
+    name, default_scaler = 'Katz', scaler.Rho
 
     def get_K(self, t):
         """
@@ -89,7 +92,7 @@ class For_H(Kernel):
         H0 = (I + tL)^{-1}
         """
         size = self.A.shape[0]
-        return np.linalg.inv(np.eye(size) + t * get_L(self.A))
+        return np.linalg.inv(np.eye(size) + t * h.get_L(self.A))
 
 
 class Comm_H(Kernel):
@@ -107,7 +110,7 @@ class Heat_H(Kernel):
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
-        self.L = get_L(self.A)
+        self.L = h.get_L(self.A)
 
     def get_K(self, t):
         """
@@ -121,7 +124,7 @@ class NHeat_H(Kernel):
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
-        self.nL = get_normalized_L(A)
+        self.nL = h.get_normalized_L(A)
 
     def get_K(self, t):
         """
@@ -135,9 +138,9 @@ class SCT_H(Kernel):
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
-        self.K_CT = np.linalg.pinv(get_L(self.A))
+        self.K_CT = np.linalg.pinv(h.get_L(self.A))
         self.sigma = self.K_CT.std()
-        self.Kds = self.K_CT / (self.sigma + self.eps)
+        self.Kds = self.K_CT / (self.sigma + self.EPS)
 
     def get_K(self, alpha):
         """
@@ -185,7 +188,7 @@ class PPR_H(Kernel):
     def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.I = np.eye(A.shape[0])
-        self.P = np.linalg.inv(get_D(A)).dot(A)
+        self.P = h.get_P(A)
 
     def get_K(self, alpha):
         return np.linalg.inv(self.I - alpha * self.P)
@@ -196,7 +199,7 @@ class ModifPPR_H(Kernel):
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
-        self.D = get_D(A)
+        self.D = h.get_D(A)
 
     def get_K(self, alpha):
         return np.linalg.inv(self.D - alpha * self.A)
@@ -208,7 +211,7 @@ class HeatPPR_H(Kernel):
     def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.I = np.eye(A.shape[0])
-        self.P = np.linalg.inv(get_D(A)).dot(A)
+        self.P = h.get_P(A)
 
     def get_K(self, t):
         return expm(-t * (self.I - self.P))

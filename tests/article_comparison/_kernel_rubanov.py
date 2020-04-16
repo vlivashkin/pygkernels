@@ -6,7 +6,7 @@ from numpy import warnings
 
 from pygraphs.measure import scaler
 from pygraphs.measure.kernel import Kernel
-from pygraphs.measure.shortcuts import get_D, get_L
+import pygraphs.measure.shortcuts as h
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures
@@ -61,7 +61,7 @@ class Heat_R(_KernelR):  # this is logHeat, actually
 
     def __init__(self, A):
         super().__init__(A)
-        self.L = np.matlib.array(get_L(A))
+        self.L = np.matlib.array(h.get_L(A))
 
     def get_K(self, t):
         with warnings.catch_warnings():
@@ -79,7 +79,7 @@ class NormalizedHeat_R(_KernelR):
 
     def __init__(self, A):
         super().__init__(A)
-        D = get_D(A)
+        D = h.get_D(A)
         L = D - A
         D_12 = np.linalg.inv(np.sqrt(D))
         self.Ll = D_12.dot(L).dot(D_12)
@@ -100,7 +100,7 @@ class RegularizedLaplacian_R(_KernelR):
 
     def __init__(self, A):
         super().__init__(A)
-        D = get_D(A)
+        D = h.get_D(A)
         self.L = D - A
 
     def get_K(self, beta):
@@ -119,7 +119,7 @@ class logPPR_R(_KernelR):
 
     def __init__(self, A):
         super().__init__(A)
-        D = get_D(A)
+        D = h.get_D(A)
         self.P = np.linalg.inv(D).dot(A)
 
     def get_K(self, alpha):
@@ -138,7 +138,7 @@ class logModifPPR_R(_KernelR):
 
     def __init__(self, A):
         super().__init__(A)
-        self.D = get_D(A)
+        self.D = h.get_D(A)
 
     def get_K(self, alpha):
         with warnings.catch_warnings():
@@ -156,7 +156,7 @@ class logHeatPPR_R(_KernelR):
 
     def __init__(self, A):
         super().__init__(A)
-        self.D = get_D(A)
+        self.D = h.get_D(A)
         self.P = np.linalg.inv(self.D).dot(A)
 
     def get_K(self, t):

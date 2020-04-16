@@ -13,7 +13,8 @@ from sklearn.metrics import normalized_mutual_info_score
 from pygraphs import util
 from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
-from pygraphs.measure import *
+from pygraphs.measure import SCT_H, SCCT_H, FE_K, RSP_K, SPCT_H, Comm_H, For_H, Heat_H, Katz_H, logComm_H, logFor_H, \
+    logHeat_H, logKatz_H
 
 
 class TestTable1(ABC):
@@ -122,8 +123,8 @@ class TestTable1(ABC):
         self.dataset_results(Heat_H, -1, 7)
 
     @unittest.skip
-    def test_pWalk(self):
-        self.dataset_results(pWalk_H, -1, 8)
+    def test_Katz(self):
+        self.dataset_results(Katz_H, -1, 8)
 
     @unittest.skip
     def test_logComm(self):
@@ -137,8 +138,8 @@ class TestTable1(ABC):
         self.dataset_results(logHeat_H, -1, 11)
 
     @unittest.skip
-    def test_Walk(self):
-        self.dataset_results(Walk_H, -1, 12)
+    def test_logKatz(self):
+        self.dataset_results(logKatz_H, -1, 12)
 
 
 class TestTable3_KKMeans_vanilla_kmeanspp(TestTable1, unittest.TestCase):

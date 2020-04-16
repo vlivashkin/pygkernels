@@ -1,10 +1,11 @@
 import unittest
 
+import numpy as np
+
+import pygraphs.measure.shortcuts as h
 from pygraphs import util
 from pygraphs.graphs import Samples
-from pygraphs.measure import *
-from pygraphs.measure import distances
-from pygraphs.measure.shortcuts import *
+from pygraphs.measure import distances, SP_D, logFor_D, logKatz_D
 
 
 class TestShortcuts(unittest.TestCase):
@@ -38,11 +39,11 @@ class TestShortcuts(unittest.TestCase):
         ])
 
     def test_get_D(self):
-        D = get_D(self.A)
+        D = h.get_D(self.A)
         self.assertTrue(np.array_equal(D, self.D))
 
     def test_get_L(self):
-        L = get_L(self.A)
+        L = h.get_L(self.A)
         self.assertTrue(np.array_equal(L, self.L))
 
 
@@ -81,9 +82,9 @@ class TestMeasureCommon(unittest.TestCase):
     @unittest.skip
     def test_full_graph_SP_logFor_Walk_equality(self):
         param = 0.00001
-        DSP = normalize(SP_D(Samples.chain_graph).get_D(-1))
-        DlogFor = normalize(logFor_D(Samples.chain_graph).get_D(param))
-        DWalk = normalize(Walk_D(Samples.chain_graph).get_D(param))
+        DSP = h.normalize(SP_D(Samples.chain_graph).get_D(-1))
+        DlogFor = h.normalize(logFor_D(Samples.chain_graph).get_D(param))
+        DWalk = h.normalize(logKatz_D(Samples.chain_graph).get_D(param))
         self.assertTrue(np.allclose(DSP, DlogFor, atol=0.01))
         self.assertTrue(np.allclose(DWalk, DSP, atol=0.01))
         self.assertTrue(np.allclose(DlogFor, DWalk, atol=0.01))

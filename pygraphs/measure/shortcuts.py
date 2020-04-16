@@ -8,51 +8,65 @@ def normalize(dm):
 
 
 def get_D(A):
+    """
+    Degree matrix
+    """
     return np.diag(np.sum(A, axis=0))
 
 
-def get_D_1(A):
-    """
-    D_1 = D^{-1}
-    """
-    return np.diag(1. / np.sum(A, axis=0))
-
-
 def get_L(A):
+    """
+    Ordinary (or combinatorial) Laplacian matrix.
+    L = D - A
+    """
     return get_D(A) - A
 
 
 def get_normalized_L(A):
+    """
+    Normalized Laplacian matrix.
+    L = D^{-1/2}*L*D^{-1/2}
+    """
     D = get_D(A)
     L = get_L(A)
     D_12 = np.linalg.inv(np.sqrt(D))
     return D_12.dot(L).dot(D_12)
 
 
-def H0_to_H(H0):
+def get_P(A):
     """
-    H = element-wise log(H0)
+    Markov matrix.
+    P = D^{-1}*A
     """
-    mask = H0 <= 0
-    H0[mask] = 1
-    H = np.log(H0)
-    H[mask] = -np.inf
-    return H
+    D = get_D(A)
+    return np.linalg.inv(D).dot(A)
 
 
-def H_to_D(H):
+def ewlog(K):
     """
-    D = (h * 1^T + 1 * h^T - H - H ^ T) / 2
+    logK = element-wise log(K)
     """
-    size = H.shape[0]
-    h = np.diagonal(H).reshape(-1, 1)
+    mask = K <= 0
+    K[mask] = 1
+    logK = np.log(K)
+    logK[mask] = -np.inf
+    return logK
+
+
+def K_to_D(K):
+    """
+    D = (k * 1^T + 1 * k^T - K - K^T) / 2
+    k = diag(K)
+    """
+    size = K.shape[0]
+    k = np.diagonal(K).reshape(-1, 1)
     i = np.ones((size, 1))
-    return 0.5 * ((h.dot(i.transpose()) + i.dot(h.transpose())) - H - H.transpose())
+    return 0.5 * ((k.dot(i.transpose()) + i.dot(k.transpose())) - K - K.transpose())
 
 
 def D_to_K(D):
     """
-    K = -1 / 2 HΔH
+    K = -1/2 H*D*H
     H = I - E/n
     """
     size = D.shape[0]

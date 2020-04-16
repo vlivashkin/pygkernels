@@ -1,11 +1,11 @@
 import logging
 import unittest
 
+import numpy as np
 from pygraphs import util
 from pygraphs.graphs import Samples
-from pygraphs.measure import *
+from pygraphs.measure import SP_D, CT_D, logKatz_D, For_D, Comm_D, Katz_D, logFor_D
 from pygraphs.measure.scaler import AlphaToT, Linear
-from pygraphs.measure.shortcuts import *
 
 
 class TestFigure1Comparison(unittest.TestCase):
@@ -37,9 +37,9 @@ class TestFigure1Comparison(unittest.TestCase):
         D = CT_D(self.graph).get_D(-1)
         self._comparison('R', D, [1.000, 1.000, 2.000, 3.000])
 
-    def test_chain_Walk(self):
+    def test_chain_logKatz(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = Walk_D(self.graph).get_D(parameter)
+        D = logKatz_D(self.graph).get_D(parameter)
         self._comparison('Walk', D, [1.025, 0.950, 1.975, 3.000])
 
     def test_chain_logFor(self):
@@ -62,12 +62,12 @@ class TestFigure1Comparison(unittest.TestCase):
 
     def test_chain_pWalk_45(self):
         parameter = AlphaToT(self.graph).scale(4.5)
-        D = pWalk_D(self.graph).get_D(parameter)
+        D = Katz_D(self.graph).get_D(parameter)
         self._comparison('pWalk 4.5', D, [1.025, 0.950, 1.541, 1.466])
 
     def test_chain_pWalk_1(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = pWalk_D(self.graph).get_D(parameter)
+        D = Katz_D(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.988, 1.025, 1.379, 1.416])
 
 
@@ -106,7 +106,7 @@ class TestTable1Comparison(unittest.TestCase):
 
     def test_chain_Walk(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = Walk_D(self.graph).get_D(parameter)
+        D = logKatz_D(self.graph).get_D(parameter)
         self._comparison('Walk', D, [1.08, 1., 1.52])
 
     def test_chain_logFor(self):
@@ -121,12 +121,12 @@ class TestTable1Comparison(unittest.TestCase):
 
     def test_chain_pWalk_45(self):
         parameter = AlphaToT(self.graph).scale(4.5)
-        D = pWalk_D(self.graph).get_D(parameter)
+        D = Katz_D(self.graph).get_D(parameter)
         self._comparison('pWalk 4.5', D, [1.08, 1.28, 0.95])
 
     def test_chain_pWalk_1(self):
         parameter = AlphaToT(self.graph).scale(1.0)
-        D = pWalk_D(self.graph).get_D(parameter)
+        D = Katz_D(self.graph).get_D(parameter)
         self._comparison('pWalk 1.0', D, [0.96, 1.46, 1.03])
 
 

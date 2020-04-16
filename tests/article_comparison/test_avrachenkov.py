@@ -19,7 +19,7 @@ from tqdm import tqdm
 from pygraphs import util
 from pygraphs.cluster import SpectralClustering_rubanov
 from pygraphs.graphs import Samples, RubanovStochasticBlockModel
-from pygraphs.measure import scaler, Walk_H, logComm_H, logHeat_H, logFor_H, logPPR_H, logModifPPR_H, logHeatPPR_H, \
+from pygraphs.measure import scaler, logKatz_H, logComm_H, logHeat_H, logFor_H, logPPR_H, logModifPPR_H, logHeatPPR_H, \
     logNHeat_H
 from pygraphs.score import FC
 from tests.article_comparison._kernel_rubanov import Katz_R, Estrada_R, Heat_R, RegularizedLaplacian_R, logPPR_R, \
@@ -33,7 +33,7 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
         self.graph = Samples.diploma_matrix
 
     def test_katz(self):
-        walk = Walk_H(self.graph)
+        walk = logKatz_H(self.graph)
         katz = Katz_R(self.graph)
         for param in scaler.Rho(self.graph).scale_list(np.linspace(0.1, 0.9, 50)):
             self.assertTrue(np.allclose(walk.get_K(param).ravel(), katz.get_K(param).ravel(), atol=0.0001),
@@ -145,8 +145,8 @@ class BalancedModel(TestCompetition):
     def real_comms(sizes):
         return np.array(sum(([i] * size for i, size in enumerate(sizes)), []))
 
-    def test_Walk(self):
-        self._compare(Walk_H, params=np.linspace(0, 0.5, 101)[1:-1], error_true=0.0072)
+    def test_logKatz(self):
+        self._compare(logKatz_H, params=np.linspace(0, 0.5, 101)[1:-1], error_true=0.0072)
 
     def test_logComm(self):
         self._compare(logComm_H, params=np.linspace(0, 0.3, 101)[1:-1], error_true=0.0084)
@@ -185,8 +185,8 @@ class TestUnbalancedModel(TestCompetition):
         GS, _ = RubanovStochasticBlockModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
         cls.graphs = GS
 
-    def test_Walk(self):
-        self._compare(Walk_H, params=np.linspace(0, 0.5, 101)[1:-1], error_true=0.012)
+    def test_logKatz(self):
+        self._compare(logKatz_H, params=np.linspace(0, 0.5, 101)[1:-1], error_true=0.012)
 
     def test_logComm(self):
         self._compare(logComm_H, params=np.linspace(0, 0.3, 101)[1:-1], error_true=0.011)

@@ -9,12 +9,12 @@ from pygraphs.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):
+    EPS = 10 ** -10
+    INIT_NAMES = ['one', 'all', 'k-means++']
+
     def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', init_measure='modularity',
                  random_state=42, device='cuda:0'):
         super().__init__(n_clusters, device=device, random_state=random_state)
-
-        self.init_names = ['one', 'all', 'k-means++']
-        self.eps = 10 ** -10
 
         self.n_init = n_init
         self.max_rerun = max_rerun
@@ -82,16 +82,19 @@ class KMeans_Fouss(KernelEstimator, ABC):
     def _predict_once(self, K: np.array, init: str):
         pass
 
-    def _calc_modularity_slow(self, G, labels):
+    def _calc_modularity_slow(self, G: nx.Graph, labels):
         communities = defaultdict(list)
         for idx, label in enumerate(labels):
             communities[label].append(idx)
         communities = list(communities.values())
         return nx.community.modularity(G, communities)
 
+    def _calc_modularity(self, G, labels):
+        pass
+
     def predict(self, K, explicit=False, G: nx.Graph = None):
         inits, best_labels, best_quality = [], None, np.inf
-        init_names = self.init_names if self.init == 'any' else [self.init]
+        init_names = self.INIT_NAMES if self.init == 'any' else [self.init]
         for init in init_names:
             results = [self._predict_successful_once(K, i, init, G=G) for i in range(self.n_init)]
             for labels, quality, inertia, modularity in results:
@@ -138,5 +141,5 @@ class KKMeans_iterative(KMeans_Fouss):
 
     def _predict_once(self, K: np.array, init: str):
         h_init = self._init_h(K, init)
-        labels, inertia, is_ok = _backend.iterative_predict(K, h_init, self.max_iter, self.eps, device=self.device)
+        labels, inertia, is_ok = _backend.iterative_predict(K, h_init, self.max_iter, self.EPS, device=self.device)
         return labels, inertia, is_ok

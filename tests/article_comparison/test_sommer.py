@@ -121,7 +121,7 @@ class TestTable3(ABC):
 
 class TestTable3_KKMeans_vanilla_kmpp_pytorch(TestTable3, unittest.TestCase):
     def dataset_results(self, measure_class, best_param, etalon_idx):
-        estimator = partial(KKMeans, init='k-means++', backend='pytorch')
+        estimator = partial(KKMeans, init='k-means++')
         self._dataset_results(measure_class, best_param, etalon_idx, estimator, parallel=False, start_random_seed=5014)
 
 

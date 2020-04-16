@@ -12,7 +12,7 @@ from sklearn.metrics import adjusted_rand_score
 from pygraphs import util
 from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Datasets
-from pygraphs.measure import *
+from pygraphs.measure import SCT_H
 from pygraphs.score import rand_index
 
 

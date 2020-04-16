@@ -2,6 +2,7 @@ import logging
 import operator
 import unittest
 
+import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
 from pygraphs import util
@@ -9,7 +10,6 @@ from pygraphs.cluster import KKMeans, SpectralClustering_rubanov
 from pygraphs.cluster.kward import KWard
 from pygraphs.graphs import Samples, Datasets
 from pygraphs.measure import kernels
-from pygraphs.measure.shortcuts import *
 
 
 class TestEstimators(unittest.TestCase):

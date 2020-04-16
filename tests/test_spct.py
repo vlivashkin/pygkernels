@@ -1,12 +1,13 @@
 import unittest
 
+import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
+import pygraphs.measure.shortcuts as h
 from pygraphs import util
 from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Samples, Datasets
-from pygraphs.measure import *
-from pygraphs.measure.shortcuts import *
+from pygraphs.measure import SPCT_D, SP_D, CT_H, logFor_H, RSP_K, FE_K, SP_K
 
 
 class TestSPCT(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestSPCT(unittest.TestCase):
 
     def test_SPCT_order(self):
         A = Samples.diploma_matrix
-        D_SP, D_CT = SP_D(A).get_D(-1), 2 * H_to_D(CT_H(A).get_K(-1))
+        D_SP, D_CT = SP_D(A).get_D(-1), 2 * h.K_to_D(CT_H(A).get_K(-1))
         self.assertTrue(np.allclose(D_SP, self.get_SP(A)))
         self.assertTrue(np.allclose(D_CT, self.get_CT(A)))
 
@@ -45,8 +46,8 @@ class TestSPCT(unittest.TestCase):
 
     def test_full_graph_SPCT_equality(self):
         A = Samples.full_graph
-        sp_normed = normalize(self.get_SP(A))
-        ct_normed = normalize(self.get_CT(A))
+        sp_normed = h.normalize(self.get_SP(A))
+        ct_normed = h.normalize(self.get_CT(A))
         self.assertTrue(np.allclose(sp_normed, ct_normed))
 
     def test_tree_SPCT_equality(self):

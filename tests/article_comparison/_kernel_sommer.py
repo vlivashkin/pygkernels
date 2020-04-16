@@ -1,6 +1,7 @@
 import numpy as np
 
-from pygraphs.measure import Kernel, scaler, For_H, D_to_K
+from pygraphs.measure import Kernel, scaler, For_H
+import pygraphs.measure.shortcuts as h
 
 
 class logFor_S(Kernel):
@@ -17,4 +18,4 @@ class logFor_S(Kernel):
         e = np.ones((size, 1))
         ds = np.diagonal(S)[:, None]
         Δ_LF = ds * e.T + e * ds.T - 2 * S
-        return D_to_K(Δ_LF)
+        return h.D_to_K(Δ_LF)

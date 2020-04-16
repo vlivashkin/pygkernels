@@ -8,11 +8,11 @@ import unittest
 
 from sklearn.metrics import normalized_mutual_info_score
 
+import numpy as np
 from pygraphs import util
 from pygraphs.cluster import KKMeans
 from pygraphs.graphs import Samples, Datasets
-from pygraphs.measure import *
-from pygraphs.measure.shortcuts import *
+from pygraphs.measure import SPCT_D, logFor_D, RSP_D, FE_D, RSP_K, FE_K, logFor_H, SPCT_K, SCT_H
 
 
 class TestFigure2Comparison(unittest.TestCase):

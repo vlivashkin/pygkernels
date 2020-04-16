@@ -14,8 +14,8 @@ from pygraphs.scenario import RejectCurve, d3_colors
 from pygraphs.util import load_or_calc_and_save
 
 distances_kernels_pairs = [
-    ('pWalk', pWalk_H, pWalk_D),
-    ('Walk', Walk_H, Walk_D),
+    ('pWalk', Katz_H, Katz_D),
+    ('Walk', logKatz_H, logKatz_D),
     ('For', For_H, For_D),
     ('logFor', logFor_H, logFor_D),
     ('Comm', Comm_H, Comm_D),
