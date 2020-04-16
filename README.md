@@ -1,35 +1,43 @@
 [![Build Status](https://travis-ci.com/vlivashkin/pygraphs.svg?branch=master)](https://travis-ci.com/vlivashkin/pygraphs)
 [![codecov](https://codecov.io/gh/vlivashkin/pygraphs/branch/master/graph/badge.svg)](https://codecov.io/gh/vlivashkin/pygraphs)
-# pygraphs
+# pygkernels &mdash; Kernels on graphs for Python
 
-Framework for clustering graphs using various distances/proximity measures.
+Framework for clustering graph nodes using various similarity/dissimilarity measures.
 
-List of distances/proximity measures:
-* **SP-CT**: Shortest Path and Commute Time (and linear combination)
-* **Katz**: Katz (a.k.a. Walk, Von Neumann diffusion kernel)
-* **For**: Forest (a.k.a. Regularized Laplacian kernel)
-* **Comm**: Communicability (a.k.a. Exponential diffusion kernel)
-* **Heat**: Heat kernel (a.k.a. Laplacian exponential diffusion kernel)
-* **NHeat**: Normalized Heat
-* **SCT**: Sigmoid Commute Time
-* **SCCT**: Sigmoid Corrected Commute Time
-* **RSP**: Randomized Shortest Path
-* **FE**: Free Energy
-* **PPR**: Personalized PageRank
-* **ModifPPR**: Modified Personalized PageRank
-* **HeatPPR**: Heat Personalized PageRank
-* logarithmic versions of all these measures
+#### List of measures:
+* Adjacency matrix based kernels:
+  * **Katz**: Katz kernel (a.k.a. Walk, Von Neumann diffusion kernel)
+  * **Comm**: Communicability kernel (a.k.a. Exponential diffusion kernel)
+  * **DFS**: Double Factorial similarity
+* Laplacian based kernels:
+  * **For**: Forest kernel (a.k.a. Regularized Laplacian kernel)
+  * **Heat**: Heat kernel (a.k.a. Laplacian exponential diffusion kernel)
+  * **NHeat**: Normalized Heat kernel
+  * **Abs**: Absorption kernel
+* Markov matrix based kernels and measures:
+  * **PPR**: Personalized PageRank
+  * **MPPR**: Modified Personalized PageRank
+  * **HPR**: PageRank heat similarity measure
+  * **RSP**: Randomized Shortest Path distance
+  * **FE**: Free Energy distance
+* Sigmoid Commute Time:
+  * **SCT**: Sigmoid Commute Time
+  * **SCCT**: Sigmoid Corrected Commute Time
+* **SP-CT**: Shortest Path, Commute Time, and their linear combination
+* logarithmic version of every measure
 
-List of clustering algoritms:
+Every measure is presented as dissimilarity (distance) and similarity (kernel/proximity measure). All of them can be used in any classification/clustering/community detection algorithm which uses kernel trick (e.g. kernel k-means).
+
+#### List of clustering algoritms:
 * Kernel k-means
 * Spectral clustering
-* Ward
+* Ward clustering
 * Wrappers for kernel k-means from kernlab, sklearn k-means
 
-List of graph generators:
+#### Graph generators:
 * Stochastic Block Model
 
-List of graph samples:
+#### Graph datsets:
 * Dolphins
 * EU-core
 * Football
@@ -40,7 +48,7 @@ List of graph samples:
 
 ## Usage
 
-Simple clustering:
+#### Simple clustering:
 ```.python
 import networkx as nx
 from pygraphs.cluster import KKMeans
