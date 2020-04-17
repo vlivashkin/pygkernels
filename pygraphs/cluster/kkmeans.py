@@ -72,7 +72,8 @@ class KMeans_Fouss(KernelEstimator, ABC):
                     quality = self._choose_measure_to_detect_best_trial(inertia, modularity)
                     return labels, quality, inertia, modularity
             except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
-                print(e)
+                # print(f'trial: {e}')
+                pass
         # case if all reruns was unsuccessful
         quality = self._choose_measure_to_detect_best_trial(inertia, modularity)
         return labels, quality, inertia, modularity

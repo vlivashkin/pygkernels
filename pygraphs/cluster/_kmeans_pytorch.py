@@ -35,7 +35,7 @@ def kmeanspp(K, n_clusters, device):
     k-means++ initialization for k-means
     The method will work only if all the distances is finite
     """
-    assert torch.all(~torch.isnan(K))
+    assert ~torch.any(torch.isnan(K))
 
     n = K.shape[0]
     e = torch.eye(n, dtype=torch.float32).to(device)
@@ -48,7 +48,9 @@ def kmeanspp(K, n_clusters, device):
         min_distances, _ = torch.min(torch.einsum('kni,ij,knj->kn', [h_e, K, h_e]), dim=0)
         min_distances.pow_(2)
         if torch.sum(min_distances) > 0:
-            next_centroid = np.random.choice(range(n), p=(min_distances / min_distances.sum()).cpu().numpy())
+            p = (min_distances / min_distances.sum()).cpu().numpy()
+            assert np.isclose(np.sum(p), 1)
+            next_centroid = np.random.choice(range(n), p=p)
         else:  # no way to make all different centroids; let's choose random one just for rerun
             next_centroid = np.random.choice(range(n))
         h[c_idx, next_centroid] = 1
