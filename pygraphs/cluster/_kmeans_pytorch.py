@@ -22,7 +22,7 @@ def _modularity(A, labels):
     degrees = torch.sum(A, dim=1, keepdim=True)
 
     Q_items = A + torch.diagonal(A) - degrees.mm(degrees.transpose(1, 0)) / n_edges
-    Q = 0
+    Q = torch.Tensor([0])
     for class_name in range(torch.max(labels).item() + 1):
         mask = labels == class_name
         Q += torch.sum(Q_items[mask][:, mask])
@@ -31,6 +31,12 @@ def _modularity(A, labels):
 
 @torch_func
 def kmeanspp(K, n_clusters, device):
+    """
+    k-means++ initialization for k-means
+    The method will work only if all the distances is finite
+    """
+    assert torch.all(~torch.isnan(K))
+
     n = K.shape[0]
     e = torch.eye(n, dtype=torch.float32).to(device)
     h = torch.zeros((n_clusters, n), dtype=torch.float32).to(device)

@@ -52,6 +52,15 @@ class KMeans_Fouss(KernelEstimator, ABC):
             raise NotImplementedError()
         return h
 
+    def _choose_measure_to_detect_best_trial(self, inertia, modularity):
+        if self.init_measure == 'inertia':
+            quality = -inertia
+        elif self.init_measure == 'modularity':
+            quality = modularity
+        else:
+            raise NotImplementedError(f'wrong init_measure: {self.init_measure}')
+        return quality
+
     def _predict_successful_once(self, K: np.array, init_idx: int, init: str, A: Optional[np.array] = None):
         np.random.seed(self.random_state + init_idx)
         labels, inertia, modularity = None, np.nan, np.nan
@@ -60,18 +69,12 @@ class KMeans_Fouss(KernelEstimator, ABC):
                 K = K.astype(np.float64)
                 labels, inertia, modularity, success = self._predict_once(K, init, A=A)
                 if success:
-                    if self.init_measure == 'inertia':
-                        quality = -inertia
-                    elif self.init_measure == 'modularity':
-                        quality = modularity
+                    quality = self._choose_measure_to_detect_best_trial(inertia, modularity)
                     return labels, quality, inertia, modularity
             except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
                 print(e)
-
-        if self.init_measure == 'inertia':
-            quality = -inertia
-        elif self.init_measure == 'modularity':
-            quality = modularity
+        # case if all reruns was unsuccessful
+        quality = self._choose_measure_to_detect_best_trial(inertia, modularity)
         return labels, quality, inertia, modularity
 
     @abstractmethod
