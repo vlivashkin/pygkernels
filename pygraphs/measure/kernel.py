@@ -4,9 +4,8 @@ import networkx as nx
 import numpy as np
 from scipy.linalg import expm
 
-import pygraphs.measure.shortcuts as h
+from . import shortcuts as h
 from pygraphs.measure import scaler
-from pygraphs.measure.scaler import Scaler
 
 
 class Kernel(ABC):
@@ -24,7 +23,7 @@ class Kernel(ABC):
             self._parent_kernel = self._parent_kernel_class(A)
             self._parent_distance = None
             self._default_scaler = self._parent_kernel._default_scaler
-        self.scaler: Scaler = self._default_scaler(A)
+        self.scaler: scaler.Scaler = self._default_scaler(A)
         self.A = A
 
     def get_K(self, param):

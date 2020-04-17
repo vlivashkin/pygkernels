@@ -4,8 +4,8 @@ import numpy as np
 from scipy.sparse.csgraph import shortest_path
 from sklearn.utils import deprecated
 
-import pygraphs.measure.shortcuts as h
-from pygraphs.measure import scaler
+from . import shortcuts as h
+from . import scaler
 
 
 class Distance(ABC):
