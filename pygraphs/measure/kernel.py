@@ -210,8 +210,8 @@ class ModifPPR_H(Kernel):
         return np.linalg.inv(self.D - alpha * self.A)
 
 
-class HeatPPR_H(Kernel):
-    name, _default_scaler = 'HeatPPR', scaler.Fraction
+class HeatPR_H(Kernel):
+    name, _default_scaler = 'HeatPR', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)

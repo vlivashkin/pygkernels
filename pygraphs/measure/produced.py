@@ -20,7 +20,7 @@ class SPCT_H(Kernel):
 
 
 class logKatz_H(Kernel):
-    name, _parent_kernel_class = 'Katz', kernel.Katz_H
+    name, _parent_kernel_class = 'logKatz', kernel.Katz_H
 
 
 class logFor_H(Kernel):
@@ -47,8 +47,8 @@ class logModifPPR_H(Kernel):
     name, _parent_kernel_class = 'logModifPPR', kernel.ModifPPR_H
 
 
-class logHeatPPR_H(Kernel):
-    name, _parent_kernel_class = 'logHeatPPR', kernel.HeatPPR_H
+class logHeatPR_H(Kernel):
+    name, _parent_kernel_class = 'logHeatPR', kernel.HeatPR_H
 
 
 class logDF_H(Kernel):
@@ -138,12 +138,12 @@ class logModifPPR_D(Distance):
     name, _parent_kernel_class = 'logModifPPR', logModifPPR_H
 
 
-class HeatPPR_D(Distance):
-    name, _parent_kernel_class = 'HeatPPR', kernel.HeatPPR_H
+class HeatPR_D(Distance):
+    name, _parent_kernel_class = 'HeatPR', kernel.HeatPR_H
 
 
-class logHeatPPR_D(Distance):
-    name, _parent_kernel_class = 'logHeatPPR', logHeatPPR_H
+class logHeatPR_D(Distance):
+    name, _parent_kernel_class = 'logHeatPR', logHeatPR_H
 
 
 class DF_D(Distance):
