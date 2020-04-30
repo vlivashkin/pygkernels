@@ -5,7 +5,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from . import shortcuts as h
-from pygraphs.measure import scaler
+from pygkernels.measure import scaler
 
 
 class Kernel(ABC):

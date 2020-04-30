@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.cluster import AgglomerativeClustering, k_means, SpectralClustering
 from sklearn.utils import deprecated
 
-from pygraphs.cluster.base import KernelEstimator, REstimatorWrapper
+from pygkernels.cluster.base import KernelEstimator, REstimatorWrapper
 
 
 # @deprecated("This is not a kernel method!")

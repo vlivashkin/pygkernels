@@ -5,11 +5,11 @@ import unittest
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
-from pygraphs import util
-from pygraphs.cluster import KKMeans, SpectralClustering_rubanov
-from pygraphs.cluster.kward import KWard
-from pygraphs.graphs import Samples, Datasets
-from pygraphs.measure import kernels
+from pygkernels import util
+from pygkernels.cluster import KKMeans, SpectralClustering_rubanov
+from pygkernels.cluster.kward import KWard
+from pygkernels.data import Samples, Datasets
+from pygkernels.measure import kernels
 
 
 class TestEstimators(unittest.TestCase):

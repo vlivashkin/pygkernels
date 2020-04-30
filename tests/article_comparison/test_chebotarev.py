@@ -2,10 +2,10 @@ import logging
 import unittest
 
 import numpy as np
-from pygraphs import util
-from pygraphs.graphs import Samples
-from pygraphs.measure import SP_D, CT_D, logKatz_D, For_D, Comm_D, Katz_D, logFor_D
-from pygraphs.measure.scaler import AlphaToT, Linear
+from pygkernels import util
+from pygkernels.data import Samples
+from pygkernels.measure import SP_D, CT_D, logKatz_D, For_D, Comm_D, Katz_D, logFor_D
+from pygkernels.measure.scaler import AlphaToT, Linear
 
 
 class TestFigure1Comparison(unittest.TestCase):

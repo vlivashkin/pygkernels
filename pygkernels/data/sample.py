@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Samples:
     chain_graph = np.array([
         [0, 1, 0, 0],

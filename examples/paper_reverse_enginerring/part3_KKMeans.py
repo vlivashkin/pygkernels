@@ -9,15 +9,15 @@ from scipy import stats
 from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm
 
-from pygraphs.util import load_or_calc_and_save, ddict2dict
+from pygkernels.util import load_or_calc_and_save, ddict2dict
 
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
 from _generated_kkmeans import generated_kkmeans_any
-from pygraphs.cluster import KKMeans as KKMeans
-from pygraphs.graphs.generator import StochasticBlockModel
-from pygraphs.measure import kernels
-from pygraphs.score import copeland
+from pygkernels.cluster import KKMeans as KKMeans
+from pygkernels.graphs.generator import StochasticBlockModel
+from pygkernels.measure import kernels
+from pygkernels.score import copeland
 
 
 def _single_competition(best_params_column, edges, nodes, estimator):

@@ -9,11 +9,11 @@ from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-from pygraphs.cluster import KWard
-from pygraphs.graphs.generator import StochasticBlockModel
-from pygraphs.measure import kernels
-from pygraphs.scenario import ParallelByGraphs
-from pygraphs.util import load_or_calc_and_save, ddict2dict
+from pygkernels.cluster import KWard
+from pygkernels.graphs.generator import StochasticBlockModel
+from pygkernels.measure import kernels
+from pygkernels.scenario import ParallelByGraphs
+from pygkernels.util import load_or_calc_and_save, ddict2dict
 
 
 def _calc_best_params(column, n_graphs=100, n_params=31, n_jobs=-1):

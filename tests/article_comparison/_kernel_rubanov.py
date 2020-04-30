@@ -4,9 +4,9 @@ import numpy as np
 import numpy.matlib
 from numpy import warnings
 
-from pygraphs.measure import scaler
-from pygraphs.measure.kernel import Kernel
-import pygraphs.measure.shortcuts as h
+from pygkernels.measure import scaler
+from pygkernels.measure.kernel import Kernel
+import pygkernels.measure.shortcuts as h
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures

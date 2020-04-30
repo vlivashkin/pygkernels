@@ -3,8 +3,8 @@ from typing import Optional
 
 import numpy as np
 
-from pygraphs.cluster import _kmeans_pytorch as _backend
-from pygraphs.cluster.base import KernelEstimator
+from pygkernels.cluster import _kmeans_pytorch as _backend
+from pygkernels.cluster.base import KernelEstimator
 
 
 class KMeans_Fouss(KernelEstimator, ABC):

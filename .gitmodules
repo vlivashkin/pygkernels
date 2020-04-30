@@ -1,0 +1,3 @@
+[submodule "pygkernels/data/community-graphs"]
+	path = pygkernels/data/community-graphs
+	url = https://github.com/vlivashkin/community-graphs

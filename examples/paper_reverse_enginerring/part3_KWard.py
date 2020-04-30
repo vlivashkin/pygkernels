@@ -10,10 +10,10 @@ from tqdm import tqdm
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
 from _generated_kward import generated_kward
-from pygraphs.cluster import KWard
-from pygraphs.graphs.generator import StochasticBlockModel
-from pygraphs.measure import kernels
-from pygraphs.score import copeland
+from pygkernels.cluster import KWard
+from pygkernels.graphs.generator import StochasticBlockModel
+from pygkernels.measure import kernels
+from pygkernels.score import copeland
 
 
 def _print_params_kkmeans(results, inits, features, filename, append=False):

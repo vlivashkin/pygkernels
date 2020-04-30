@@ -1,5 +1,5 @@
-from pygraphs.cluster import _kward_pytorch
-from pygraphs.cluster.base import KernelEstimator
+from pygkernels.cluster import _kward_pytorch
+from pygkernels.cluster.base import KernelEstimator
 
 
 class KWard(KernelEstimator):

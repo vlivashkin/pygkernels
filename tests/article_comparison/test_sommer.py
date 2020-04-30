@@ -12,10 +12,10 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.metrics import normalized_mutual_info_score
 
-from pygraphs import util
-from pygraphs.cluster import KKMeans
-from pygraphs.graphs import Datasets
-from pygraphs.measure import SCCT_H, FE_K, logFor_H, RSP_K, SCT_H, SPCT_H
+from pygkernels import util
+from pygkernels.cluster import KKMeans
+from pygkernels.data import Datasets
+from pygkernels.measure import SCCT_H, FE_K, logFor_H, RSP_K, SCT_H, SPCT_H
 
 
 class TestTable3(ABC):

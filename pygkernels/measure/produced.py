@@ -1,8 +1,8 @@
 from sklearn.utils import deprecated
 
-from pygraphs.measure import scaler, kernel, distance
-from pygraphs.measure.distance import Distance, SP_D, CT_D
-from pygraphs.measure.kernel import Kernel, CT_H
+from pygkernels.measure import scaler, kernel, distance
+from pygkernels.measure.distance import Distance, SP_D, CT_D
+from pygkernels.measure.kernel import Kernel, CT_H
 
 
 # H KERNELS (log kernels derived from kernels)

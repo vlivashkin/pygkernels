@@ -9,8 +9,8 @@ warnings.filterwarnings("ignore")
 sys.path.append('../..')
 from _generated_kkmeans import generated_kkmeans_any
 from _generated_kward import generated_kward
-from pygraphs.measure import kernels
-from pygraphs.scenario import plot_results
+from pygkernels.measure import kernels
+from pygkernels.scenario import plot_results
 
 
 def _plot_log_results(results, img_path):

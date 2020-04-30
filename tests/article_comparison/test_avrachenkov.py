@@ -16,14 +16,15 @@ import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-from pygraphs import util
-from pygraphs.cluster import SpectralClustering_rubanov
-from pygraphs.graphs import Samples, RubanovStochasticBlockModel
-from pygraphs.measure import scaler, logKatz_H, logComm_H, logHeat_H, logFor_H, logPPR_H, logModifPPR_H, logHeatPPR_H, \
-    logNHeat_H
-from pygraphs.score import FC
+from pygkernels import util
+from pygkernels.cluster import SpectralClustering_rubanov
+from pygkernels.data import Samples
+from pygkernels.measure import scaler, logKatz_H, logComm_H, logHeat_H, logFor_H, logPPR_H, logModifPPR_H, logNHeat_H, \
+    logHeatPR_H
+from pygkernels.score import FC
 from tests.article_comparison._kernel_rubanov import Katz_R, Estrada_R, Heat_R, RegularizedLaplacian_R, logPPR_R, \
     logModifPPR_R, logHeatPPR_R
+from tests.article_comparison._rubanov_sbm_model import RubanovStochasticBlockModel
 
 
 class TestNewMeasuresEqualuty(unittest.TestCase):
@@ -75,7 +76,7 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
                             f'error in param={param:0.3f}')
 
     def test_logHeatPPR(self):
-        logppr = logHeatPPR_H(self.graph)
+        logppr = logHeatPR_H(self.graph)
         ppr_rubanov = logHeatPPR_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
             self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
@@ -167,7 +168,7 @@ class BalancedModel(TestCompetition):
         self._compare(logModifPPR_H, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0072)
 
     def test_logHeatPPR(self):
-        self._compare(logHeatPPR_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0074)
+        self._compare(logHeatPR_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0074)
 
 
 @unittest.skip
@@ -207,7 +208,7 @@ class TestUnbalancedModel(TestCompetition):
         self._compare(logModifPPR_H, params=np.linspace(0, 1, 101)[1:-1], error_true=0.0022)
 
     def test_logHeatPPR(self):
-        self._compare(logHeatPPR_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0021)
+        self._compare(logHeatPR_H, params=np.linspace(0, 20, 101)[1:-1], error_true=0.0021)
 
 
 if __name__ == "__main__":

@@ -46,9 +46,9 @@ https://github.com/vlivashkin/community-graphs
 #### Simple clustering:
 ```.python
 import networkx as nx
-from pygraphs.cluster import KKMeans
-from pygraphs.graphs import Datasets
-from pygraphs.measure import logComm_H
+from pygkernels.cluster import KKMeans
+from pygkernels.data import Datasets
+from pygkernels.measure import logComm_H
 
 _, Gs, _ = Datasets().news_2cl_1  # example graph
 G: nx.Graph = Gs[0]

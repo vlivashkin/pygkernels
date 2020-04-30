@@ -9,11 +9,11 @@ from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-from pygraphs.graphs.generator import StochasticBlockModel
-from pygraphs.measure import kernels
-from pygraphs.cluster.kkmeans import KKMeans as KKMeans
-from pygraphs.scenario import ParallelByGraphs, d3_colors
-from pygraphs.util import load_or_calc_and_save, ddict2dict
+from pygkernels.graphs.generator import StochasticBlockModel
+from pygkernels.measure import kernels
+from pygkernels.cluster.kkmeans import KKMeans as KKMeans
+from pygkernels.scenario import ParallelByGraphs, d3_colors
+from pygkernels.util import load_or_calc_and_save, ddict2dict
 
 
 @load_or_calc_and_save('./cache/p5_2class.pkl')

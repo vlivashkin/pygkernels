@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
-import pygraphs.measure.shortcuts as h
-from pygraphs import util
-from pygraphs.graphs import Samples
-from pygraphs.measure import distances, SP_D, logFor_D, logKatz_D
+import pygkernels.measure.shortcuts as h
+from pygkernels import util
+from pygkernels.data import Samples
+from pygkernels.measure import distances, SP_D, logFor_D, logKatz_D
 
 
 class TestShortcuts(unittest.TestCase):

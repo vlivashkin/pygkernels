@@ -4,7 +4,7 @@ from itertools import combinations
 import numpy as np
 import torch
 
-from pygraphs.cluster.base import torch_func
+from pygkernels.cluster.base import torch_func
 
 
 def calc_cache_batch(Ck_n, Cl_n, Ck_h, Cl_h, K, device):

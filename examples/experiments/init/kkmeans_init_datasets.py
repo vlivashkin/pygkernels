@@ -6,13 +6,13 @@ from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
 sys.path.append('../..')
-from pygraphs.cluster import KKMeans
-from pygraphs.graphs import Datasets
-from pygraphs.measure import kernels
-from pygraphs.util import load_or_calc_and_save
+from pygkernels.cluster import KKMeans
+from pygkernels.graphs import Datasets
+from pygkernels.measure import kernels
+from pygkernels.util import load_or_calc_and_save
 import networkx as nx
 
-CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygraphs/kkmeans_init_datasets_modularity'
+CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygkernels/kkmeans_init_datasets_modularity'
 dataset_names = [
     'dolphins',
     'football',

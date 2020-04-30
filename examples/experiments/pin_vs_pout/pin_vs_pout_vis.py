@@ -7,10 +7,10 @@ import numpy as np
 from tqdm import tqdm
 
 sys.path.append('../..')
-from pygraphs.util import load_or_calc_and_save
-from pygraphs.measure import kernels
-from pygraphs.cluster import KKMeans as KKMeans
-from pygraphs.scenario import d3_colors
+from pygkernels.util import load_or_calc_and_save
+from pygkernels.measure import kernels
+from pygkernels.cluster import KKMeans as KKMeans
+from pygkernels.scenario import d3_colors
 
 # Experiment 1
 # Calc a 2d field p_in vs p_out for several n and k(balanced classes)

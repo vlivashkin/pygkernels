@@ -8,9 +8,9 @@ import numpy as np
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
 from _datasets_kkmeans import datasets_kkmeans_any
-from pygraphs.measure import kernels
-from pygraphs.scenario import d3_colors
-from pygraphs.util import configure_logging
+from pygkernels.measure import kernels
+from pygkernels.scenario import d3_colors
+from pygkernels.util import configure_logging
 
 configure_logging()
 logger = logging.getLogger()

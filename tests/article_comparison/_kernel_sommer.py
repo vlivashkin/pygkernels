@@ -1,7 +1,7 @@
 import numpy as np
 
-from pygraphs.measure import Kernel, scaler, For_H
-import pygraphs.measure.shortcuts as h
+from pygkernels.measure import Kernel, scaler, For_H
+import pygkernels.measure.shortcuts as h
 
 
 class logFor_S(Kernel):

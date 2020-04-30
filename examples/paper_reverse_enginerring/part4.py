@@ -8,10 +8,10 @@ import numpy as np
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
 from _generated_kkmeans import generated_kkmeans_any
-from pygraphs.graphs.generator import StochasticBlockModel
-from pygraphs.measure import *
-from pygraphs.scenario import RejectCurve, d3_colors
-from pygraphs.util import load_or_calc_and_save
+from pygkernels.graphs.generator import StochasticBlockModel
+from pygkernels.measure import *
+from pygkernels.scenario import RejectCurve, d3_colors
+from pygkernels.util import load_or_calc_and_save
 
 distances_kernels_pairs = [
     ('pWalk', Katz_H, Katz_D),

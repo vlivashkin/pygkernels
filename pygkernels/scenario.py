@@ -8,7 +8,7 @@ import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-from pygraphs.util import ddict2dict
+from pygkernels.util import ddict2dict
 
 d3_category20 = [
     '#1f77b4',

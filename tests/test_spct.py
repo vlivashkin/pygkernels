@@ -3,11 +3,11 @@ import unittest
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
 
-import pygraphs.measure.shortcuts as h
-from pygraphs import util
-from pygraphs.cluster import KKMeans
-from pygraphs.graphs import Samples, Datasets
-from pygraphs.measure import SPCT_D, SP_D, CT_H, logFor_H, RSP_K, FE_K, SP_K
+import pygkernels.measure.shortcuts as h
+from pygkernels import util
+from pygkernels.cluster import KKMeans
+from pygkernels.data import Samples, Datasets
+from pygkernels.measure import SPCT_D, SP_D, CT_H, logFor_H, RSP_K, FE_K, SP_K
 
 
 class TestSPCT(unittest.TestCase):

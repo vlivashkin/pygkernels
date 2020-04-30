@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from pygraphs.cluster.base import torch_func
+from pygkernels.cluster.base import torch_func
 
 
 def _hKh(hk, ei, K):

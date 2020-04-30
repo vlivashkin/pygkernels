@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.cluster import KMeans
 
-from pygraphs.cluster.base import KernelEstimator
+from pygkernels.cluster.base import KernelEstimator
 
 
 class SpectralClustering_rubanov(KernelEstimator):

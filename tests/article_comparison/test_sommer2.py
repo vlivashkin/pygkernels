@@ -10,10 +10,10 @@ from functools import partial
 
 from sklearn.metrics import normalized_mutual_info_score
 
-from pygraphs import util
-from pygraphs.cluster import KKMeans
-from pygraphs.graphs import Datasets
-from pygraphs.measure import SCT_H, SCCT_H, FE_K, RSP_K, SPCT_H, Comm_H, For_H, Heat_H, Katz_H, logComm_H, logFor_H, \
+from pygkernels import util
+from pygkernels.cluster import KKMeans
+from pygkernels.data import Datasets
+from pygkernels.measure import SCT_H, SCCT_H, FE_K, RSP_K, SPCT_H, Comm_H, For_H, Heat_H, Katz_H, logComm_H, logFor_H, \
     logHeat_H, logKatz_H
 
 

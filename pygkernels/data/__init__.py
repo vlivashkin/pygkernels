@@ -1,10 +1,9 @@
-from pygraphs.graphs.dataset import Datasets
-from pygraphs.graphs.generator import StochasticBlockModel, RubanovStochasticBlockModel
-from pygraphs.graphs.sample import Samples
+from pygkernels.data.dataset import Datasets
+from pygkernels.data.sample import Samples
+from pygkernels.data.sbm_generator import StochasticBlockModel
 
 __all__ = [
     Samples,
     Datasets,
-    StochasticBlockModel,
-    RubanovStochasticBlockModel
+    StochasticBlockModel
 ]

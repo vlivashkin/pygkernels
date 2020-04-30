@@ -6,12 +6,12 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from pygraphs import score
-from pygraphs.cluster import KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn, \
+from pygkernels import score
+from pygkernels.cluster import KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn, \
     KKMeans, KKMeans_iterative
-from pygraphs.cluster import _kmeans_pytorch
-from pygraphs.graphs import Datasets
-from pygraphs.measure import logComm_H
+from pygkernels.cluster import _kmeans_pytorch
+from pygkernels.data import Datasets
+from pygkernels.measure import logComm_H
 
 
 class TestEstimators(unittest.TestCase):

@@ -8,11 +8,11 @@ from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
-from pygraphs.cluster import KKMeans as KKMeans
+from pygkernels.cluster import KKMeans as KKMeans
 from example_graphs.dataset import Datasets
-from pygraphs.measure import kernels
-from pygraphs.scenario import ParallelByGraphs
-from pygraphs.util import load_or_calc_and_save, configure_logging
+from pygkernels.measure import kernels
+from pygkernels.scenario import ParallelByGraphs
+from pygkernels.util import load_or_calc_and_save, configure_logging
 
 configure_logging()
 logger = logging.getLogger()
