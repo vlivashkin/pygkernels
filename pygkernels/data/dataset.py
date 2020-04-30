@@ -7,7 +7,7 @@ import numpy as np
 class Datasets:
     """
     Example datasets.
-    Class uses https://github.com/vlivashkin/community-graphs, mounted as submodule to ./graphs
+    Class uses https://github.com/vlivashkin/community-graphs, mounted as submodule to ./community-graphs
     """
 
     def __init__(self, datasets_root=None):
@@ -51,15 +51,16 @@ class Datasets:
 
         self._loaded_datasets = {}
 
-    def _load_gml(self, fpath):
+    def _load_gml(self, rel_path):
+        fpath = f'{self.datasets_root}/{rel_path}'
         G = nx.read_gml(fpath)
-        nodes_order, partition = list(nx.get_node_attributes(G, 'gt').items())
+        nodes_order, partition = zip(*nx.get_node_attributes(G, 'gt').items())
         edges = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
         info = {
             'name': os.path.splitext(os.path.basename(fpath))[0],
             'count': 1,
-            'n': len(self.partition),
-            'k': len(set(self.partition)),
+            'n': len(partition),
+            'k': len(set(partition)),
             'p_in': None,
             'p_out': None
         }

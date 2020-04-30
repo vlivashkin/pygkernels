@@ -1,5 +1,6 @@
 import unittest
 from collections import defaultdict
+from typing import Dict
 
 import networkx as nx
 import numpy as np
@@ -51,23 +52,22 @@ class TestEstimators(unittest.TestCase):
             km = estimator(n_clusters=3)
             km.predict(K, G=G)
 
-    def _calc_modularity_slow(self, G: nx.Graph, labels):
+    @staticmethod
+    def _calc_modularity_slow(G: nx.Graph, labels: Dict):
         communities = defaultdict(list)
-        for idx, label in enumerate(labels):
-            communities[label].append(idx)
+        for name, label in labels.items():
+            communities[label].append(name)
         communities = list(communities.values())
         return nx.community.modularity(G, communities)
 
     def test_modularity(self):
-        graphs, Gs, info = Datasets().polbooks
+        graphs, Gs, _ = Datasets().polbooks
         (A, y_true), G = graphs[0], Gs[0]
-        y_true_better = np.zeros((len(y_true),))
-        mapping = dict([(class_name, i) for i, class_name in enumerate(set(y_true))])
-        for i, item in enumerate(y_true):
-            y_true_better[i] = mapping[item]
+        modularity_nx = self._calc_modularity_slow(G, nx.get_node_attributes(G, 'gt'))
 
-        modularity_nx = self._calc_modularity_slow(G, y_true_better)
-        ours_nx = score.modularity(A, y_true_better)
-        ours2_nx = _kmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(y_true_better).int())
-        self.assertTrue(np.isclose(modularity_nx, ours_nx, atol=0.0001))
-        self.assertTrue(np.isclose(modularity_nx, ours2_nx, atol=0.0001))
+        class_mapping = dict([(class_name, idx) for idx, class_name in enumerate(set(y_true))])
+        y_true_clean = np.array([class_mapping[item] for item in y_true])
+        mod_ours_numpy = score.modularity(A, y_true_clean)
+        mod_ours_torch = _kmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(y_true_clean).int())
+        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy, atol=0.0001))
+        self.assertTrue(np.isclose(modularity_nx, mod_ours_torch, atol=0.0001))
