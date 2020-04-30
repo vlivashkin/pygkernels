@@ -95,7 +95,7 @@ class TestTable2(unittest.TestCase):
             K = measure.get_K(best_param)
             true_nmi = self.etalon[info['name']][idx]
 
-            labels_pred = KKMeans(n_clusters=info['k'], n_init=5, device='cpu').predict(K, G=G)
+            labels_pred = KKMeans(n_clusters=info['k'], n_init=5, device='cpu').predict(K, A=A)
             test_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
             diff = true_nmi - test_nmi
 

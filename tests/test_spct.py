@@ -11,21 +11,15 @@ from pygkernels.measure import SPCT_D, SP_D, CT_H, logFor_H, RSP_K, FE_K, SP_K
 
 
 class TestSPCT(unittest.TestCase):
-    """
-    This is important:
-    lambda = 0 -> CT
-    lambda = 1 -> SP
-    """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         util.configure_logging()
-        self.get_CT = lambda A: SPCT_D(A).get_D(0)
-        self.get_SP = lambda A: SPCT_D(A).get_D(1)
+        self.get_CT = lambda A: h.normalize(SPCT_D(A).get_D(0))  # lambda = 0 -> CT
+        self.get_SP = lambda A: h.normalize(SPCT_D(A).get_D(1))  # lambda = 1 -> SP
 
     def test_SPCT_order(self):
         A = Samples.diploma_matrix
-        D_SP, D_CT = SP_D(A).get_D(-1), 2 * h.K_to_D(CT_H(A).get_K(-1))
+        D_SP, D_CT = h.normalize(SP_D(A).get_D(-1)), h.normalize(2 * h.K_to_D(CT_H(A).get_K(-1)))
         self.assertTrue(np.allclose(D_SP, self.get_SP(A)))
         self.assertTrue(np.allclose(D_CT, self.get_CT(A)))
 
@@ -111,7 +105,8 @@ class Figure2ComparisonTests(unittest.TestCase):
         self.graph, self.y_true = graph[0]
 
     def call_and_print(self, name, K):
-        ari = adjusted_rand_score(KKMeans(n_clusters=2, device='cpu').fit_predict(K), self.y_true)
+        y_pred = KKMeans(n_clusters=2, device='cpu', init_measure='inertia').fit_predict(K)
+        ari = adjusted_rand_score(self.y_true, y_pred)
         print('{}\t{:0.3f}'.format(name, ari))
 
     def test_CT(self):

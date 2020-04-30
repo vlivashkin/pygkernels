@@ -83,10 +83,13 @@ class KMeans_Fouss(KernelEstimator, ABC):
         pass
 
     def predict(self, K, explicit=False, A: Optional[np.array] = None):
+        if A is not None:
+            A = A.astype(np.float32)
+
         inits, best_labels, best_quality = [], None, np.inf
         init_names = self.INIT_NAMES if self.init == 'any' else [self.init]
         for init in init_names:
-            results = [self._predict_successful_once(K, i, init, A=A.astype(np.float32)) for i in range(self.n_init)]
+            results = [self._predict_successful_once(K, i, init, A=A) for i in range(self.n_init)]
             for labels, quality, inertia, modularity in results:
                 if explicit:
                     inits.append({
