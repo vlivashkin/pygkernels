@@ -3,13 +3,13 @@ import sys
 import warnings
 from functools import partial
 
-from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+from sklearn.metrics import adjusted_rand_score
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 sys.path.append('../..')
 from pygraphs.cluster import KKMeans as KKMeans
-from pygraphs.graphs.dataset import Datasets
+from example_graphs.dataset import Datasets
 from pygraphs.measure import kernels
 from pygraphs.scenario import ParallelByGraphs
 from pygraphs.util import load_or_calc_and_save, configure_logging

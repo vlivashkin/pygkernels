@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='pygraphs',
+    name='pygkernels',
     version='0.9',
-    packages=['pygraphs'],
+    packages=['pygkernels'],
     url='',
     license='MIT',
     author='Vladimir Ivashkin',

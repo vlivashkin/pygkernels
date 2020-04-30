@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/vlivashkin/pygraphs.svg?branch=master)](https://travis-ci.com/vlivashkin/pygraphs)
-[![codecov](https://codecov.io/gh/vlivashkin/pygraphs/branch/master/graph/badge.svg)](https://codecov.io/gh/vlivashkin/pygraphs)
+[![Build Status](https://travis-ci.com/vlivashkin/pygkernels.svg?branch=master)](https://travis-ci.com/vlivashkin/pygkernels)
+[![codecov](https://codecov.io/gh/vlivashkin/pygkernels/branch/master/graph/badge.svg)](https://codecov.io/gh/vlivashkin/pygkernels)
 # pygkernels &mdash; Kernels on Graphs for Python
 
 Framework for clustering graph nodes using various similarity/dissimilarity measures.
@@ -38,12 +38,7 @@ Every measure is presented as dissimilarity (distance) and similarity (kernel/pr
 * Stochastic Block Model
 
 #### Graph datsets:
-* Dolphins
-* EU-core
-* Football
-* Zachary karate
-* Newsgroup (9 subsets)
-* Polbooks
+https://github.com/vlivashkin/community-graphs
 
 
 ## Usage

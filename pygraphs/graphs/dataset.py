@@ -1,200 +1,86 @@
 import os
-from os.path import join as pj
 
 import networkx as nx
 import numpy as np
 
 
-class ImportedGraphBuilder:
-    def __init__(self):
-        self.name = None
-        self.nodes_mapping = []
-        self.nodes_class = []
-        self.edges = None
+class Datasets:
+    """
+    Example datasets.
+    Class uses https://github.com/vlivashkin/community-graphs, mounted as submodule to ./graphs
+    """
 
-    def set_name(self, name):
-        self.name = name
-        return self
+    def __init__(self, datasets_root=None):
+        if datasets_root is None:
+            folder_of_this_src_file = os.path.dirname(os.path.abspath(__file__))
+            self.datasets_root = f'{folder_of_this_src_file}/datasets/gml_graphs'
+        else:
+            self.datasets_root = datasets_root
 
-    def import_nodes(self, filename, sep='\t', startline=0, name_col_idx=0, class_col_idx=1):
-        with open(filename) as f:
-            for line_idx, line in enumerate(f):
-                if len(line) > 0 and line_idx >= startline:
-                    line_content = (line[:-2] if line.endswith(';\n') else line[:-1]).split(sep)
-                    self.nodes_mapping.append(str(line_idx) if name_col_idx == 'idx' else line_content[name_col_idx])
-                    self.nodes_class.append(line_content[class_col_idx])
-        self.edges = np.zeros((len(self.nodes_class), len(self.nodes_class)))
-        return self
+        self._lazy_datasets = {
+            'cora_AI': lambda: self._load_gml('cora_subset/Artificial_Intelligence.gml'),
+            'cora_AI_ML': lambda: self._load_gml('cora_subset/Artificial_Intelligence__Machine_Learning.gml'),
+            'cora_DS_AT': lambda: self._load_gml('cora_subset/Data_Structures__Algorithms_and_Theory.gml'),
+            'cora_DB': lambda: self._load_gml('cora_subset/Databases.gml'),
+            'cora_EC': lambda: self._load_gml('cora_subset/Encryption_and_Compression.gml'),
+            'cora_HA': lambda: self._load_gml('cora_subset/Hardware_and_Architecture.gml'),
+            'cora_HCI': lambda: self._load_gml('cora_subset/Human_Computer_Interaction.gml'),
+            'cora_IR': lambda: self._load_gml('cora_subset/Information_Retrieval.gml'),
+            'cora_Net': lambda: self._load_gml('cora_subset/Networking.gml'),
+            'cora_OS': lambda: self._load_gml('cora_subset/Operating_Systems.gml'),
+            'cora_Prog': lambda: self._load_gml('cora_subset/Programming.gml'),
+            'dolphins': lambda: self._load_gml('dolphins.gml'),
+            'eu-core': lambda: self._load_gml('eu-core.gml'),
+            'eurosis': lambda: self._load_gml('eu-eurosis.gml'),
+            'football': lambda: self._load_gml('football.gml'),
+            'karate': lambda: self._load_gml('karate.gml'),
+            'news_2cl_1': lambda: self._load_gml('newsgroup/news_2cl_1.gml'),
+            'news_2cl_2': lambda: self._load_gml('newsgroup/news_2cl_2.gml'),
+            'news_2cl_3': lambda: self._load_gml('newsgroup/news_2cl_3.gml'),
+            'news_3cl_1': lambda: self._load_gml('newsgroup/news_3cl_1.gml'),
+            'news_3cl_2': lambda: self._load_gml('newsgroup/news_3cl_2.gml'),
+            'news_3cl_3': lambda: self._load_gml('newsgroup/news_3cl_3.gml'),
+            'news_5cl_1': lambda: self._load_gml('newsgroup/news_5cl_1.gml'),
+            'news_5cl_2': lambda: self._load_gml('newsgroup/news_5cl_2.gml'),
+            'news_5cl_3': lambda: self._load_gml('newsgroup/news_5cl_3.gml'),
+            'polblogs': lambda: self._load_gml('polblogs.gml'),
+            'polbooks': lambda: self._load_gml('polbooks.gml'),
+            'sp_school_day_1': lambda: self._load_gml('sp_school/sp_school_day_1.gml'),
+            'sp_school_day_2': lambda: self._load_gml('sp_school/sp_school_day_2.gml'),
+        }
 
-    def import_nodes_and_edges(self, filename):
-        stage = -1  # 0 if vertices, 1 if edges
-        with open(filename) as f:
-            for line in f:
-                if len(line) > 0:
-                    if line.startswith('*'):
-                        stage += 1
-                        if stage == 0:
-                            self.nodes_class = []
-                        elif stage == 1:
-                            self.edges = np.zeros((len(self.nodes_class), len(self.nodes_class)))
-                        continue
-                    elif stage == 0:
-                        self.nodes_class.append(int(line[:-1].split(' ')[1][1:-1]))
-                    elif stage == 1:
-                        v1, v2 = line[:-1].strip().split(' ')
-                        self.edges[int(v1) - 1, int(v2) - 1] = 1
-                        self.edges[int(v2) - 1, int(v1) - 1] = 1
-        return self
+        self._loaded_datasets = {}
 
-    def import_edges(self, filename, sep='\t', startline=0, node1_col_idx=0, node2_col_idx=1):
-        with open(filename) as f:
-            for line_idx, line in enumerate(f):
-                if len(line) > 0 and line_idx >= startline:
-                    line_content = (line[:-2] if line.endswith(';\n') else line[:-1]).split(sep)
-                    v1 = self.nodes_mapping.index(line_content[node1_col_idx])
-                    v2 = self.nodes_mapping.index(line_content[node2_col_idx])
-                    self.edges[int(v1), int(v2)] = 1
-                    self.edges[int(v2), int(v1)] = 1
-        return self
-
-    def import_adjacency_matrix(self, filename):
-        with open(filename) as f:
-            for i, line in enumerate(f):
-                if len(line) > 0:
-                    for j, value in enumerate(line.split(',')):
-                        self.edges[i, j] = value
-        return self
-
-    def import_gml(self, filename):
-        G = nx.read_gml(filename)
-        nodelist, class_ = zip(*nx.get_node_attributes(G, 'value').items())
-        self.nodes_class = class_
-        self.edges = np.array(nx.adjacency_matrix(G, nodelist=nodelist).todense())
-        return self
-
-    def build(self):
-        if self.name is None or self.nodes_class is None or self.edges is None:
-            raise NotImplementedError()
-        G = nx.from_numpy_matrix(self.edges)
+    def _load_gml(self, fpath):
+        G = nx.read_gml(fpath)
+        nodes_order, partition = list(nx.get_node_attributes(G, 'gt').items())
+        edges = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
         info = {
-            'name': self.name,
+            'name': os.path.splitext(os.path.basename(fpath))[0],
             'count': 1,
-            'n': len(self.nodes_class),
-            'k': len(list(set(self.nodes_class))),
+            'n': len(self.partition),
+            'k': len(set(self.partition)),
             'p_in': None,
             'p_out': None
         }
-        return [(self.edges, self.nodes_class)], [G], info
-
-
-class Datasets:
-    DATASETS_ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'datasets')
-
-    _lazy_datasets = {
-        # 'as': lambda: Datasets._load_altsoph('as', 'as.clusters', 'as.edges'),  # TOO BIG
-        # 'citeseer': lambda: Datasets._load_webkb_like('citeseer', 'citeseer.nodes', 'citeseer.edges'),  # BROKEN
-        # 'cora_full': lambda: Datasets._load_altsoph('cora_full', '_old.clusters', '_old.edges'),  # TOO BIG
-        'dolphins': lambda: Datasets._load_altsoph('dolphins', 'dolphins.clusters', 'dolphins.edges'),
-        'eu-core': lambda: Datasets._load_altsoph('eu-core', 'eu-core.clusters', 'eu-core.edges'),
-        'football': lambda: Datasets._load_gml('football', 'football.gml'),
-        'karate': lambda: Datasets._load_altsoph('karate', 'karate.clusters', 'karate.edges'),
-        'news_2cl_1': lambda: Datasets._load_newsgroup('news_2cl_1', 'news_2cl_1_classeo.csv', 'news_2cl_1_Docr.csv'),
-        'news_2cl_2': lambda: Datasets._load_newsgroup('news_2cl_2', 'news_2cl_2_classeo.csv', 'news_2cl_2_Docr.csv'),
-        'news_2cl_3': lambda: Datasets._load_newsgroup('news_2cl_3', 'news_2cl_3_classeo.csv', 'news_2cl_3_Docr.csv'),
-        'news_3cl_1': lambda: Datasets._load_newsgroup('news_3cl_1', 'news_3cl_1_classeo.csv', 'news_3cl_1_Docr.csv'),
-        'news_3cl_2': lambda: Datasets._load_newsgroup('news_3cl_2', 'news_3cl_2_classeo.csv', 'news_3cl_2_Docr.csv'),
-        'news_3cl_3': lambda: Datasets._load_newsgroup('news_3cl_3', 'news_3cl_3_classeo.csv', 'news_3cl_3_Docr.csv'),
-        'news_5cl_1': lambda: Datasets._load_newsgroup('news_5cl_1', 'news_5cl_1_classeo.csv', 'news_5cl_1_Docr.csv'),
-        'news_5cl_2': lambda: Datasets._load_newsgroup('news_5cl_2', 'news_5cl_2_classeo.csv', 'news_5cl_2_Docr.csv'),
-        'news_5cl_3': lambda: Datasets._load_newsgroup('news_5cl_3', 'news_5cl_3_classeo.csv', 'news_5cl_3_Docr.csv'),
-        'polblogs': lambda: Datasets._load_gml('polblogs', 'polblogs.gml'),
-        'polbooks': lambda: Datasets._load_gml('polbooks', 'polbooks.gml'),
-        # 'webkb_cornel': lambda: Datasets._load_webkb('webkb_cornell', 'cornell/webkb-cornell.nodes',
-        #                                              'cornell/webkb-cornell.edges'),  # POSSIBLY BROKEN
-        # 'webkb_texas': lambda: Datasets._load_webkb('webkb_texas', 'texas/webkb-texas.nodes',
-        #                                             'texas/webkb-texas.edges'),  # POSSIBLY BROKEN
-        # 'webkb_washington': lambda: Datasets._load_webkb('webkb_washington', 'washington/webkb-washington.nodes',
-        #                                                  'washington/webkb-washington.edges'),  # POSSIBLY BROKEN
-        # 'webkb_wisconsin': lambda: Datasets._load_webkb('webkb_wisconsin', 'wisconsin/webkb-wisconsin.nodes',
-        #                                                 'wisconsin/webkb-wisconsin.edges')  # POSSIBLY BROKEN
-    }
-
-    _loaded_datasets = {}
+        return [(edges, partition)], [G], info
 
     @property
-    def newsgroup(self):
+    def cora_subsets(self):
+        cora_names = ['cora_AI', 'cora_AI_ML', 'cora_DS_AT', 'cora_DB', 'cora_EC', 'cora_HA',
+                      'cora_HCI', 'cora_IR', 'cora_Net', 'cora_OS', 'cora_Prog']
+        return [self[x] for x in cora_names]
+
+    @property
+    def newsgroup_subsets(self):
         newsgroup_names = ['news_2cl_1', 'news_2cl_2', 'news_2cl_3',
                            'news_3cl_1', 'news_3cl_2', 'news_3cl_3',
                            'news_5cl_1', 'news_5cl_2', 'news_5cl_3']
         return [self[x] for x in newsgroup_names]
 
     @property
-    def webkb(self):
-        webkb_names = ['webkb_cornel', 'webkb_texas', 'webkb_washington', 'webkb_wisconsin']
-        return [self[x] for x in webkb_names]
-
-    @property
     def all(self):
         return [self[x] for x in self._lazy_datasets.keys()]
-
-    @staticmethod
-    def _load_altsoph(name, nodes_path, edges_path):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, name, nodes_path)) \
-            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path)) \
-            .build()
-
-    @staticmethod
-    def _load_polbooks_or_football(name, nodes_path, edges_path):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, name, nodes_path), name_col_idx='idx', class_col_idx=2) \
-            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path)) \
-            .build()
-
-    @staticmethod
-    def _load_polblogs_or_zachary(name, graph_path):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_nodes_and_edges(pj(Datasets.DATASETS_ROOT_PATH, name, graph_path)) \
-            .build()
-
-    @staticmethod
-    def _load_newsgroup(name, nodes_path, edges_path):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup', nodes_path),
-                          name_col_idx='idx', class_col_idx=0) \
-            .import_adjacency_matrix(pj(Datasets.DATASETS_ROOT_PATH, 'newsgroup', edges_path)) \
-            .build()
-
-    @staticmethod
-    def _load_webkb(name, nodes_path, edges_path):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, 'webkb', nodes_path),
-                          startline=2, name_col_idx=0, class_col_idx=-1) \
-            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, 'webkb', edges_path),
-                          startline=3, node1_col_idx=1, node2_col_idx=3) \
-            .build()
-
-    @staticmethod
-    def _load_webkb_like(name, nodes_path, edges_path):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_nodes(pj(Datasets.DATASETS_ROOT_PATH, name, nodes_path),
-                          startline=2, name_col_idx=0, class_col_idx=-1) \
-            .import_edges(pj(Datasets.DATASETS_ROOT_PATH, name, edges_path),
-                          startline=3, node1_col_idx=1, node2_col_idx=3) \
-            .build()
-
-    @staticmethod
-    def _load_gml(name, filename):
-        return ImportedGraphBuilder() \
-            .set_name(name) \
-            .import_gml(pj(Datasets.DATASETS_ROOT_PATH, name, filename)) \
-            .build()
 
     def __getitem__(self, item):
         if item not in self._loaded_datasets:
