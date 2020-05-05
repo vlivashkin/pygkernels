@@ -8,6 +8,6 @@ before_install:
   - pip install codecov
 install:
 - pip install .
-script: pytest tests
+script: pytest tests --cov=pygkernels
 after_success:
 - codecov
