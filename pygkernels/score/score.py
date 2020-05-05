@@ -97,6 +97,7 @@ def FC(comms1, comms2):
     M = _getMs(comms1, comms2)
     return 1 - 1 / l * max(_getMatch(M, perm) for perm in itertools.permutations(range(max(M.shape))))
 
+
 def modularity(A: np.array, partition):
     """
     Simplified version only for undirected graphs

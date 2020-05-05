@@ -74,7 +74,7 @@ class TestTable1(ABC):
             K = measure.get_K(best_param)
 
             kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=5432)
-            labels_pred = kkmeans.predict(K, G=G)
+            labels_pred = kkmeans.predict(K, A=A)
             test_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
 
             true_nmi = self.etalon[info['name']][etalon_idx]
