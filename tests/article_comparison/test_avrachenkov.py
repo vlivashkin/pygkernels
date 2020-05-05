@@ -64,21 +64,21 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
     def test_logPPR(self):
         logppr = logPPR_H(self.graph)
         ppr_rubanov = logPPR_R(self.graph)
-        for param in scaler.Linear().scale_list(np.linspace(0.0, 1.0, 50)):
+        for param in scaler.Linear().scale_list(np.linspace(0.0, 1.0, 50)[1:-1]):
             self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
                             f'error in param={param:0.3f}')
 
     def test_logModifPPR(self):
         logppr = logModifPPR_H(self.graph)
         ppr_rubanov = logModifPPR_R(self.graph)
-        for param in scaler.Linear().scale_list(np.linspace(0.0, 0.9, 50)):
+        for param in scaler.Linear().scale_list(np.linspace(0.0, 0.9, 50)[1:-1]):
             self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
                             f'error in param={param:0.3f}')
 
     def test_logHeatPPR(self):
         logppr = logHeatPR_H(self.graph)
         ppr_rubanov = logHeatPR_R(self.graph)
-        for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
+        for param in scaler.Fraction().scale_list(np.linspace(0.0, 0.7, 50))[1:-1]:
             self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
                             f'error in param={param:0.3f}')
 
