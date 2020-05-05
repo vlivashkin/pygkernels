@@ -4,9 +4,9 @@ import numpy as np
 import numpy.matlib
 from numpy import warnings
 
+import pygkernels.measure.shortcuts as h
 from pygkernels.measure import scaler
 from pygkernels.measure.kernel import Kernel
-import pygkernels.measure.shortcuts as h
 
 
 # Avrachenkov: Kernels on Graphs as Proximity Measures
@@ -40,7 +40,6 @@ class Katz_R(_KernelR):
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - t * self.A)
             return np.log(np.array(K))
 
@@ -51,7 +50,6 @@ class Estrada_R(_KernelR):
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = _KernelR.mat_exp(t * self.A)
             return np.log(np.array(K))
 
@@ -66,7 +64,6 @@ class Heat_R(_KernelR):  # this is logHeat, actually
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = _KernelR.mat_exp(- t * self.L, n=50)
             if np.any(K < 0):
                 # logging.info(t, "K < 0")
@@ -87,11 +84,10 @@ class NormalizedHeat_R(_KernelR):
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = _KernelR.mat_exp(-t * self.Ll, n=50)
             if np.any(K < 0):
-                # logging.info(t, "K < 0")
                 return None
+            K[K == 0] = self.EPS
             return np.log(np.array(K))
 
 
@@ -106,11 +102,10 @@ class RegularizedLaplacian_R(_KernelR):
     def get_K(self, beta):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) + beta * self.L)
             if np.any(K < 0):
-                # logging.info(beta, "K < 0")
                 return None
+            K[K == 0] = self.EPS
             return np.log(np.array(K))
 
 
@@ -125,11 +120,10 @@ class logPPR_R(_KernelR):
     def get_K(self, alpha):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - alpha * self.P)
             if np.any(K < 0):
-                # logging.info(alpha, "K < 0")
                 return None
+            K[K == 0] = self.EPS
             return np.log(np.array(K))
 
 
@@ -143,11 +137,10 @@ class logModifPPR_R(_KernelR):
     def get_K(self, alpha):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = np.linalg.inv(self.D - alpha * self.A)
             if np.any(K < 0):
-                # logging.info(alpha, "K < 0")
                 return None
+            K[K == 0] = self.EPS
             return np.log(np.array(K))
 
 
@@ -162,9 +155,8 @@ class logHeatPR_R(_KernelR):
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-
             K = _KernelR.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
             if np.any(K < 0):
-                # logging.info(t, "K < 0")
                 return None
+            K[K == 0] = self.EPS
             return np.log(np.array(K))
