@@ -3,7 +3,7 @@ from typing import Optional
 
 import numpy as np
 
-from pygkernels.cluster import _kmeans_pytorch as _backend
+from pygkernels.cluster import _kkmeans_pytorch as _backend
 from pygkernels.cluster.base import KernelEstimator
 
 

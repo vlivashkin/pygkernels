@@ -10,7 +10,7 @@ from tqdm import tqdm
 from pygkernels import score
 from pygkernels.cluster import KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn, \
     KKMeans, KKMeans_iterative
-from pygkernels.cluster import _kmeans_pytorch
+from pygkernels.cluster import _kkmeans_pytorch
 from pygkernels.data import Datasets
 from pygkernels.measure import logComm_H
 
@@ -68,6 +68,6 @@ class TestEstimators(unittest.TestCase):
         class_mapping = dict([(class_name, idx) for idx, class_name in enumerate(set(y_true))])
         y_true_clean = np.array([class_mapping[item] for item in y_true])
         mod_ours_numpy = score.modularity(A, y_true_clean)
-        mod_ours_torch = _kmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(y_true_clean).int())
+        mod_ours_torch = _kkmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(y_true_clean).int())
         self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy, atol=0.0001))
         self.assertTrue(np.isclose(modularity_nx, mod_ours_torch, atol=0.0001))
