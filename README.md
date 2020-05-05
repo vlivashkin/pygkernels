@@ -57,8 +57,9 @@ K = logComm_H(A).get_K(param=0.1)
 partition = estimator.predict(K, A=A)
 ```
 
-#### Grid search parameters:
+#### Grid search measure parameters:
 ```python
+import numpy as np
 from sklearn.metrics import adjusted_rand_score
 from pygkernels.cluster import KKMeans
 from pygkernels.data import StochasticBlockModel
@@ -69,9 +70,10 @@ n_graphs, n, k, p_in, p_out = 100, 100, 2, 0.3, 0.1  # params for G(n (k)p_in, p
 n_params = 30  # grid search through n_params in [0, 1] space
 
 graphs, _ = StochasticBlockModel(n, k, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
-gridsearch_results = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True, ignore_errors=True)
+gridsearch = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True, ignore_errors=True)
 
-params, ari, error = gridsearch_results.perform(KKMeans, logComm_H, graphs, k, n_jobs=-1, n_gpu=2)
+params, ari, error = gridsearch.perform(KKMeans, logComm_H, graphs, k, n_jobs=-1, n_gpu=2)
+best_param = params[np.argmax(ari)]
 ```
 
 All examples are located in ./examples

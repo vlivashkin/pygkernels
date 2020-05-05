@@ -42,7 +42,7 @@ class Katz_R(_KernelR):
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
 
             K = np.linalg.inv(np.matlib.eye(self.A.shape[0]) - t * self.A)
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
 class Estrada_R(_KernelR):
@@ -53,7 +53,7 @@ class Estrada_R(_KernelR):
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
 
             K = _KernelR.mat_exp(t * self.A)
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
 class Heat_R(_KernelR):  # this is logHeat, actually
@@ -71,7 +71,7 @@ class Heat_R(_KernelR):  # this is logHeat, actually
             if np.any(K < 0):
                 # logging.info(t, "K < 0")
                 return None
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
 class NormalizedHeat_R(_KernelR):
@@ -92,7 +92,7 @@ class NormalizedHeat_R(_KernelR):
             if np.any(K < 0):
                 # logging.info(t, "K < 0")
                 return None
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
 class RegularizedLaplacian_R(_KernelR):
@@ -111,7 +111,7 @@ class RegularizedLaplacian_R(_KernelR):
             if np.any(K < 0):
                 # logging.info(beta, "K < 0")
                 return None
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
 class logPPR_R(_KernelR):
@@ -130,7 +130,7 @@ class logPPR_R(_KernelR):
             if np.any(K < 0):
                 # logging.info(alpha, "K < 0")
                 return None
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
 class logModifPPR_R(_KernelR):
@@ -148,11 +148,11 @@ class logModifPPR_R(_KernelR):
             if np.any(K < 0):
                 # logging.info(alpha, "K < 0")
                 return None
-            return np.array(np.log(K))
+            return np.log(np.array(K))
 
 
-class logHeatPPR_R(_KernelR):
-    name, _default_scaler = 'logHeatPPR R', scaler.Fraction
+class logHeatPR_R(_KernelR):
+    name, _default_scaler = 'logHeatPR R', scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -167,4 +167,4 @@ class logHeatPPR_R(_KernelR):
             if np.any(K < 0):
                 # logging.info(t, "K < 0")
                 return None
-            return np.array(np.log(K))
+            return np.log(np.array(K))
