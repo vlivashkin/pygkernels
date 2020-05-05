@@ -44,7 +44,7 @@ https://github.com/vlivashkin/community-graphs
 ## Usage
 
 #### Simple clustering:
-```.python
+```python
 import networkx as nx
 from pygkernels.cluster import KKMeans
 from pygkernels.measure import logComm_H
@@ -58,7 +58,7 @@ partition = estimator.predict(K, A=A)
 ```
 
 #### Grid search parameters:
-```.python
+```python
 from sklearn.metrics import adjusted_rand_score
 from pygkernels.cluster import KKMeans
 from pygkernels.data import StochasticBlockModel

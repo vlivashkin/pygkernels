@@ -1,11 +1,13 @@
 language: python
 python:
-- "3.6"
+- 3.6
+before_install:
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest
+  - pip install codecov
 install:
 - pip install .
-- pip install codecov
-script:
-- python -m unittest discover
-- coverage run --source=. -m unittest discover
+script: pytest tests
 after_success:
 - codecov
