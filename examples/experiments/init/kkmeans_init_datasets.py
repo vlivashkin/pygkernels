@@ -6,7 +6,7 @@ from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
-sys.path.append('../..')
+sys.path.append('../../..')
 from pygkernels.cluster import KKMeans
 from pygkernels.data import Datasets
 from pygkernels.measure import kernels
