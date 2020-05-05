@@ -132,8 +132,8 @@ class ParallelByGraphs:
             if self.progressbar:
                 graphs = tqdm(graphs, desc=kernel_class.name)
             all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(
-                graph, kernel_class,
-                estimator_class(n_classes, device=graph_idx % n_gpu, random_state=2000 + graph_idx), graph_idx
+                graph, kernel_class, estimator_class(n_classes, device=graph_idx % n_gpu if n_gpu > 0 else 'cpu',
+                                                     random_state=2000 + graph_idx), graph_idx
             ) for graph_idx, graph in enumerate(graphs))
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():

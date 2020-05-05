@@ -48,7 +48,7 @@ class TestTable3(ABC):
                          n_init_nmi=1, parallel=False, start_random_seed=5003):
         results = []
         for graphs, Gs, info in [
-            self.datasets['football'], self.datasets['karate'],
+            self.datasets['football'],  # self.datasets['karate'],
             self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
             # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
             # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']

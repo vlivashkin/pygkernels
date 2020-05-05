@@ -1,5 +1,6 @@
 import sys
 
+import networkx as nx
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
@@ -7,17 +8,23 @@ from tqdm import tqdm
 
 sys.path.append('../..')
 from pygkernels.cluster import KKMeans
-from pygkernels.graphs import Datasets
+from pygkernels.data import Datasets
 from pygkernels.measure import kernels
 from pygkernels.util import load_or_calc_and_save
-import networkx as nx
 
 CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygkernels/kkmeans_init_datasets_modularity'
 dataset_names = [
+    'cora_DB',
+    'cora_EC',
+    'cora_HA',
+    'cora_HCI',
+    'cora_IR',
+    'cora_Net',
     'dolphins',
+    'eu-core',
+    'eurosis',
     'football',
     'karate',
-    'polbooks',
     'news_2cl_1',
     'news_2cl_2',
     'news_2cl_3',
@@ -27,18 +34,22 @@ dataset_names = [
     'news_5cl_1',
     'news_5cl_2',
     'news_5cl_3',
+    'polblogs',
+    'polbooks',
+    'sp_school_day_1',
+    'sp_school_day_2'
 ]
 
 
 def perform_param(param_flat, graph, kernel_class, estimator):
-    A, y_true, G = graph
+    A, y_true = graph
     kernel = kernel_class(A)
 
     param_results = []
     try:
         param = kernel.scaler.scale(param_flat)
         K = kernel.get_K(param)
-        inits = estimator.predict(K, explicit=True, G=G)
+        inits = estimator.predict(K, explicit=True, A=A)
         for init in inits:
             y_pred = init['labels']
             param_results.append({
@@ -56,13 +67,10 @@ def perform_param(param_flat, graph, kernel_class, estimator):
 
 def perform_graph(graph, kernel_class, k, n_params=51, n_jobs=6, n_gpu=2):
     params = np.linspace(0, 1, n_params)
-    graph = graph[0], graph[1], nx.from_numpy_matrix(graph[0])
-
     results = dict(Parallel(n_jobs=n_jobs)(delayed(perform_param)(
         param_flat, graph, kernel_class,
         KKMeans(k, device=param_idx % n_gpu, random_state=2000 + param_idx, n_init=10)
     ) for param_idx, param_flat in enumerate(params)))
-
     return results
 
 

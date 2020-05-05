@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 sys.path.append('../../..')
 from pygkernels.cluster import KKMeans
-from pygkernels.graphs import StochasticBlockModel
+from pygkernels.data import StochasticBlockModel
 from pygkernels.measure import kernels, Kernel
 from pygkernels.score import sns1
 from pygkernels.util import load_or_calc_and_save
