@@ -29,7 +29,7 @@ Framework for clustering graph nodes using various similarity/dissimilarity meas
 Every measure is presented as dissimilarity (distance) and similarity (kernel/proximity) measure. All of them can be used in any classification/clustering/community detection algorithm which uses kernel trick (e.g. kernel k-means).
 
 #### List of clustering algoritms:
-* Kernel k-means
+* Kernel k-means (GPU support, powered with pytorch)
 * Spectral clustering
 * Ward clustering
 * Wrappers for kernel k-means from kernlab, sklearn k-means
@@ -47,18 +47,34 @@ https://github.com/vlivashkin/community-graphs
 ```.python
 import networkx as nx
 from pygkernels.cluster import KKMeans
-from pygkernels.data import Datasets
 from pygkernels.measure import logComm_H
 
-_, Gs, _ = Datasets().news_2cl_1  # example graph
-G: nx.Graph = Gs[0]
+G = nx.read_gml('news_2cl_1.gml')
 A = nx.adjacency_matrix(G).todense()
 
 estimator = KKMeans(n_clusters=2)
 K = logComm_H(A).get_K(param=0.1)
-y_pred = estimator.predict(K, G=G)
+partition = estimator.predict(K, A=A)
 ```
 
+#### Grid search parameters:
+```.python
+from sklearn.metrics import adjusted_rand_score
+from pygkernels.cluster import KKMeans
+from pygkernels.data import StochasticBlockModel
+from pygkernels.measure import logComm_H
+from pygkernels.scenario import ParallelByGraphs
+
+n_graphs, n, k, p_in, p_out = 100, 100, 2, 0.3, 0.1  # params for G(n (k)p_in, p_out) graph generator
+n_params = 30  # grid search through n_params in [0, 1] space
+
+graphs, _ = StochasticBlockModel(n, k, p_in=p_in, p_out=p_out).generate_graphs(n_graphs)
+gridsearch_results = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True, ignore_errors=True)
+
+params, ari, error = gridsearch_results.perform(KKMeans, logComm_H, graphs, k, n_jobs=-1, n_gpu=2)
+```
+
+All examples are located in ./examples
 
 ## Citation
 
