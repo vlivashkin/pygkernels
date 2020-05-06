@@ -54,7 +54,7 @@ class Datasets:
 
     @staticmethod
     def simplify_partition(partition: List):
-        class_mapping = [(y, x) for x, y in enumerate(set(partition))]
+        class_mapping = dict([(y, x) for x, y in enumerate(set(partition))])
         return [class_mapping[x] for x in partition]
 
     def _read_gml(self, rel_path):

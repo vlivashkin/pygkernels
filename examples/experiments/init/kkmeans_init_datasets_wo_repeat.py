@@ -8,12 +8,11 @@ from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
-from pygkernels.score import sns1
-
 sys.path.append('../../..')
 from pygkernels.cluster import KKMeans
 from pygkernels.data import Datasets
 from pygkernels.measure import kernels, Kernel
+from pygkernels.score import sns1
 from pygkernels.util import load_or_calc_and_save
 
 CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygkernels/kkmeans_init_datasets_modularity'
