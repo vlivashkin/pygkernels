@@ -44,7 +44,7 @@ dataset_names = [
 
 
 def perform_graph(graph, kernel_class: Type[Kernel], estimator: KKMeans, graph_idx):
-    (A, y_true), G = graph
+    A, y_true = graph
     kernel: Kernel = kernel_class(A)
 
     results = {}
@@ -78,7 +78,7 @@ def perform_kernel(dataset_name, graphs, kernel_class, k, root=f'{CACHE_ROOT}/by
     @load_or_calc_and_save(f'{root}/{dataset_name}_{kernel_class.name}_results.pkl')
     def _calc(n_graphs=None, n_params=None, n_jobs=None):
         kmeans = partial(KKMeans, n_clusters=k, init='any', n_init=N_INITS, init_measure='modularity')
-        return Parallel(n_jobs=n_jobs)(delayed(perform_graph)(
+        return Parallel(n_jobs=N_JOBS)(delayed(perform_graph)(
             graph, kernel_class, kmeans(device=graph_idx % N_GPU, random_state=2000 + graph_idx),
             graph_idx=graph_idx
         ) for graph_idx, graph in enumerate(graphs))
