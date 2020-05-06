@@ -73,8 +73,8 @@ def perform_graph(dataset_name, graph, kernel_class: Type[Kernel], k, root=f'{CA
     def _calc(n_graphs=None, n_params=None, n_jobs=None):
         kmeans = partial(KKMeans, n_clusters=k, init='any', n_init=N_INITS, init_measure='modularity')
         results = Parallel(n_jobs=N_JOBS)(
-            delayed(perform_param)(kmeans(device=param_flat % N_GPU, random_state=2000 + param_flat), param_flat)
-            for param_flat in np.linspace(0, 1, N_PARAMS))
+            delayed(perform_param)(kmeans(device=param_idx % N_GPU, random_state=2000 + param_idx), param_flat)
+            for param_idx, param_flat in enumerate(np.linspace(0, 1, N_PARAMS)))
         return dict(results)
 
     return {
