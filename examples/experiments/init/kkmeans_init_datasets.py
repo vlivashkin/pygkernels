@@ -1,5 +1,7 @@
 import argparse
 import sys
+from functools import partial
+from typing import Type
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -9,9 +11,8 @@ from tqdm import tqdm
 sys.path.append('../../..')
 from pygkernels.cluster import KKMeans
 from pygkernels.data import Datasets
-from pygkernels.measure import kernels
+from pygkernels.measure import kernels, Kernel
 from pygkernels.util import load_or_calc_and_save
-from pygkernels.score import sns1
 
 CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygkernels/kkmeans_init_datasets_modularity'
 dataset_names = [
@@ -42,48 +43,45 @@ dataset_names = [
 ]
 
 
-def perform_param(param_flat, graph, kernel_class, estimator):
-    A, y_true = graph
-    kernel = kernel_class(A)
+def perform_graph(graph, kernel_class: Type[Kernel], estimator: KKMeans, graph_idx):
+    (A, y_true), G = graph
+    kernel: Kernel = kernel_class(A)
 
-    param_results = []
-    try:
-        param = kernel.scaler.scale(param_flat)
-        K = kernel.get_K(param)
-        inits = estimator.predict(K, explicit=True, A=A)
-        for init in inits:
-            y_pred = init['labels']
-            param_results.append({
-                'labels': y_pred,
-                'inertia': init['inertia'],
-                'init': init['init'],
-                'score_ari': adjusted_rand_score(y_true, y_pred),
-                'score_nmi': normalized_mutual_info_score(y_true, y_pred, average_method='geometric'),
-                'score_sns1': sns1(y_true, y_pred)
-            })
-    except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError:
-        pass
-
-    return param_flat, param_results
-
-
-def perform_graph(graph, kernel_class, k):
-    params = np.linspace(0, 1, N_PARAMS)
-    results = dict(Parallel(n_jobs=N_JOBS)(delayed(perform_param)(
-        param_flat, graph, kernel_class,
-        KKMeans(k, device=param_idx % N_GPU, random_state=2000 + param_idx, n_init=N_INITS)
-    ) for param_idx, param_flat in enumerate(params)))
-    return results
+    results = {}
+    for param_flat in np.linspace(0, 1, N_PARAMS):
+        param_results = []
+        try:
+            param = kernel.scaler.scale(param_flat)
+            K = kernel.get_K(param)
+            inits = estimator.predict(K, explicit=True, A=A)
+            for init in inits:
+                y_pred = init['labels']
+                param_results.append({
+                    'labels': y_pred,
+                    'inertia': init['inertia'],
+                    'modularity': init['modularity'],
+                    'init': init['init'],
+                    'score_ari': adjusted_rand_score(y_true, y_pred),
+                    'score_nmi': normalized_mutual_info_score(y_true, y_pred, average_method='geometric'),
+                    # 'score_sns1': sns1(y_true, y_pred)
+                })
+        except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
+            print(f'{kernel.name}, g={graph_idx}, p={param_flat}: {e}')
+        results[param_flat] = param_results
+    return {
+        'results': results,
+        'y_true': y_true
+    }
 
 
 def perform_kernel(dataset_name, graphs, kernel_class, k, root=f'{CACHE_ROOT}/by_column_and_kernel'):
     @load_or_calc_and_save(f'{root}/{dataset_name}_{kernel_class.name}_results.pkl')
     def _calc(n_graphs=None, n_params=None, n_jobs=None):
-        results = []
-        for graph_idx, graph in enumerate(graphs):
-            result = perform_graph(graph, kernel_class, k)
-            results.append(result)
-        return results
+        kmeans = partial(KKMeans, n_clusters=k, init='any', n_init=N_INITS, init_measure='modularity')
+        return Parallel(n_jobs=n_jobs)(delayed(perform_graph)(
+            graph, kernel_class, kmeans(device=graph_idx % N_GPU, random_state=2000 + graph_idx),
+            graph_idx=graph_idx
+        ) for graph_idx, graph in enumerate(graphs))
 
     return _calc(n_graphs=None, n_params=None, n_jobs=None)
 
