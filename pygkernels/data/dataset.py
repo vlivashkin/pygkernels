@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 import networkx as nx
 import numpy as np
@@ -51,11 +52,17 @@ class Datasets:
 
         self._loaded_datasets = {}
 
+    @staticmethod
+    def simplify_partition(partition: List):
+        class_mapping = [(y, x) for x, y in enumerate(set(partition))]
+        return [class_mapping[x] for x in partition]
+
     def _read_gml(self, rel_path):
         fpath = f'{self.datasets_root}/{rel_path}'
         G = nx.read_gml(fpath)
         nodes_order, partition = zip(*nx.get_node_attributes(G, 'gt').items())
         edges = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
+        partition = self.simplify_partition(partition)
         info = {
             'name': os.path.splitext(os.path.basename(fpath))[0],
             'count': 1,

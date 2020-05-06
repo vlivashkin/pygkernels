@@ -8,6 +8,8 @@ from joblib import Parallel, delayed
 from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
 from tqdm import tqdm
 
+from pygkernels.score import sns1
+
 sys.path.append('../../..')
 from pygkernels.cluster import KKMeans
 from pygkernels.data import Datasets
@@ -43,12 +45,11 @@ dataset_names = [
 ]
 
 
-def perform_graph(graph, kernel_class: Type[Kernel], estimator: KKMeans, graph_idx):
+def perform_graph(dataset_name, graph, kernel_class: Type[Kernel], k, root=f'{CACHE_ROOT}/by_column_and_kernel'):
     A, y_true = graph
     kernel: Kernel = kernel_class(A)
 
-    results = {}
-    for param_flat in np.linspace(0, 1, N_PARAMS):
+    def perform_param(estimator, param_flat):
         param_results = []
         try:
             param = kernel.scaler.scale(param_flat)
@@ -63,46 +64,37 @@ def perform_graph(graph, kernel_class: Type[Kernel], estimator: KKMeans, graph_i
                     'init': init['init'],
                     'score_ari': adjusted_rand_score(y_true, y_pred),
                     'score_nmi': normalized_mutual_info_score(y_true, y_pred, average_method='geometric'),
-                    # 'score_sns1': sns1(y_true, y_pred)
+                    'score_sns1': sns1(y_true, y_pred)
                 })
         except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
-            print(f'{kernel.name}, g={graph_idx}, p={param_flat}: {e}')
-        results[param_flat] = param_results
-    return {
-        'results': results,
-        'y_true': y_true
-    }
+            print(f'{kernel.name}, p={param_flat}: {e}')
+        return param_flat, param_results
 
-
-def perform_kernel(dataset_name, graphs, kernel_class, k, root=f'{CACHE_ROOT}/by_column_and_kernel'):
-    @load_or_calc_and_save(f'{root}/{dataset_name}_{kernel_class.name}_results.pkl')
+    @load_or_calc_and_save(f'{root}/{dataset_name}_{kernel_class.name}_results.pkl', ignore_if_exist=True)
     def _calc(n_graphs=None, n_params=None, n_jobs=None):
         kmeans = partial(KKMeans, n_clusters=k, init='any', n_init=N_INITS, init_measure='modularity')
-        return Parallel(n_jobs=N_JOBS)(delayed(perform_graph)(
-            graph, kernel_class, kmeans(device=graph_idx % N_GPU, random_state=2000 + graph_idx),
-            graph_idx=graph_idx
-        ) for graph_idx, graph in enumerate(graphs))
+        results = Parallel(n_jobs=N_JOBS)(
+            delayed(perform_param)(kmeans(device=param_flat % N_GPU, random_state=2000 + param_flat), param_flat)
+            for param_flat in np.linspace(0, 1, N_PARAMS))
+        return dict(results)
 
-    return _calc(n_graphs=None, n_params=None, n_jobs=None)
-
-
-def perform_column(dataset_name, graphs, k):
-    for kernel_class in tqdm(kernels, desc=dataset_name):
-        perform_kernel(dataset_name, graphs, kernel_class, k)
+    return {
+        'results': _calc(n_graphs=None, n_params=None, n_jobs=None),
+        'y_true': y_true
+    }
 
 
 def perform():
     for dataset_name in dataset_names:
         graphs, _, info = Datasets()[dataset_name]
-        graphs = graphs * N_GRAPHS
-        perform_column(dataset_name, graphs, info['k'])
+        for kernel_class in tqdm(kernels, desc=dataset_name):
+            perform_graph(dataset_name, graphs[0], kernel_class, info['k'])
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--n_jobs', type=int, default=6, required=False)
     parser.add_argument('--n_gpu', type=int, default=2, required=False)
-    parser.add_argument('--n_graphs', type=int, default=20, required=False)
     parser.add_argument('--n_inits', type=int, default=30, required=False)
     parser.add_argument('--n_params', type=int, default=51, required=False)
 
@@ -111,7 +103,6 @@ if __name__ == '__main__':
 
     N_JOBS = args.n_jobs
     N_GPU = args.n_gpu
-    N_GRAPHS = args.n_graphs
     N_INITS = args.n_inits
     N_PARAMS = args.n_params
     perform()
