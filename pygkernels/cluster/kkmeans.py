@@ -11,7 +11,7 @@ class KMeans_Fouss(KernelEstimator, ABC):
     EPS = 10 ** -10
     INIT_NAMES = ['one', 'all', 'k-means++']
 
-    def __init__(self, n_clusters, n_init=10, max_rerun=100, max_iter=100, init='k-means++', init_measure='modularity',
+    def __init__(self, n_clusters, n_init=10, max_rerun=5, max_iter=100, init='k-means++', init_measure='modularity',
                  random_state=42, device=None):
         super().__init__(n_clusters, random_state=random_state, device=device)
 
