@@ -70,7 +70,7 @@ def perform_graph(dataset_name, graph, kernel_class: Type[Kernel], k, graph_idx,
             print(f'{kernel.name}, p={param_flat}: {e}')
         return param_flat, param_results
 
-    @load_or_calc_and_save(f'{root}/{dataset_name}{str(graph_idx).zfill(2)}_{kernel_class.name}_results.pkl',
+    @load_or_calc_and_save(f'{root}/{dataset_name}_{kernel_class.name}_results_{str(graph_idx).zfill(2)}.pkl',
                            ignore_if_exist=True)
     def _calc(n_graphs=None, n_params=None, n_jobs=None):
         kmeans = partial(KKMeans, n_clusters=k, init='any', n_init=N_INITS, init_measure='modularity')
