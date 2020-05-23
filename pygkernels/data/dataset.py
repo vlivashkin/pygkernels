@@ -32,7 +32,7 @@ class Datasets:
             'cora_Prog': lambda: self._read_gml('cora_subset/Programming.gml'),
             'dolphins': lambda: self._read_gml('dolphins.gml'),
             'eu-core': lambda: self._read_gml('eu-core.gml'),
-            'eurosis': lambda: self._read_gml('eu-eurosis.gml'),
+            'eurosis': lambda: self._read_gml('eurosis.gml'),
             'football': lambda: self._read_gml('football.gml'),
             'karate': lambda: self._read_gml('karate.gml'),
             'news_2cl_1': lambda: self._read_gml('newsgroup/news_2cl_1.gml'),
