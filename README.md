@@ -76,7 +76,8 @@ params, ari, error = gridsearch.perform(KKMeans, logComm_H, graphs, k, n_jobs=-1
 best_param = params[np.argmax(ari)]
 ```
 
-All examples are located in ./examples
+All examples are located in [./examples](./examples).
+More usage approaches are in a separate repo https://github.com/vlivashkin/pygkernels-experiments
 
 ## Citation
 
