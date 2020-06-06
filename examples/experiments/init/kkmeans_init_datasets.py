@@ -15,30 +15,18 @@ from pygkernels.measure import kernels, Kernel
 from pygkernels.score import sns1
 from pygkernels.util import load_or_calc_and_save
 
-CACHE_ROOT = '/media/illusionww/68949C3149F4E819/phd/pygkernels/kkmeans_init_datasets_modularity'
+CACHE_ROOT = '/home/illusionww/Documents/HDD/phd/pygkernels/kkmeans_init_datasets'
 dataset_names = [
     'dolphins',
     'football',
     'karate',
-    'news_2cl_1',
-    'news_2cl_2',
-    'news_2cl_3',
-    'news_3cl_1',
-    'news_3cl_2',
-    'news_3cl_3',
-    'news_5cl_1',
-    'news_5cl_2',
-    'news_5cl_3',
+    'news_2cl_1', 'news_2cl_2', 'news_2cl_3',
+    'news_3cl_1', 'news_3cl_2', 'news_3cl_3',
+    'news_5cl_1', 'news_5cl_2', 'news_5cl_3',
     'polblogs',
     'polbooks',
-    'sp_school_day_1',
-    'sp_school_day_2',
-    'cora_DB',
-    'cora_EC',
-    'cora_HA',
-    'cora_HCI',
-    'cora_IR',
-    'cora_Net',
+    'sp_school_day_1', 'sp_school_day_2',
+    'cora_DB', 'cora_EC', 'cora_HA', 'cora_HCI', 'cora_IR', 'cora_Net',
     'eu-core',
     'eurosis'
 ]
@@ -97,7 +85,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--n_jobs', type=int, default=6, required=False)
     parser.add_argument('--n_gpu', type=int, default=2, required=False)
-    parser.add_argument('--n_graphs', type=int, default=5, required=False)
+    parser.add_argument('--n_graphs', type=int, default=7, required=False)
     parser.add_argument('--n_inits', type=int, default=30, required=False)
     parser.add_argument('--n_params', type=int, default=51, required=False)
 
