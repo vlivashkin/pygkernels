@@ -57,7 +57,7 @@ class TestSPCT(unittest.TestCase):
         self.assertTrue(np.allclose(self.get_SP(A), true_SP))
 
     # def test_compare_clustering_quality(self):
-    #     graphs, info = dataset.news_2cl_1
+    #     graphs, info = dataset.news_2cl1
     #     A, y_true = graphs[0]
     #
     #     def test_quality(K):

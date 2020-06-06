@@ -71,24 +71,24 @@ class TestTable2(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.etalon = {
-            'news_2cl_1': (.845, .807, .831, .652, .816),
-            'news_2cl_2': (.587, .587, .588, .512, .568),
-            'news_2cl_3': (.810, .811, .750, .859, .796),
-            'news_3cl_1': (.766, .762, .754, .742, .773),
-            'news_3cl_2': (.770, .783, .755, .626, .730),
-            'news_3cl_3': (.765, .770, .744, .715, .759),
-            'news_5cl_1': (.696, .690, .604, .681, .668),
-            'news_5cl_2': (.640, .646, .587, .596, .604),
-            'news_5cl_3': (.612, .616, .573, .478, .573),
+            'news_2cl1': (.845, .807, .831, .652, .816),
+            'news_2cl2': (.587, .587, .588, .512, .568),
+            'news_2cl3': (.810, .811, .750, .859, .796),
+            'news_3cl1': (.766, .762, .754, .742, .773),
+            'news_3cl2': (.770, .783, .755, .626, .730),
+            'news_3cl3': (.765, .770, .744, .715, .759),
+            'news_5cl1': (.696, .690, .604, .681, .668),
+            'news_5cl2': (.640, .646, .587, .596, .604),
+            'news_5cl3': (.612, .616, .573, .478, .573),
         }
         self.datasets = Datasets()
 
     def _newsgroup_results(self, measure_class, best_param, idx):
         results = []
         for graphs, Gs, info in [
-            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
+            # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
+            # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
             (A, labels_true), G = graphs[0], Gs[0]
             measure = measure_class(A)

@@ -35,15 +35,24 @@ class Datasets:
             'eurosis': lambda: self._read_gml('eurosis.gml'),
             'football': lambda: self._read_gml('football.gml'),
             'karate': lambda: self._read_gml('karate.gml'),
-            'news_2cl_1': lambda: self._read_gml('newsgroup/news_2cl_1.gml'),
-            'news_2cl_2': lambda: self._read_gml('newsgroup/news_2cl_2.gml'),
-            'news_2cl_3': lambda: self._read_gml('newsgroup/news_2cl_3.gml'),
-            'news_3cl_1': lambda: self._read_gml('newsgroup/news_3cl_1.gml'),
-            'news_3cl_2': lambda: self._read_gml('newsgroup/news_3cl_2.gml'),
-            'news_3cl_3': lambda: self._read_gml('newsgroup/news_3cl_3.gml'),
-            'news_5cl_1': lambda: self._read_gml('newsgroup/news_5cl_1.gml'),
-            'news_5cl_2': lambda: self._read_gml('newsgroup/news_5cl_2.gml'),
-            'news_5cl_3': lambda: self._read_gml('newsgroup/news_5cl_3.gml'),
+            'news_2cl1': lambda: self._read_gml('newsgroup/news_2cl1.gml'),
+            'news_2cl2': lambda: self._read_gml('newsgroup/news_2cl2.gml'),
+            'news_2cl3': lambda: self._read_gml('newsgroup/news_2cl3.gml'),
+            'news_3cl1': lambda: self._read_gml('newsgroup/news_3cl1.gml'),
+            'news_3cl2': lambda: self._read_gml('newsgroup/news_3cl2.gml'),
+            'news_3cl3': lambda: self._read_gml('newsgroup/news_3cl3.gml'),
+            'news_5cl1': lambda: self._read_gml('newsgroup/news_5cl1.gml'),
+            'news_5cl2': lambda: self._read_gml('newsgroup/news_5cl2.gml'),
+            'news_5cl3': lambda: self._read_gml('newsgroup/news_5cl3.gml'),
+            'news_2cl1_0.1': lambda: self._read_gml('newsgroup_0.1/news_2cl1_0.1.gml'),
+            'news_2cl2_0.1': lambda: self._read_gml('newsgroup_0.1/news_2cl2_0.1.gml'),
+            'news_2cl3_0.1': lambda: self._read_gml('newsgroup_0.1/news_2cl3_0.1.gml'),
+            'news_3cl1_0.1': lambda: self._read_gml('newsgroup_0.1/news_3cl1_0.1.gml'),
+            'news_3cl2_0.1': lambda: self._read_gml('newsgroup_0.1/news_3cl2_0.1.gml'),
+            'news_3cl3_0.1': lambda: self._read_gml('newsgroup_0.1/news_3cl3_0.1.gml'),
+            'news_5cl1_0.1': lambda: self._read_gml('newsgroup_0.1/news_5cl1_0.1.gml'),
+            'news_5cl2_0.1': lambda: self._read_gml('newsgroup_0.1/news_5cl2_0.1.gml'),
+            'news_5cl3_0.1': lambda: self._read_gml('newsgroup_0.1/news_5cl3_0.1.gml'),
             'polblogs': lambda: self._read_gml('polblogs.gml'),
             'polbooks': lambda: self._read_gml('polbooks.gml'),
             'sp_school_day_1': lambda: self._read_gml('sp_school/sp_school_day_1.gml'),
@@ -81,9 +90,16 @@ class Datasets:
 
     @property
     def newsgroup_subsets(self):
-        newsgroup_names = ['news_2cl_1', 'news_2cl_2', 'news_2cl_3',
-                           'news_3cl_1', 'news_3cl_2', 'news_3cl_3',
-                           'news_5cl_1', 'news_5cl_2', 'news_5cl_3']
+        newsgroup_names = ['news_2cl1', 'news_2cl2', 'news_2cl3',
+                           'news_3cl1', 'news_3cl2', 'news_3cl3',
+                           'news_5cl1', 'news_5cl2', 'news_5cl3']
+        return [self[x] for x in newsgroup_names]
+
+    @property
+    def newsgroup01_subsets(self):
+        newsgroup_names = ['news_2cl1_0.1', 'news_2cl2_0.1', 'news_2cl3_0.1',
+                           'news_3cl1_0.1', 'news_3cl2_0.1', 'news_3cl3_0.1',
+                           'news_5cl1_0.1', 'news_5cl2_0.1', 'news_5cl3_0.1']
         return [self[x] for x in newsgroup_names]
 
     @property

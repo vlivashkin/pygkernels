@@ -34,7 +34,7 @@ class TestEstimators(unittest.TestCase):
 
     @unittest.skip
     def test_estimators_news_2cl(self):
-        graphs, Gs, info = Datasets().news_2cl_1
+        graphs, Gs, info = Datasets().news_2cl1
         (A, gt), G = graphs[0], Gs[0]
         K = logComm_H(A).get_K(0.5)
 
@@ -44,7 +44,7 @@ class TestEstimators(unittest.TestCase):
 
     @unittest.skip
     def test_estimators_news_3cl(self):
-        graphs, Gs, info = Datasets().news_3cl_1
+        graphs, Gs, info = Datasets().news_3cl1
         (A, gt), G = graphs[0], Gs[0]
         K = logComm_H(A).get_K(0.5)
 

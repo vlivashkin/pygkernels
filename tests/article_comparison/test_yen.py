@@ -23,24 +23,24 @@ class Table1Tests(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
         self.etalon = {  # SCT RI, SCT ARI
-            'news_2cl_1': (.975, .95),
-            'news_2cl_2': (.906, .83),
-            'news_2cl_3': (.955, .91),
-            'news_3cl_1': (.939, .91),
-            'news_3cl_2': (.936, .91),
-            'news_3cl_3': (.939, .91),
-            'news_5cl_1': (.830, .80),
-            'news_5cl_2': (.748, .77),
-            'news_5cl_3': (.764, .75)
+            'news_2cl1': (.975, .95),
+            'news_2cl2': (.906, .83),
+            'news_2cl3': (.955, .91),
+            'news_3cl1': (.939, .91),
+            'news_3cl2': (.936, .91),
+            'news_3cl3': (.939, .91),
+            'news_5cl1': (.830, .80),
+            'news_5cl2': (.748, .77),
+            'news_5cl3': (.764, .75)
         }
         self.datasets = Datasets()
 
     def _newsgroup_results(self, name, scorer_func, result_idx, atol=0.1):
         results = []
         for graphs, _, info in [
-            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
+            # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
+            # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
             A, labels_true = graphs[0]
             K = SCT_H(A).get_K(22)

@@ -28,15 +28,15 @@ class TestTable3(ABC):
             'football': (.7928, .9061, .9028, .9092, .8115, .8575),
             'karate': (1., 1., 1., 1., 1., 1.),
             'polblogs': (.5525, .5813, .5811, .5815, .5757, .5605),
-            'news_2cl_1': (.7944, .8050, .8381, .7966, .8174, .6540),
-            'news_2cl_2': (.5819, .5909, .5844, .5797, .5523, .5159),
-            'news_2cl_3': (.7577, .8107, .7482, .7962, .7857, .8592),
-            'news_3cl_1': (.7785, .7810, .7530, .7810, .7730, .7426),
-            'news_3cl_2': (.7616, .7968, .7585, .7761, .7282, .6246),
-            'news_3cl_3': (.7455, .7707, .7487, .7300, .7627, .7203),
-            'news_5cl_1': (.6701, .6922, .6143, .7078, .6658, .6815),
-            'news_5cl_2': (.6177, .6401, .5977, .6243, .6154, .5970),
-            'news_5cl_3': (.6269, .6065, .5729, .5750, .5712, .4801)
+            'news_2cl1': (.7944, .8050, .8381, .7966, .8174, .6540),
+            'news_2cl2': (.5819, .5909, .5844, .5797, .5523, .5159),
+            'news_2cl3': (.7577, .8107, .7482, .7962, .7857, .8592),
+            'news_3cl1': (.7785, .7810, .7530, .7810, .7730, .7426),
+            'news_3cl2': (.7616, .7968, .7585, .7761, .7282, .6246),
+            'news_3cl3': (.7455, .7707, .7487, .7300, .7627, .7203),
+            'news_5cl1': (.6701, .6922, .6143, .7078, .6658, .6815),
+            'news_5cl2': (.6177, .6401, .5977, .6243, .6154, .5970),
+            'news_5cl3': (.6269, .6065, .5729, .5750, .5712, .4801)
         }
         self.datasets = Datasets()
 
@@ -49,9 +49,9 @@ class TestTable3(ABC):
         results = []
         for graphs, Gs, info in [
             self.datasets['football'],  # self.datasets['karate'],
-            self.datasets['news_2cl_1'], self.datasets['news_2cl_2'], self.datasets['news_2cl_3'],
-            # self.datasets['news_3cl_1'], self.datasets['news_3cl_2'], self.datasets['news_3cl_3'],
-            # self.datasets['news_5cl_1'], self.datasets['news_5cl_2'], self.datasets['news_5cl_3']
+            self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
+            # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
+            # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
             A, labels_true = graphs[0]
             measure = measure_class(A)
