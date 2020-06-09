@@ -85,12 +85,11 @@ class TestTable2(unittest.TestCase):
 
     def _newsgroup_results(self, measure_class, best_param, idx):
         results = []
-        for graphs, Gs, info in [
+        for (A, labels_true), info in [
             self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
             # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
             # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
-            (A, labels_true), G = graphs[0], Gs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
             true_nmi = self.etalon[info['name']][idx]

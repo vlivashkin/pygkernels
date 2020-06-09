@@ -70,41 +70,25 @@ class Datasets:
         fpath = f'{self.datasets_root}/{rel_path}'
         G = nx.read_gml(fpath)
         nodes_order, partition = zip(*nx.get_node_attributes(G, 'gt').items())
-        edges = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
+        A = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
         partition = self.simplify_partition(partition)
+
+        n, k = len(partition), len(set(partition))
+        potential_edges_in = np.sum([x * (x - 1) / 2 for x in [len(partition[partition == ki]) for ki in range(k)]])
+        potential_edges_out = n * (n - 1) / 2 - potential_edges_in
+        actual_edges_in = np.sum([A[i, j] for i in range(n) for j in range(i + 1, n) if partition[i] == partition[j]])
+        actual_edges_out = np.sum([A[i, j] for i in range(n) for j in range(i + 1, n)]) - actual_edges_in
+        p_in = actual_edges_in / potential_edges_in
+        p_out = actual_edges_out / potential_edges_out
+
         info = {
             'name': os.path.splitext(os.path.basename(fpath))[0],
-            'count': 1,
             'n': len(partition),
             'k': len(set(partition)),
-            'p_in': None,
-            'p_out': None
+            'p_in': p_in,
+            'p_out': p_out
         }
-        return [(edges, partition)], [G], info
-
-    @property
-    def cora_subsets(self):
-        cora_names = ['cora_AI', 'cora_AI_ML', 'cora_DS_AT', 'cora_DB', 'cora_EC', 'cora_HA',
-                      'cora_HCI', 'cora_IR', 'cora_Net', 'cora_OS', 'cora_Prog']
-        return [self[x] for x in cora_names]
-
-    @property
-    def newsgroup_subsets(self):
-        newsgroup_names = ['news_2cl1', 'news_2cl2', 'news_2cl3',
-                           'news_3cl1', 'news_3cl2', 'news_3cl3',
-                           'news_5cl1', 'news_5cl2', 'news_5cl3']
-        return [self[x] for x in newsgroup_names]
-
-    @property
-    def newsgroup01_subsets(self):
-        newsgroup_names = ['news_2cl1_0.1', 'news_2cl2_0.1', 'news_2cl3_0.1',
-                           'news_3cl1_0.1', 'news_3cl2_0.1', 'news_3cl3_0.1',
-                           'news_5cl1_0.1', 'news_5cl2_0.1', 'news_5cl3_0.1']
-        return [self[x] for x in newsgroup_names]
-
-    @property
-    def all(self):
-        return [self[x] for x in self._lazy_datasets.keys()]
+        return (A, partition), info
 
     def __getitem__(self, item):
         if item not in self._loaded_datasets:

@@ -47,13 +47,12 @@ class TestTable3(ABC):
     def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init_inertia=3,
                          n_init_nmi=1, parallel=False, start_random_seed=5003):
         results = []
-        for graphs, Gs, info in [
+        for (A, gt), info in [
             self.datasets['football'],  # self.datasets['karate'],
             self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
             # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
             # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
-            A, labels_true = graphs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
@@ -61,9 +60,9 @@ class TestTable3(ABC):
                 def whole_kmeans_run(i_run):
                     kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=i_run,
                                               device=i_run % 2)
-                    labels_pred = kkmeans.predict(K, A=A)
-                    assert (len(labels_true) == len(labels_pred))
-                    item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+                    y_pred = kkmeans.predict(K, A=A)
+                    assert (len(gt) == len(y_pred))
+                    item_nmi = normalized_mutual_info_score(gt, y_pred, average_method='geometric')
                     return item_nmi
 
                 init_nmi = Parallel(n_jobs=6)(delayed(whole_kmeans_run)(i) for i in range(n_init_nmi))
@@ -72,9 +71,9 @@ class TestTable3(ABC):
                 for i_run in range(n_init_nmi):
                     kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia,
                                               random_state=start_random_seed + i_run, device='cpu')
-                    labels_pred = kkmeans.predict(K, A=A)
-                    assert (len(labels_true) == len(labels_pred))
-                    item_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+                    y_pred = kkmeans.predict(K, A=A)
+                    assert (len(gt) == len(y_pred))
+                    item_nmi = normalized_mutual_info_score(gt, y_pred, average_method='geometric')
                     init_nmi.append(item_nmi)
 
             test_nmi_mean = np.mean(init_nmi)

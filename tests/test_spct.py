@@ -101,8 +101,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
 
-        graph, _, info = Datasets().karate
-        self.graph, self.y_true = graph[0]
+        (self.graph, self.y_true), _ = Datasets().karate
 
     def call_and_print(self, name, K):
         y_pred = KKMeans(n_clusters=2, device='cpu', init_measure='inertia').fit_predict(K)

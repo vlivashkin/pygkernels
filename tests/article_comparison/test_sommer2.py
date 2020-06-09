@@ -63,19 +63,18 @@ class TestTable1(ABC):
 
     def _dataset_results(self, measure_class, best_param, etalon_idx, estimator_class, n_init_inertia=10):
         results = []
-        for graphs, Gs, info in [
+        for (A, gt), info in [
             self.datasets['football'], self.datasets['karate'],
             self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
             # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
             # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
-            (A, labels_true), G = graphs[0], Gs[0]
             measure = measure_class(A)
             K = measure.get_K(best_param)
 
             kkmeans = estimator_class(n_clusters=info['k'], n_init=n_init_inertia, random_state=5432)
-            labels_pred = kkmeans.predict(K, A=A)
-            test_nmi = normalized_mutual_info_score(labels_true, labels_pred, average_method='geometric')
+            y_pred = kkmeans.predict(K, A=A)
+            test_nmi = normalized_mutual_info_score(gt, y_pred, average_method='geometric')
 
             true_nmi = self.etalon[info['name']][etalon_idx]
             diff = true_nmi - test_nmi

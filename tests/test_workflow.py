@@ -1,5 +1,4 @@
 import logging
-import operator
 import unittest
 
 import numpy as np
@@ -35,26 +34,20 @@ class TestEstimators(unittest.TestCase):
 class TestWorkflow(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.datasets = Datasets()
 
     def test_ward_clustering(self):
-        graphs, _, info = self.datasets.polbooks
-        for measure in kernels:
-            measureparamdict = {}
-            mean = []
-            for edges, nodes in graphs:
-                measure_o = measure(edges)
-                param = list(measure_o.scaler.scale_list([0.5]))[0]
-                D = measure_o.get_K(param)
-                y_pred = KWard(len(list(set(graphs[0][1])))).predict(D)
-                ari = adjusted_rand_score(nodes, y_pred)
-                mean.append(ari)
-            mean = [m for m in mean if m is not None and m == m]
-            score = np.array(mean).mean()
-            if score is not None and score == score:
-                measureparamdict[0.5] = score
-            maxparam = max(measureparamdict.items(), key=operator.itemgetter(1))[0]
-            logging.info("{}\t{}\t{}".format(measure.name, maxparam, measureparamdict[maxparam]))
+        (A, gt), info = Datasets().polbooks
+        flat_param = 0.5
+        for kernel_class in kernels:
+            kernel = kernel_class(A)
+            param = list(kernel.scaler.scale_list([flat_param]))[0]
+            D = kernel.get_K(param)
+            y_pred = KWard(n_clusters=info['k']).predict(D)
+            assert (len(y_pred) == len(gt))
+            assert (not np.isnan(y_pred).any())
+
+            score = adjusted_rand_score(gt, y_pred)
+            logging.info("{}\t{}\t{}".format(kernel_class.name, flat_param, score))
 
 
 if __name__ == "__main__":

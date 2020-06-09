@@ -37,17 +37,16 @@ class Table1Tests(unittest.TestCase):
 
     def _newsgroup_results(self, name, scorer_func, result_idx, atol=0.1):
         results = []
-        for graphs, _, info in [
+        for (A, gt), info in [
             self.datasets['news_2cl1'], self.datasets['news_2cl2'], self.datasets['news_2cl3'],
             # self.datasets['news_3cl1'], self.datasets['news_3cl2'], self.datasets['news_3cl3'],
             # self.datasets['news_5cl1'], self.datasets['news_5cl2'], self.datasets['news_5cl3']
         ]:
-            A, labels_true = graphs[0]
             K = SCT_H(A).get_K(22)
             true_nmi = self.etalon[info['name']][result_idx]
 
-            labels_pred = KKMeans(n_clusters=info['k'], n_init=30, device='cpu').predict(K, A=A)
-            test_nmi = scorer_func(labels_true, labels_pred)
+            y_pred = KKMeans(n_clusters=info['k'], n_init=30, device='cpu').predict(K, A=A)
+            test_nmi = scorer_func(gt, y_pred)
             diff = np.abs(test_nmi - true_nmi)
 
             logging.info('measure\tgraph\ttest nmi\ttrue nmi\tdiff')
