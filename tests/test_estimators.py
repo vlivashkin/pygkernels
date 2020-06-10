@@ -50,7 +50,10 @@ class TestEstimators(unittest.TestCase):
             km.predict(K, A=A)
 
     @staticmethod
-    def _calc_modularity_slow(G: nx.Graph, labels: Dict):
+    def _calc_nx_modularity(G: nx.Graph, labels: Dict):
+        """
+        NetworkX modularity; it's slow
+        """
         communities = defaultdict(list)
         for name, label in labels.items():
             communities[label].append(name)
@@ -59,7 +62,10 @@ class TestEstimators(unittest.TestCase):
 
     def test_modularity(self):
         (A, gt), _ = Datasets().polbooks
-        modularity_nx = self._calc_modularity_slow(nx.from_numpy_array(A), gt)
+        G = nx.from_numpy_array(A)
+        nx.set_node_attributes(G, dict(enumerate(gt)), 'gt')
+
+        modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, 'gt'))
 
         mod_ours_numpy = score.modularity(A, gt)
         mod_ours_torch = _kkmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(gt).int())
