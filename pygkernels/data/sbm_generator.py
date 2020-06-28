@@ -1,6 +1,9 @@
 import logging
 
+import networkx as nx
 import numpy as np
+from joblib import Parallel, delayed
+from tqdm import tqdm
 
 
 class StochasticBlockModel:
@@ -36,26 +39,37 @@ class StochasticBlockModel:
             name_parts.append(f'p_in={self.p_in}, p_out={self.p_out}')
         self.name = ', '.join(name_parts)
 
-    def generate_graph(self):
-        nodes = []
-        for i in range(self.k):
-            nodes.extend([i] * self.cluster_sizes[i])
+    def generate_graph(self, seed=None):
+        if seed is not None:
+            np.random.seed(seed)
 
-        edges = np.zeros((self.n, self.n))
+        partition = []
+        for i in range(self.k):
+            partition.extend([i] * self.cluster_sizes[i])
+
+        A = np.zeros((self.n, self.n))
         for i in range(self.n):
             for j in range(i + 1, self.n):
                 if self.probability_matrix_mode:
-                    p = self.probability_matrix[nodes[i]][nodes[j]]
+                    p = self.probability_matrix[partition[i]][partition[j]]
                 else:
-                    p = self.p_in if nodes[i] == nodes[j] else self.p_out
+                    p = self.p_in if partition[i] == partition[j] else self.p_out
                 k = np.random.choice([0, 1], p=[1 - p, p])
                 if k:
-                    edges[i][j] = 1
-                    edges[j][i] = 1
+                    A[i][j] = 1
+                    A[j][i] = 1
 
-        return edges, nodes
+        return A, partition
 
-    def generate_graphs(self, n_graphs):
+    def generate_connected_graph(self, seed=None):
+        if seed is not None:
+            np.random.seed(seed)
+        A, partition = self.generate_graph()
+        while not nx.is_connected(nx.from_numpy_matrix(A)):
+            A, partition = self.generate_graph()
+        return A, partition
+
+    def generate_graphs(self, n_graphs, is_connected=True, verbose=False, n_jobs=6):
         logging.info('StochasticBlockModel: count={}, {}'.format(n_graphs, self.name))
 
         info = {
@@ -71,5 +85,9 @@ class StochasticBlockModel:
                 'p_in': self.p_in,
                 'p_out': self.p_out
             })
-        graphs = [self.generate_graph() for _ in range(n_graphs)]
+        graphs_range = tqdm(range(n_graphs), desc=f'SBM {self.n}, {self.k}') if verbose else range(n_graphs)
+        if is_connected:  # may take time, parallel will be handy
+            graphs = Parallel(n_jobs=n_jobs)(delayed(self.generate_connected_graph)(idx) for idx in graphs_range)
+        else:
+            graphs = [self.generate_graph(idx) for idx in graphs_range]
         return graphs, info
