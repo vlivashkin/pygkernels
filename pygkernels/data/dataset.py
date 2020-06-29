@@ -74,6 +74,7 @@ class Datasets:
         partition = self.simplify_partition(partition)
 
         n, k = len(partition), len(set(partition))
+        unbalance = None  # TODO: unbalance
         potential_edges_in = np.sum([x * (x - 1) / 2 for x in [len(partition[partition == ki]) for ki in range(k)]])
         potential_edges_out = n * (n - 1) / 2 - potential_edges_in
         actual_edges_in = np.sum([A[i, j] for i in range(n) for j in range(i + 1, n) if partition[i] == partition[j]])
@@ -85,6 +86,7 @@ class Datasets:
             'name': os.path.splitext(os.path.basename(fpath))[0],
             'n': len(partition),
             'k': len(set(partition)),
+            'unbalance': unbalance,
             'p_in': p_in,
             'p_out': p_out
         }
@@ -92,6 +94,7 @@ class Datasets:
 
     def __getitem__(self, item):
         if item not in self._loaded_datasets:
+            print(f'Item {item} not in cache; reload')
             self._loaded_datasets[item] = self._lazy_datasets[item]()
         return self._loaded_datasets[item]
 

@@ -7,36 +7,39 @@ from tqdm import tqdm
 
 
 class StochasticBlockModel:
-    def __init__(self, n_nodes, n_classes, cluster_sizes=None, p_in=None, p_out=None, probability_matrix=None):
+    def __init__(self, n_nodes, n_classes, cluster_sizes=None, balance=None, p_in=None, p_out=None,
+                 probability_matrix=None):
         self.n = n_nodes
         self.k = n_classes
 
-        if p_in is not None and p_out is not None and probability_matrix is None:
+        assert (p_in is None) ^ (probability_matrix is None), 'provide either (p_in, p_out) or probability_matrix'
+        if p_in is not None and p_out is not None:
             self.p_in = p_in
             self.p_out = p_out
             self.probability_matrix_mode = False
-        elif p_in is None and p_out is None and probability_matrix is not None:
+            probability_matrix_str = f'p_in={self.p_in}, p_out={self.p_out}'
+        else:  # probability_matrix is not None
             assert probability_matrix.shape[0] == n_classes and probability_matrix.shape[1] == n_classes
             self.probability_matrix = probability_matrix
             self.probability_matrix_mode = True
-        else:
-            raise ValueError('provide either (p_in, p_out) or probability_matrix')
+            probability_matrix_str = 'probability matrix'
 
-        if cluster_sizes is not None:
+        assert not (cluster_sizes is not None and balance is not None), 'can\'t fill both cluster_sizes and balance'
+        if balance is not None:
+            softmax = lambda x, beta: np.exp(beta * x) / np.sum(np.exp(beta * x), axis=0)
+            self.cluster_sizes = ([1] * self.k + (self.n - self.k) * softmax(np.arange(self.k)[::-1], beta=balance))\
+                .astype(np.int)
+            cluster_sizes_str = f'balance={balance:.2f}'
+        elif cluster_sizes is not None:
             assert len(cluster_sizes) == n_classes
             self.cluster_sizes = cluster_sizes
-            self.cluster_sizes_mode = False
+            cluster_sizes_str = f'cluster_sizes={cluster_sizes}'
         else:
             self.cluster_sizes = [self.n // self.k] * self.k
-            self.cluster_sizes_mode = True
+            cluster_sizes_str = f'equal classes'
+        self.cluster_sizes[0] += self.n - np.sum(self.cluster_sizes)
 
-        name_parts = ['n={}'.format(self.n), 'k={}'.format(self.k)]
-        if self.cluster_sizes_mode:
-            name_parts.append('cluster_sizes mode')
-        if self.probability_matrix_mode:
-            name_parts.append('probability_matrix mode')
-        else:
-            name_parts.append(f'p_in={self.p_in}, p_out={self.p_out}')
+        name_parts = ['n={}'.format(self.n), 'k={}'.format(self.k), cluster_sizes_str, probability_matrix_str]
         self.name = ', '.join(name_parts)
 
     def generate_graph(self, seed=None):
@@ -77,7 +80,7 @@ class StochasticBlockModel:
             'n_graphs': n_graphs,
             'n': self.n,
             'k': self.k,
-            'cluster_sizes_mode': self.cluster_sizes_mode,
+            'cluster_sizes': self.cluster_sizes,
             'probability_matrix_mode': self.probability_matrix_mode
         }
         if not self.probability_matrix_mode:
@@ -85,7 +88,11 @@ class StochasticBlockModel:
                 'p_in': self.p_in,
                 'p_out': self.p_out
             })
-        graphs_range = tqdm(range(n_graphs), desc=f'SBM {self.n}, {self.k}') if verbose else range(n_graphs)
+        if verbose:
+            print(self.name)
+            graphs_range = tqdm(range(n_graphs), desc=f'SBM')
+        else:
+            graphs_range = range(n_graphs)
         if is_connected:  # may take time, parallel will be handy
             graphs = Parallel(n_jobs=n_jobs)(delayed(self.generate_connected_graph)(idx) for idx in graphs_range)
         else:
