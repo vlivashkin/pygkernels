@@ -11,29 +11,19 @@ from tqdm import tqdm
 from pygkernels.util import ddict2dict
 
 d3_category20 = [
-    '#1f77b4',
-    '#aec7e8',
-    '#ff7f0e',
-    '#ffbb78',
-    '#2ca02c',
-    '#98df8a',
-    '#d62728',
-    '#ff9896',
-    '#9467bd',
-    '#c5b0d5',
-    '#8c564b',
-    '#c49c94',
-    '#e377c2',
-    '#f7b6d2',
-    '#7f7f7f',
-    '#c7c7c7',
-    '#bcbd22',
-    '#dbdb8d',
-    '#17becf',
-    '#9edae5',
-    '#cccccc',
-    '#999999',
-    '#666666'
+    '#aec7e8', '#1f77b4',
+    '#ffbb78', '#ff7f0e',
+    '#98df8a', '#2ca02c',
+    '#ff9896', '#d62728',
+    '#c5b0d5', '#9467bd',
+    '#c49c94', '#8c564b',
+    '#f7b6d2', '#e377c2',
+    '#c7c7c7', '#7f7f7f',
+    '#dbdb8d', '#bcbd22',
+    '#9edae5', '#17becf',
+    '#999900', '#cccc00',
+    '#990099', '#cc00cc',
+    '#666666', '#000000'
 ]
 
 
