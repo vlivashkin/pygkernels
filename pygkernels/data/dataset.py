@@ -78,13 +78,20 @@ class Datasets:
         partition = self.simplify_partition(partition)
 
         meta = self.meta[name]
+        n, k = meta['n_nodes'], meta['n_classes']
+        S, P = np.array(meta['cluster_sizes']), np.array(meta['edge_probs'])
+        p_in = np.mean(np.diagonal(P) * S)
+        p_out = np.sum([S[i] * S[j] * P[i, j] for i in range(k) for j in range(i + 1, k)]) / \
+                np.sum([S[i] * S[j] for i in range(k) for j in range(i + 1, k)])
 
         info = {
             'name': os.path.splitext(os.path.basename(fpath))[0],
-            'n': meta['n_nodes'],
-            'k': meta['n_classes'],
-            'S': np.array(meta['cluster_sizes']),
-            'P': np.array(meta['edge_probs'])
+            'n': n,
+            'k': k,
+            'p_in': p_in,
+            'p_out': p_out,
+            'S': S,
+            'P': P
         }
         return (A, partition), info
 
