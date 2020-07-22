@@ -80,7 +80,8 @@ class Datasets:
         meta = self.meta[name]
         n, k = meta['n_nodes'], meta['n_classes']
         S, P = np.array(meta['cluster_sizes']), np.array(meta['edge_probs'])
-        p_in = np.mean(np.diagonal(P) * S)
+        p_in = np.sum((S[i] * S[i] / 2) * P[i, i] for i in range(k)) / \
+               np.sum((S[i] * S[i] / 2) for i in range(k))
         p_out = np.sum([S[i] * S[j] * P[i, j] for i in range(k) for j in range(i + 1, k)]) / \
                 np.sum([S[i] * S[j] for i in range(k) for j in range(i + 1, k)])
 
@@ -90,6 +91,7 @@ class Datasets:
             'k': k,
             'p_in': p_in,
             'p_out': p_out,
+            'unbalance': None,
             'S': S,
             'P': P
         }
