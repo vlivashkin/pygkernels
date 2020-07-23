@@ -10,11 +10,11 @@ from pygkernels.data.utils import np2nx
 
 class GraphGenerator:
     @classmethod
-    def from_adj_matrix(cls, A, partition, k):
-        return cls.from_graph(np2nx(A, partition), k)
+    def params_from_adj_matrix(cls, A, partition, k):
+        return cls.params_from_graph(np2nx(A, partition), k)
 
     @classmethod
-    def from_graph(cls, G, k) -> 'GraphGenerator':
+    def params_from_graph(cls, G, k) -> 'GraphGenerator':
         raise NotImplementedError()
 
     def generate_graph(self, seed=None) -> (np.ndarray, np.ndarray):

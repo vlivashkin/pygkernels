@@ -37,7 +37,7 @@ class LFRGenerator(GraphGenerator):
         logging.info(f'LFR params: {" ".join(self.generate_info())}')
 
     @classmethod
-    def from_graph(cls, G, k) -> 'LFRGenerator':
+    def params_from_graph(cls, G, k) -> 'LFRGenerator':
         # Graph-based parameters
         n = G.number_of_nodes()
         degree_sequence = [d for n, d in G.degree()]
@@ -93,14 +93,3 @@ class LFRGenerator(GraphGenerator):
                                 max_degree=self.max_degree, min_community=self.min_community,
                                 max_community=self.max_community, seed=seed)
         return nx2np(G)
-
-
-if __name__ == '__main__':
-    from pygkernels.data import Datasets
-
-    (A, partition), info = Datasets()['news_2cl1_0.1']
-    gen = LFRGenerator.from_adj_matrix(A, partition, info['k'])
-    print(gen.generate_info())
-    A, partition = gen.generate_graph()
-    gen = LFRGenerator.from_adj_matrix(A, partition, info['k'])
-    print(gen.generate_info())

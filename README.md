@@ -22,6 +22,7 @@ Framework for clustering graph nodes using various similarity/dissimilarity meas
   * **FE**: Free Energy distance
 * Sigmoid Commute Time:
   * **SCT**: Sigmoid Commute Time
+  * **CCT**: Corrected Commute Time
   * **SCCT**: Sigmoid Corrected Commute Time
 * **SP-CT**: Shortest Path, Commute Time, and their linear combination
 * logarithmic version of every measure
@@ -36,6 +37,7 @@ Every measure is presented as dissimilarity (distance) and similarity (kernel/pr
 
 #### Graph generators:
 * Stochastic Block Model
+* LFR (networkx wrapper)
 
 #### Graph datsets:
 https://github.com/vlivashkin/community-graphs
@@ -74,6 +76,18 @@ gridsearch = ParallelByGraphs(adjusted_rand_score, n_params, progressbar=True, i
 
 params, ari, error = gridsearch.perform(KKMeans, logComm_H, graphs, k, n_jobs=-1, n_gpu=2)
 best_param = params[np.argmax(ari)]
+```
+
+#### Generate LFR graphs like datasets:
+```python
+from pygkernels.data import Datasets, LFRGenerator
+
+(A, partition), info = Datasets()['news_2cl1_0.1']
+gen = LFRGenerator.params_from_adj_matrix(A, partition, info['k'])
+print(gen.generate_info())
+A, partition = gen.generate_graph()
+gen = LFRGenerator.params_from_adj_matrix(A, partition, info['k'])
+print(gen.generate_info())
 ```
 
 All examples are located in [./examples](./examples).
