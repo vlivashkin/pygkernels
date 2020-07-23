@@ -20,9 +20,9 @@ class Datasets:
             self.datasets_root = datasets_root
 
         with open(f'{self.datasets_root}/stat.json', 'r') as f:
-            self.meta = json.load(f)
+            self._meta = json.load(f)
 
-        self._lazy_datasets = {
+        self._paths = {
             'cora_AI': 'cora_subset/Artificial_Intelligence.gml',
             'cora_AI_ML': 'cora_subset/Artificial_Intelligence__Machine_Learning.gml',
             'cora_DS_AT': 'cora_subset/Data_Structures__Algorithms_and_Theory.gml',
@@ -77,7 +77,7 @@ class Datasets:
         A = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
         partition = self.simplify_partition(partition)
 
-        meta = self.meta[name]
+        meta = self._meta[name]
         n, k = meta['n_nodes'], meta['n_classes']
         S, P = np.array(meta['cluster_sizes']), np.array(meta['edge_probs'])
         p_in = np.sum((S[i] * S[i] / 2) * P[i, i] for i in range(k)) / \
@@ -100,7 +100,7 @@ class Datasets:
     def __getitem__(self, name):
         if name not in self._loaded_datasets:
             print(f'Dataset {name} not in cache; reload')
-            self._loaded_datasets[name] = self._read_gml(name, self._lazy_datasets[name])
+            self._loaded_datasets[name] = self._read_gml(name, self._paths[name])
         return self._loaded_datasets[name]
 
     def __getattr__(self, name):

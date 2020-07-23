@@ -1,12 +1,9 @@
-import logging
-
-import networkx as nx
 import numpy as np
-from joblib import Parallel, delayed
-from tqdm import tqdm
+
+from pygkernels.data.graph_generator import GraphGenerator
 
 
-class StochasticBlockModel:
+class StochasticBlockModel(GraphGenerator):
     def __init__(self, n_nodes, n_classes, cluster_sizes=None, balance=None, p_in=None, p_out=None,
                  probability_matrix=None):
         self.n = n_nodes
@@ -27,7 +24,7 @@ class StochasticBlockModel:
         assert not (cluster_sizes is not None and balance is not None), 'can\'t fill both cluster_sizes and balance'
         if balance is not None:
             softmax = lambda x, beta: np.exp(beta * x) / np.sum(np.exp(beta * x), axis=0)
-            self.cluster_sizes = ([1] * self.k + (self.n - self.k) * softmax(np.arange(self.k)[::-1], beta=balance))\
+            self.cluster_sizes = ([1] * self.k + (self.n - self.k) * softmax(np.arange(self.k)[::-1], beta=balance)) \
                 .astype(np.int)
             cluster_sizes_str = f'balance={balance:.2f}'
         elif cluster_sizes is not None:
@@ -41,6 +38,22 @@ class StochasticBlockModel:
 
         name_parts = ['n={}'.format(self.n), 'k={}'.format(self.k), cluster_sizes_str, probability_matrix_str]
         self.name = ', '.join(name_parts)
+
+    def generate_info(self, n_graphs):
+        info = {
+            'name': 'count:{}, {}'.format(n_graphs, self.name),
+            'n_graphs': n_graphs,
+            'n': self.n,
+            'k': self.k,
+            'cluster_sizes': self.cluster_sizes,
+            'probability_matrix_mode': self.probability_matrix_mode
+        }
+        if not self.probability_matrix_mode:
+            info.update({
+                'p_in': self.p_in,
+                'p_out': self.p_out
+            })
+        return info
 
     def generate_graph(self, seed=None):
         if seed is not None:
@@ -63,38 +76,3 @@ class StochasticBlockModel:
                     A[j][i] = 1
 
         return A, partition
-
-    def generate_connected_graph(self, seed=None):
-        if seed is not None:
-            np.random.seed(seed)
-        A, partition = self.generate_graph()
-        while not nx.is_connected(nx.from_numpy_matrix(A)):
-            A, partition = self.generate_graph()
-        return A, partition
-
-    def generate_graphs(self, n_graphs, is_connected=True, verbose=False, n_jobs=6):
-        logging.info('StochasticBlockModel: count={}, {}'.format(n_graphs, self.name))
-
-        info = {
-            'name': 'count:{}, {}'.format(n_graphs, self.name),
-            'n_graphs': n_graphs,
-            'n': self.n,
-            'k': self.k,
-            'cluster_sizes': self.cluster_sizes,
-            'probability_matrix_mode': self.probability_matrix_mode
-        }
-        if not self.probability_matrix_mode:
-            info.update({
-                'p_in': self.p_in,
-                'p_out': self.p_out
-            })
-        if verbose:
-            print(self.name)
-            graphs_range = tqdm(range(n_graphs), desc=f'SBM')
-        else:
-            graphs_range = range(n_graphs)
-        if is_connected:  # may take time, parallel will be handy
-            graphs = Parallel(n_jobs=n_jobs)(delayed(self.generate_connected_graph)(idx) for idx in graphs_range)
-        else:
-            graphs = [self.generate_graph(idx) for idx in graphs_range]
-        return graphs, info
