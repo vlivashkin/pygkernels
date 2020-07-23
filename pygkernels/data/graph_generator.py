@@ -5,19 +5,19 @@ import numpy as np
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
+from pygkernels.data.utils import np2nx
+
 
 class GraphGenerator:
     @classmethod
-    def from_adj_matrix(cls, A, partition):
-        G = nx.from_numpy_matrix(A)
-        nx.set_node_attributes(G, partition, 'community')
-        return cls.from_graph(G)
+    def from_adj_matrix(cls, A, partition, k):
+        return cls.from_graph(np2nx(A, partition), k)
 
     @classmethod
-    def from_graph(cls, G) -> 'GraphGenerator':
+    def from_graph(cls, G, k) -> 'GraphGenerator':
         raise NotImplementedError()
 
-    def generate_graph(self, seed=None) -> (np.array, np.array):
+    def generate_graph(self, seed=None) -> (np.ndarray, np.ndarray):
         raise NotImplementedError()
 
     def generate_info(self, n_graphs) -> dict:
@@ -37,8 +37,7 @@ class GraphGenerator:
         info = self.generate_info(n_graphs)
         graphs_range = range(n_graphs)
         if verbose:
-            print(self.name)
-            graphs_range = tqdm(graphs_range, desc=f'SBM')
+            graphs_range = tqdm(graphs_range, desc=f'{self.__class__.__name__}')
         if is_connected:  # may take time, parallel will be handy
             graphs = Parallel(n_jobs=n_jobs)(delayed(self.generate_connected_graph)(idx) for idx in graphs_range)
         else:

@@ -1,11 +1,10 @@
 from abc import ABC
 
-import networkx as nx
 import numpy as np
 from scipy.linalg import expm
 
-from . import shortcuts as h
 from pygkernels.measure import scaler
+from . import shortcuts as h
 
 
 class Kernel(ABC):
@@ -40,36 +39,12 @@ class Kernel(ABC):
 class CT_H(Kernel):
     name, _default_scaler = 'CT', scaler.Linear
 
-    def CT(self):
-        """
-        Commute time kernel function.
-        Ref: Fouss (2007)
-        """
-        G = nx.from_numpy_matrix(self.A)
-        L = nx.laplacian_matrix(G, nodelist=sorted(G.nodes)).toarray().astype('float')
-        K = np.linalg.pinv(L)
-        return K
+    def __init__(self, A: np.ndarray):
+        super().__init__(A)
+        self.K_CT = np.linalg.pinv(h.get_L(self.A))
 
-    def resistance_kernel(self):
-        """
-        H = (L + J)^{-1}
-        """
-        size = self.A.shape[0]
-        L = h.get_L(self.A)
-        J = np.ones((size, size)) / size
-        return np.linalg.pinv(L + J)
-
-    def resistance_kernel2(self):
-        """
-        H = (I + L)^{-1}
-        """
-        size = self.A.shape[0]
-        I = np.eye(size)
-        L = h.get_L(self.A)
-        return np.linalg.pinv(I + L)
-
-    def get_K(self, param):
-        return self.resistance_kernel()
+    def get_K(self, param=None):
+        return self.K_CT
 
 
 class Katz_H(Kernel):
@@ -132,12 +107,11 @@ class NHeat_H(Kernel):
         return expm(-t * self.nL)
 
 
-class SCT_H(Kernel):
+class SCT_H(CT_H):
     name, _default_scaler = 'SCT', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
-        self.K_CT = np.linalg.pinv(h.get_L(self.A))
         self.sigma = self.K_CT.std()
         self.Kds = self.K_CT / (self.sigma + self.EPS)
 
@@ -148,14 +122,12 @@ class SCT_H(Kernel):
         return 1. / (1. + np.exp(-alpha * self.Kds))
 
 
-class SCCT_H(Kernel):
-    name, _default_scaler = 'SCCT', scaler.Fraction
+class CCT_H(Kernel):
+    name, _default_scaler = 'CCT', scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
         self.K_CCT = self.H_CCT(A)
-        self.sigma = self.K_CCT.std()
-        self.Kds = self.K_CCT / self.sigma
 
     def H_CCT(self, A: np.ndarray):
         """
@@ -173,6 +145,18 @@ class SCCT_H(Kernel):
         volG = np.sum(A)
         M = D05.dot(A - d.dot(d.transpose()) / volG).dot(D05)
         return H.dot(D05).dot(M).dot(np.linalg.pinv(I - M)).dot(M).dot(D05).dot(H)
+
+    def get_K(self, alpha=None):
+        return self.K_CCT
+
+
+class SCCT_H(CCT_H):
+    name, _default_scaler = 'SCCT', scaler.Fraction
+
+    def __init__(self, A: np.ndarray):
+        super().__init__(A)
+        self.sigma = self.K_CCT.std()
+        self.Kds = self.K_CCT / self.sigma
 
     def get_K(self, alpha):
         """

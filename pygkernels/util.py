@@ -4,7 +4,6 @@ import pickle
 import sys
 
 import numpy as np
-from joblib import Parallel, delayed
 
 
 def configure_logging():
