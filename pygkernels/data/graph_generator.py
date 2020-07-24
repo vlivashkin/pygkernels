@@ -27,19 +27,20 @@ class GraphGenerator:
         if seed is not None:
             np.random.seed(seed)
         A, partition = self.generate_graph()
-        while not nx.is_connected(nx.from_numpy_matrix(A)):
-            A, partition = self.generate_graph()
+        G = nx.from_numpy_matrix(A)
+        while not nx.is_connected(G):
+            components = list(nx.connected_components(G))
+            print(f'not connected! {len(components)} components')
+            G.add_edge(np.random.choice(list(components[0])), np.random.choice(list(components[1])))
         return A, partition
 
-    def generate_graphs(self, n_graphs, is_connected=True, verbose=False, n_jobs=6):
+    def generate_graphs(self, n_graphs, is_connected=True, verbose=False, n_jobs=1):
         logging.info(f'{self.__class__.__name__}: count={n_graphs}')
 
         info = self.generate_info(n_graphs)
         graphs_range = range(n_graphs)
         if verbose:
             graphs_range = tqdm(graphs_range, desc=f'{self.__class__.__name__}')
-        if is_connected:  # may take time, parallel will be handy
-            graphs = Parallel(n_jobs=n_jobs)(delayed(self.generate_connected_graph)(idx) for idx in graphs_range)
-        else:
-            graphs = [self.generate_graph(idx) for idx in graphs_range]
+        generate_method = self.generate_connected_graph if is_connected else self.generate_graph
+        graphs = Parallel(n_jobs=n_jobs)(delayed(generate_method)(idx) for idx in graphs_range)
         return graphs, info

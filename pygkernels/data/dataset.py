@@ -77,7 +77,7 @@ class Datasets:
         A = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
         partition = self.simplify_partition(partition)
 
-        meta = self._meta[name]
+        meta = self._meta[os.path.splitext(os.path.basename(rel_path))[0]]
         n, k = meta['n_nodes'], meta['n_classes']
         S, P = np.array(meta['cluster_sizes']), np.array(meta['edge_probs'])
         p_in = np.sum((S[i] * S[i] / 2) * P[i, i] for i in range(k)) / \
