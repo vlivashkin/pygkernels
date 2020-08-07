@@ -1,8 +1,8 @@
 from collections import Counter
 
 import numpy as np
+import powerlaw
 from networkx.generators.community import LFR_benchmark_graph
-from scipy.optimize import curve_fit
 
 from pygkernels.data.graph_generator import GraphGenerator
 from pygkernels.data.utils import nx2np
@@ -18,11 +18,10 @@ def estimate_mu(graph, partition):
 
 
 def power_law(values):
-    values_count = sorted(Counter(values).items(), key=lambda x: x[0], reverse=True)
-    deg, cnt = zip(*values_count)
-    cnt = np.cumsum(cnt)
-    params, _ = curve_fit(lambda x, a, b: x * a + b, np.log(deg), np.log(cnt))
-    return -1 * params[0] + 1
+    tau = powerlaw.Fit(values).alpha
+    if tau > 200 or np.isnan(tau):
+        tau = 200
+    return tau
 
 
 class LFRGenerator(GraphGenerator):
@@ -76,7 +75,8 @@ class LFRGenerator(GraphGenerator):
         return info
 
     def generate_graph(self, seed=None):
-        G = LFR_benchmark_graph(self.n, self.tau1, self.tau2, self.mu, average_degree=self.average_degree,
-                                max_degree=self.max_degree, min_community=self.min_community,
-                                max_community=self.max_community, seed=seed, tol=1e-5, max_iters=100000)
+        G = LFR_benchmark_graph(self.n, self.tau1, self.tau2, self.mu,
+                                average_degree=self.average_degree, max_degree=self.max_degree,
+                                min_community=self.min_community, max_community=self.max_community,
+                                seed=seed, tol=1e-5, max_iters=10000)
         return nx2np(G)
