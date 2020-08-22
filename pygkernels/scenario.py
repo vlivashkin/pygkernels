@@ -11,19 +11,19 @@ from tqdm import tqdm
 from pygkernels.util import ddict2dict
 
 d3_category20 = [
-    '#aec7e8', '#1f77b4',
-    '#ffbb78', '#ff7f0e',
-    '#98df8a', '#2ca02c',
-    '#ff9896', '#d62728',
-    '#c5b0d5', '#9467bd',
-    '#c49c94', '#8c564b',
-    '#f7b6d2', '#e377c2',
-    '#c7c7c7', '#7f7f7f',
-    '#dbdb8d', '#bcbd22',
-    '#9edae5', '#17becf',
-    '#999900', '#cccc00',
-    '#990099', '#cc00cc',
-    '#666666', '#000000'
+    '#aec7e8', '#1f77b4',  #  0  1
+    '#ffbb78', '#ff7f0e',  #  2  3
+    '#98df8a', '#2ca02c',  #  4  5
+    '#ff9896', '#d62728',  #  6  7
+    '#c5b0d5', '#9467bd',  #  8  9
+    '#9edae5', '#17becf',  # 10 11
+    '#f7b6d2', '#e377c2',  # 12 13
+    '#c7c7c7', '#7f7f7f',  # 14 15
+    '#dbdb8d', '#bcbd22',  # 16 17
+    '#c49c94', '#8c564b',  # 18 19
+    '#7eeaba', '#4cb787',  # 20 21
+    '#dd00dd', '#aa00aa',  # 22 23
+    '#555555',  # 24 25
 ]
 
 
@@ -35,29 +35,31 @@ def d3():
 
 
 d3_colors = {
-    'pWalk': d3_category20[1],
-    'Walk': d3_category20[0],
-    'For': d3_category20[3],
-    'logFor': d3_category20[2],
-    'Comm': d3_category20[5],
-    'logComm': d3_category20[4],
-    'Heat': d3_category20[7],
-    'logHeat': d3_category20[6],
-    'NHeat': d3_category20[9],
-    'logNHeat': d3_category20[8],
-    'SCT': d3_category20[11],
-    'SCCT': d3_category20[10],
-    'RSP': d3_category20[13],
-    'FE': d3_category20[12],
-    'PPR': d3_category20[15],
-    'logPPR': d3_category20[14],
-    'ModifPPR': d3_category20[17],
-    'logModifPPR': d3_category20[16],
-    'HeatPPR': d3_category20[19],
-    'logHeatPPR': d3_category20[18],
-    'SP-CT': d3_category20[20],
-    'SP': d3_category20[21],
-    'CT': d3_category20[22]
+    'Katz': d3_category20[0],
+    'logKatz': d3_category20[1],
+    'For': d3_category20[2],
+    'logFor': d3_category20[3],
+    'Comm': d3_category20[4],
+    'logComm': d3_category20[5],
+    'Heat': d3_category20[6],
+    'logHeat': d3_category20[7],
+    'NHeat': d3_category20[8],
+    'logNHeat': d3_category20[9],
+    'SCT': d3_category20[10],
+    'SCCT': d3_category20[11],
+    'RSP': d3_category20[12],
+    'FE': d3_category20[13],
+    'PPR': d3_category20[14],
+    'logPPR': d3_category20[15],
+    'ModifPPR': d3_category20[16],
+    'logModifPPR': d3_category20[17],
+    'HeatPR': d3_category20[18],
+    'logHeatPR': d3_category20[19],
+    'DF': d3_category20[20],
+    'logDF': d3_category20[21],
+    'Abs': d3_category20[22],
+    'logAbs': d3_category20[23],
+    'SP-CT': d3_category20[24],
 }
 
 
