@@ -111,3 +111,28 @@ def modularity(A: np.array, partition):
         mask = np.array(partition) == class_name
         Q += np.sum(Q_items[mask][:, mask])
     return Q / n_edges
+
+
+def _create_krondecker(partition):
+    n = len(partition)
+    kron_mask = np.tile(partition, n) == np.repeat(partition, n)
+
+    return np.reshape(kron_mask, (n, n))
+
+
+def modularity2(AIJ, partition):
+    # reverse = {}
+    # for comm_idx, comm in enumerate(partition):
+    #     for item in comm.tolist():
+    #         reverse[item] = comm_idx + 1
+    # partition = [reverse[x] for x in range(len(reverse))]
+
+    n = len(AIJ)
+    m = np.sum(AIJ)  # no of edges
+
+    k = np.sum(AIJ, axis=1)
+    expectation = np.reshape(np.tile(k, n) * np.repeat(k, n), (n, n)) / m
+    kron = _create_krondecker(partition)
+
+    # Q = (1 / 2m) * SUM(AIJ - (ki.kj / 2m)) ∂(ci, cj)
+    return (1.0 / m) * np.sum(kron * (AIJ - expectation))

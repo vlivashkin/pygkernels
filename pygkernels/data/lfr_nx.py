@@ -34,7 +34,7 @@ class LFRGenerator(GraphGenerator):
         self.tau2 = tau2
         self.mu = mu
         self.average_degree = average_degree
-        self.min_degree = None  # min_degree
+        self.min_degree = min_degree  # min_degree
         self.max_degree = max_degree
         self.min_community = min_community
         self.max_community = max_community
