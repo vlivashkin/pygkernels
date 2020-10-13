@@ -1,4 +1,4 @@
-joblib
+joblib==0.13.2
 matplotlib
 networkx
 numpy
@@ -7,3 +7,4 @@ scikit-learn
 scipy
 tqdm
 torch
+powerlaw
