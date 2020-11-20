@@ -10,9 +10,9 @@ setup(
     author_email='vladimir.ivashkin@phystech.edu',
     description='',
     install_requires=[
-        'joblib',
+        'joblib==0.13.2',
         'matplotlib',
-        'networkx',
+        'networkx==2.5',
         'numpy',
         'pandas',
         'scikit-learn',

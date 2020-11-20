@@ -1,6 +1,6 @@
 joblib==0.13.2
 matplotlib
-networkx
+networkx==2.5
 numpy
 pandas
 scikit-learn

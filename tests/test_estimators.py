@@ -60,27 +60,32 @@ class TestEstimators(unittest.TestCase):
         communities = list(communities.values())
         return nx.community.modularity(G, communities)
 
-    def test_modularity_undirected(self):
+    def test_modularity_datasets(self):
         (A, gt), _ = Datasets().polbooks
         G = nx.from_numpy_array(A)
         nx.set_node_attributes(G, dict(enumerate(gt)), 'gt')
 
         modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, 'gt'))
 
-        mod_ours_numpy = score.modularity(A, gt)
+        mod_ours_numpy1 = score.modularity(A, gt)
+        mod_ours_numpy2 = score.modularity(A, gt)
         mod_ours_torch = _kkmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(gt).int())
-        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy, atol=0.0001))
+        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy1, atol=0.0001))
+        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy2, atol=0.0001))
         self.assertTrue(np.isclose(modularity_nx, mod_ours_torch, atol=0.0001))
 
-    def test_modularity_directed(self):
+    def test_modularity2_LFR(self):
         A, gt = LFRGenerator(200, 5, 5, 0.7, min_degree=5).generate_graph()
         A, gt = np.array(A), np.array(gt)
+        np.fill_diagonal(A, 0)
+
         G = nx.from_numpy_array(A)
         nx.set_node_attributes(G, dict(enumerate(gt)), 'gt')
-
         modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, 'gt'))
 
-        mod_ours_numpy = score.modularity2(A, gt + 1)
+        mod_ours_numpy1 = score.modularity(A, gt)
+        mod_ours_numpy2 = score.modularity2(A, gt)
         mod_ours_torch = _kkmeans_pytorch._modularity(torch.from_numpy(A).float(), torch.from_numpy(gt).int())
-        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy, atol=0.0001))
+        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy1, atol=0.0001))
+        self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy2, atol=0.0001))
         self.assertTrue(np.isclose(modularity_nx, mod_ours_torch, atol=0.0001))

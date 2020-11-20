@@ -80,10 +80,10 @@ class Datasets:
         meta = self._meta[os.path.splitext(os.path.basename(rel_path))[0]]
         n, k = meta['n_nodes'], meta['n_classes']
         S, P = np.array(meta['cluster_sizes']), np.array(meta['edge_probs'])
-        p_in = np.sum((S[i] * S[i] / 2) * P[i, i] for i in range(k)) / \
-               np.sum((S[i] * S[i] / 2) for i in range(k))
-        p_out = np.sum([S[i] * S[j] * P[i, j] for i in range(k) for j in range(i + 1, k)]) / \
-                np.sum([S[i] * S[j] for i in range(k) for j in range(i + 1, k)])
+        p_in = np.sum([(S[i] * S[i] / 2) * P[i, i] for i in range(k)]) / \
+               np.sum([(S[i] * S[i] / 2) for i in range(k)])
+        p_out = np.sum([[S[i] * S[j] * P[i, j] for i in range(k) for j in range(i + 1, k)]]) / \
+                np.sum([[S[i] * S[j] for i in range(k) for j in range(i + 1, k)]])
 
         info = {
             'name': os.path.splitext(os.path.basename(fpath))[0],

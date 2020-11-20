@@ -14,7 +14,7 @@ from pygkernels import util
 from pygkernels.cluster import KKMeans
 from pygkernels.data import Datasets
 from pygkernels.measure import SCT_H, SCCT_H, FE_K, RSP_K, SPCT_H, Comm_H, For_H, Heat_H, Katz_H, logComm_H, logFor_H, \
-    logHeat_H, logKatz_H
+    logHeat_H, logKatz_H, SP_K
 
 
 class TestTable1(ABC):
@@ -107,7 +107,7 @@ class TestTable1(ABC):
         self.dataset_results(RSP_K, 0.03, 3)
 
     def test_SP(self):
-        self.dataset_results(SPCT_H, 1, 4)
+        self.dataset_results(SP_K, -1, 4)
 
     @unittest.skip
     def test_Comm(self):

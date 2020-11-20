@@ -1,4 +1,4 @@
-from networkx import LFR_benchmark_graph
+from networkx.algorithms.community import LFR_benchmark_graph
 
 from pygkernels.data import Datasets, LFRGenerator
 from pygkernels.data.utils import nx2np
