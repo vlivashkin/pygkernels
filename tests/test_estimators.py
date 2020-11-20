@@ -31,18 +31,8 @@ class TestEstimators(unittest.TestCase):
             Ward_sklearn,
         ]
 
-    @unittest.skip
-    def test_estimators_news_2cl(self):
-        (A, gt), info = Datasets().news_2cl1
-        K = logComm_H(A).get_K(0.5)
-
-        for estimator in tqdm(self.estimators):
-            km = estimator(n_clusters=info['k'])
-            km.predict(K, A=A)
-
-    @unittest.skip
     def test_estimators_news_3cl(self):
-        (A, gt), info = Datasets().news_3cl1
+        (A, gt), info = Datasets()['football']
         K = logComm_H(A).get_K(0.5)
 
         for estimator in tqdm(self.estimators):
@@ -74,7 +64,7 @@ class TestEstimators(unittest.TestCase):
         self.assertTrue(np.isclose(modularity_nx, mod_ours_numpy2, atol=0.0001))
         self.assertTrue(np.isclose(modularity_nx, mod_ours_torch, atol=0.0001))
 
-    def test_modularity2_LFR(self):
+    def test_modularity_LFR(self):
         A, gt = LFRGenerator(200, 5, 5, 0.7, min_degree=5).generate_graph()
         A, gt = np.array(A), np.array(gt)
         np.fill_diagonal(A, 0)

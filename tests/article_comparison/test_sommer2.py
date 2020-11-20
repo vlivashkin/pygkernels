@@ -106,6 +106,7 @@ class TestTable1(ABC):
     def test_RSP(self):
         self.dataset_results(RSP_K, 0.03, 3)
 
+    @unittest.skip
     def test_SP(self):
         self.dataset_results(SP_K, -1, 4)
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.cluster import KMeans
 
@@ -23,7 +25,7 @@ class SpectralClustering_rubanov(KernelEstimator):
         S = np.diag(sgns)
         return X.dot(S)
 
-    def predict(self, K):
+    def predict(self, K, A: Optional[np.array] = None):
         X = self._max_ort(K)
         X = self._sign_flip(X)
         cls = KMeans(n_clusters=self.n_clusters, n_init=self.n_init, random_state=self.random_state)

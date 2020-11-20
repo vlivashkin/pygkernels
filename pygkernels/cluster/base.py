@@ -3,6 +3,7 @@ import subprocess
 import uuid
 from abc import abstractmethod, ABC
 from os.path import join as pj
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -28,7 +29,7 @@ class KernelEstimator(BaseEstimator, ClusterMixin, ABC):
         return self
 
     @abstractmethod
-    def predict(self, K):
+    def predict(self, K, A: Optional[np.array] = None):
         pass
 
     def fit_predict(self, X, y=None):
