@@ -12,7 +12,7 @@ setup(
     install_requires=[
         'joblib==0.13.2',
         'matplotlib',
-        'networkx==2.5',
+        'networkx==2.3',
         'numpy',
         'pandas',
         'scikit-learn',
