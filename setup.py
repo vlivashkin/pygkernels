@@ -18,6 +18,7 @@ setup(
         'scikit-learn',
         'scipy',
         'tqdm',
-        'torch'
+        'torch',
+        'powerlaw'
     ]
 )
