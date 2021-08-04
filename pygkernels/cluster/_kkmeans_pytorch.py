@@ -22,7 +22,7 @@ def _modularity(A, labels):
     degrees = torch.sum(A, dim=1, keepdim=True)
 
     Q_items = A + torch.diagonal(A) - degrees.mm(degrees.transpose(1, 0)) / n_edges
-    Q = torch.Tensor([0])
+    Q = torch.Tensor([0]).to(Q_items.device)
     for class_name in range(torch.max(labels).item() + 1):
         mask = labels == class_name
         Q += torch.sum(Q_items[mask][:, mask])

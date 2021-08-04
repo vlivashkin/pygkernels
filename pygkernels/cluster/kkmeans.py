@@ -1,3 +1,4 @@
+import traceback
 from abc import ABC, abstractmethod
 from typing import Optional
 
@@ -72,9 +73,11 @@ class KMeans_Fouss(KernelEstimator, ABC):
                     quality = self._choose_measure_to_detect_best_trial(inertia, modularity)
                     return labels, quality, inertia, modularity
             except Exception or ValueError or FloatingPointError or np.linalg.LinAlgError as e:
-                # print(f'trial: {e}')
-                pass
-        # case if all reruns was unsuccessful
+                print(f'trial: {e}')
+                traceback.print_exc()
+                # pass
+        # case if all reruns were unsuccessful
+        print(f'all reruns were unsuccessful')
         quality = self._choose_measure_to_detect_best_trial(inertia, modularity)
         return labels, quality, inertia, modularity
 
