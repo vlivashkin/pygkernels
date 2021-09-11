@@ -23,7 +23,7 @@ d3_category20 = [
     '#c49c94', '#8c564b',  # 18 19
     '#7eeaba', '#4cb787',  # 20 21
     '#dd00dd', '#aa00aa',  # 22 23
-    '#555555',  # 24 25
+    '#555555', '#cccccc',  # 24 25
 ]
 
 
@@ -60,6 +60,7 @@ d3_colors = {
     'Abs': d3_category20[22],
     'logAbs': d3_category20[23],
     'SP-CT': d3_category20[24],
+    'several': d3_category20[25],
 }
 
 
