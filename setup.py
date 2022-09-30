@@ -10,7 +10,7 @@ setup(
     author_email='vladimir.ivashkin@phystech.edu',
     description='',
     install_requires=[
-        'joblib==0.13.2',
+        'joblib==1.2.0',
         'matplotlib',
         'networkx==2.3',
         'numpy',
