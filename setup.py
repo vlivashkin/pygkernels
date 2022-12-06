@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="pygkernels",
-    version="0.9",
+    version="0.9.1",
     packages=["pygkernels"],
     url="",
     license="MIT",
