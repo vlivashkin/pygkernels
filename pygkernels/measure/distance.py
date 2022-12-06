@@ -32,16 +32,16 @@ class Distance(ABC):
 
 
 class SP_D(Distance):
-    name, _default_scaler = 'SP', scaler.Linear
+    name, _default_scaler = "SP", scaler.Linear
 
     def get_D(self, param):
-        with np.errstate(divide='ignore', invalid='ignore'):
-            A = np.divide(1., self.A, where=lambda x: x != 0)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            A = np.divide(1.0, self.A, where=lambda x: x != 0)
         return np.array(shortest_path(A, directed=False), dtype=np.float64)
 
 
 class CT_D(Distance):
-    name, _default_scaler = 'CT', scaler.Linear
+    name, _default_scaler = "CT", scaler.Linear
 
     def commute_distance(self):
         """
@@ -87,7 +87,7 @@ class RSP_vanilla_like(Distance, ABC):
 
 @deprecated()
 class RSP_vanilla_D(RSP_vanilla_like):
-    name, _default_scaler = 'RSP vanilla', scaler.FractionReversed
+    name, _default_scaler = "RSP vanilla", scaler.FractionReversed
 
     def get_D(self, beta):
         """
@@ -107,7 +107,7 @@ class RSP_vanilla_D(RSP_vanilla_like):
 
 @deprecated()
 class FE_vanilla_D(RSP_vanilla_like):
-    name, _default_scaler = 'FE vanilla', scaler.FractionReversed
+    name, _default_scaler = "FE vanilla", scaler.FractionReversed
 
     def get_D(self, beta):
         """
@@ -131,7 +131,7 @@ class _RSP_like(Distance, ABC):
     def __init__(self, A):
         super().__init__(A)
 
-        max = np.finfo('d').max
+        max = np.finfo("d").max
         eps = 0.00000001
 
         # If A is integer-valued, and beta is floating-point, can get an
@@ -169,7 +169,7 @@ class _RSP_like(Distance, ABC):
 
 
 class RSP_D(_RSP_like):
-    name, _default_scaler = 'RSP', scaler.FractionReversed
+    name, _default_scaler = "RSP", scaler.FractionReversed
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -203,7 +203,7 @@ class RSP_D(_RSP_like):
 
 
 class FE_D(_RSP_like):
-    name, _default_scaler = 'FE', scaler.FractionReversed
+    name, _default_scaler = "FE", scaler.FractionReversed
 
     def get_D(self, beta):
         W, Z = self.WZ(beta)
@@ -214,9 +214,9 @@ class FE_D(_RSP_like):
 
         # If there any 0 values in Zh (because of isolated nodes), taking
         # log will raise a divide-by-zero error -- ignore it
-        np.seterr(divide='ignore')
+        np.seterr(divide="ignore")
         FE = -np.log(Zh) / beta
-        np.seterr(divide='raise')
+        np.seterr(divide="raise")
         D_FE = 0.5 * (FE + FE.T)
 
         # Just in case, set diagonals to zero:

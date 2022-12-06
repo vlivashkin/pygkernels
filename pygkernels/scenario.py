@@ -11,19 +11,32 @@ from tqdm import tqdm
 from pygkernels.util import ddict2dict
 
 d3_category20 = [
-    '#aec7e8', '#1f77b4',  #  0  1
-    '#ffbb78', '#ff7f0e',  #  2  3
-    '#98df8a', '#2ca02c',  #  4  5
-    '#ff9896', '#d62728',  #  6  7
-    '#c5b0d5', '#9467bd',  #  8  9
-    '#9edae5', '#17becf',  # 10 11
-    '#f7b6d2', '#e377c2',  # 12 13
-    '#c7c7c7', '#7f7f7f',  # 14 15
-    '#dbdb8d', '#bcbd22',  # 16 17
-    '#c49c94', '#8c564b',  # 18 19
-    '#7eeaba', '#4cb787',  # 20 21
-    '#dd00dd', '#aa00aa',  # 22 23
-    '#555555', '#cccccc',  # 24 25
+    "#aec7e8",
+    "#1f77b4",  #  0  1
+    "#ffbb78",
+    "#ff7f0e",  #  2  3
+    "#98df8a",
+    "#2ca02c",  #  4  5
+    "#ff9896",
+    "#d62728",  #  6  7
+    "#c5b0d5",
+    "#9467bd",  #  8  9
+    "#9edae5",
+    "#17becf",  # 10 11
+    "#f7b6d2",
+    "#e377c2",  # 12 13
+    "#c7c7c7",
+    "#7f7f7f",  # 14 15
+    "#dbdb8d",
+    "#bcbd22",  # 16 17
+    "#c49c94",
+    "#8c564b",  # 18 19
+    "#7eeaba",
+    "#4cb787",  # 20 21
+    "#dd00dd",
+    "#aa00aa",  # 22 23
+    "#555555",
+    "#cccccc",  # 24 25
 ]
 
 
@@ -35,32 +48,32 @@ def d3():
 
 
 d3_colors = {
-    'Katz': d3_category20[0],
-    'logKatz': d3_category20[1],
-    'For': d3_category20[2],
-    'logFor': d3_category20[3],
-    'Comm': d3_category20[4],
-    'logComm': d3_category20[5],
-    'Heat': d3_category20[6],
-    'logHeat': d3_category20[7],
-    'NHeat': d3_category20[8],
-    'logNHeat': d3_category20[9],
-    'SCT': d3_category20[10],
-    'SCCT': d3_category20[11],
-    'RSP': d3_category20[12],
-    'FE': d3_category20[13],
-    'PPR': d3_category20[14],
-    'logPPR': d3_category20[15],
-    'ModifPPR': d3_category20[16],
-    'logModifPPR': d3_category20[17],
-    'HeatPR': d3_category20[18],
-    'logHeatPR': d3_category20[19],
-    'DF': d3_category20[20],
-    'logDF': d3_category20[21],
-    'Abs': d3_category20[22],
-    'logAbs': d3_category20[23],
-    'SP-CT': d3_category20[24],
-    'several': d3_category20[25],
+    "Katz": d3_category20[0],
+    "logKatz": d3_category20[1],
+    "For": d3_category20[2],
+    "logFor": d3_category20[3],
+    "Comm": d3_category20[4],
+    "logComm": d3_category20[5],
+    "Heat": d3_category20[6],
+    "logHeat": d3_category20[7],
+    "NHeat": d3_category20[8],
+    "logNHeat": d3_category20[9],
+    "SCT": d3_category20[10],
+    "SCCT": d3_category20[11],
+    "RSP": d3_category20[12],
+    "FE": d3_category20[13],
+    "PPR": d3_category20[14],
+    "logPPR": d3_category20[15],
+    "ModifPPR": d3_category20[16],
+    "logModifPPR": d3_category20[17],
+    "HeatPR": d3_category20[18],
+    "logHeatPR": d3_category20[19],
+    "DF": d3_category20[20],
+    "logDF": d3_category20[21],
+    "Abs": d3_category20[22],
+    "logAbs": d3_category20[23],
+    "SP-CT": d3_category20[24],
+    "several": d3_category20[25],
 }
 
 
@@ -71,9 +84,11 @@ class ParallelByGraphs:
 
     def __init__(self, scorer, params_flat, progressbar=False, verbose=False, ignore_errors=False):
         self.scorer = scorer
-        self.params_flat = params_flat \
-            if type(params_flat) == list or type(params_flat) == np.array \
+        self.params_flat = (
+            params_flat
+            if type(params_flat) == list or type(params_flat) == np.array
             else np.linspace(0, 1, params_flat)
+        )
         self.progressbar = progressbar
         self.verbose = verbose
         self.ignore_errors = ignore_errors
@@ -91,7 +106,7 @@ class ParallelByGraphs:
                 return func()
             except Exception or FloatingPointError or np.linalg.LinAlgError as e:
                 if self.verbose:
-                    logging.error(f'{error_prefix}: {e}')
+                    logging.error(f"{error_prefix}: {e}")
                 return None
         else:
             return func()
@@ -100,7 +115,7 @@ class ParallelByGraphs:
         edges, y_true = graph
         graph_results = {}
 
-        kernel = self.secure_run(partial(kernel_class, edges), f'{kernel_class.name}, graph {graph_idx}')
+        kernel = self.secure_run(partial(kernel_class, edges), f"{kernel_class.name}, graph {graph_idx}")
         if kernel is None:
             return graph_results
 
@@ -108,8 +123,10 @@ class ParallelByGraphs:
         if single_graph and self.progressbar:
             params = tqdm(params, desc=kernel_class.name)
         for param_flat in params:
-            score = self.secure_run(partial(self._calc_param, param_flat, kernel, estimator, y_true),
-                                    f'{kernel_class.name}, graph {graph_idx}')
+            score = self.secure_run(
+                partial(self._calc_param, param_flat, kernel, estimator, y_true),
+                f"{kernel_class.name}, graph {graph_idx}",
+            )
             if score is not None:
                 graph_results[param_flat] = score
         return graph_results
@@ -118,16 +135,24 @@ class ParallelByGraphs:
         raw_param_dict = defaultdict(list)
         if len(graphs) == 1:  # single graph scenario
             graph_results = self._calc_graph(
-                graphs[0], kernel_class, estimator_class(n_classes, random_state=2000), 0, single_graph=True)
+                graphs[0], kernel_class, estimator_class(n_classes, random_state=2000), 0, single_graph=True
+            )
             for param_flat, ari in graph_results.items():
                 raw_param_dict[param_flat].append(ari)
         elif n_jobs > 1:  # parallel
             if self.progressbar:
                 graphs = tqdm(graphs, desc=kernel_class.name)
-            all_graph_results = Parallel(n_jobs=n_jobs)(delayed(self._calc_graph)(
-                graph, kernel_class, estimator_class(n_classes, device=graph_idx % n_gpu if n_gpu > 0 else 'cpu',
-                                                     random_state=2000 + graph_idx), graph_idx
-            ) for graph_idx, graph in enumerate(graphs))
+            all_graph_results = Parallel(n_jobs=n_jobs)(
+                delayed(self._calc_graph)(
+                    graph,
+                    kernel_class,
+                    estimator_class(
+                        n_classes, device=graph_idx % n_gpu if n_gpu > 0 else "cpu", random_state=2000 + graph_idx
+                    ),
+                    graph_idx,
+                )
+                for graph_idx, graph in enumerate(graphs)
+            )
             for graph_results in all_graph_results:
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
@@ -136,7 +161,8 @@ class ParallelByGraphs:
                 graphs = tqdm(graphs, desc=kernel_class.name)
             for graph_idx, graph in enumerate(graphs):
                 graph_results = self._calc_graph(
-                    graph, kernel_class, estimator_class(n_classes, random_state=2000 + graph_idx), graph_idx)
+                    graph, kernel_class, estimator_class(n_classes, random_state=2000 + graph_idx), graph_idx
+                )
                 for param_flat, ari in graph_results.items():
                     raw_param_dict[param_flat].append(ari)
 
@@ -158,9 +184,9 @@ def plot_ax(ax, name, x, y, error, color1, color2):
     low_error[low_error < 0] = 0
     high_error = y + error
     high_error[high_error > 1] = 1
-    ax.fill_between(x, low_error, high_error,
-                    alpha=0.2, edgecolor=color1, facecolor=color2,
-                    linewidth=1, antialiased=True)
+    ax.fill_between(
+        x, low_error, high_error, alpha=0.2, edgecolor=color1, facecolor=color2, linewidth=1, antialiased=True
+    )
 
 
 def plot_results(ax, toplot, xlim=(0, 1), ylim=(-0.01, 1.01), nolegend=False):
@@ -191,8 +217,11 @@ class RejectCurve:
 
     @staticmethod
     def _reject_curve(K, y_true, need_shuffle):
-        pairs = [(K[a, b], y_true[a] == y_true[b])
-                 for a, b in combinations(range(K.shape[0]), 2) if a != b and not np.isnan(K[a, b])]
+        pairs = [
+            (K[a, b], y_true[a] == y_true[b])
+            for a, b in combinations(range(K.shape[0]), 2)
+            if a != b and not np.isnan(K[a, b])
+        ]
         if need_shuffle:
             shuffle(pairs)
         pairs = sorted(pairs, key=lambda x: x[0])

@@ -15,8 +15,8 @@ class TestGraphGenerators(unittest.TestCase):
         self.p_in, self.p_out = 0.3, 0.1
 
     def _check_shapes(self, graphs, n_nodes, n_classes):
-        print('X[0].shape', graphs[0][0].shape)
-        print('Counter(y[0])', Counter(graphs[0][1]))
+        print("X[0].shape", graphs[0][0].shape)
+        print("Counter(y[0])", Counter(graphs[0][1]))
 
         self.assertTrue(all([X.shape == (n_nodes, n_nodes) for X, _ in graphs]))
         for _, y in graphs:
@@ -50,24 +50,25 @@ class TestGraphGenerators(unittest.TestCase):
         self._check_probabilities(graphs, self.p_in, self.p_out)
 
     def test_stochasticblockmodel_pmatrix(self):
-        model = StochasticBlockModel(self.n_nodes, 2, probability_matrix=np.array([
-            [self.p_in, self.p_out],
-            [self.p_out, self.p_in]
-        ]))
+        model = StochasticBlockModel(
+            self.n_nodes, 2, probability_matrix=np.array([[self.p_in, self.p_out], [self.p_out, self.p_in]])
+        )
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)
 
     def test_stochasticblockmodel_clustersizes(self):
-        model = StochasticBlockModel(self.n_nodes, 2, cluster_sizes=[self.n_nodes // 2, self.n_nodes // 2],
-                                     p_in=self.p_in, p_out=self.p_out)
+        model = StochasticBlockModel(
+            self.n_nodes, 2, cluster_sizes=[self.n_nodes // 2, self.n_nodes // 2], p_in=self.p_in, p_out=self.p_out
+        )
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)
 
     def test_rubanovsmodel(self):
-        model = RubanovStochasticBlockModel(np.array([50, 50]),
-                                            np.array([[self.p_in, self.p_out], [self.p_out, self.p_in]]))
+        model = RubanovStochasticBlockModel(
+            np.array([50, 50]), np.array([[self.p_in, self.p_out], [self.p_out, self.p_in]])
+        )
         graphs, _ = model.generate_graphs(1000)
         self._check_shapes(graphs, self.n_nodes, self.n_classes)
         self._check_probabilities(graphs, self.p_in, self.p_out)

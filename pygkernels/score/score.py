@@ -8,7 +8,7 @@ from scipy import stats
 def max_accuracy(y_true, y_pred):
     names_true, names_pred, max_result = list(set(y_true)), list(set(y_pred)), 0
     for perm in itertools.permutations(names_pred):
-        acc = np.average([1. if names_true.index(ti) == perm.index(pi) else 0. for ti, pi in zip(y_true, y_pred)])
+        acc = np.average([1.0 if names_true.index(ti) == perm.index(pi) else 0.0 for ti, pi in zip(y_true, y_pred)])
         if acc > max_result:
             max_result = acc
     return max_result

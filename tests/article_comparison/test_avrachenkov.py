@@ -19,11 +19,27 @@ from tqdm import tqdm
 from pygkernels import util
 from pygkernels.cluster import SpectralClustering_rubanov
 from pygkernels.data import Samples
-from pygkernels.measure import scaler, logKatz_H, logComm_H, logHeat_H, logFor_H, logPPR_H, logModifPPR_H, logNHeat_H, \
-    logHeatPR_H
+from pygkernels.measure import (
+    scaler,
+    logKatz_H,
+    logComm_H,
+    logHeat_H,
+    logFor_H,
+    logPPR_H,
+    logModifPPR_H,
+    logNHeat_H,
+    logHeatPR_H,
+)
 from pygkernels.score import FC
-from tests.article_comparison._kernel_rubanov import Katz_R, Estrada_R, Heat_R, RegularizedLaplacian_R, logPPR_R, \
-    logModifPPR_R, logHeatPR_R
+from tests.article_comparison._kernel_rubanov import (
+    Katz_R,
+    Estrada_R,
+    Heat_R,
+    RegularizedLaplacian_R,
+    logPPR_R,
+    logModifPPR_R,
+    logHeatPR_R,
+)
 from tests.article_comparison._rubanov_sbm_model import RubanovStochasticBlockModel
 
 
@@ -37,50 +53,64 @@ class TestNewMeasuresEqualuty(unittest.TestCase):
         walk = logKatz_H(self.graph)
         katz = Katz_R(self.graph)
         for param in scaler.Rho(self.graph).scale_list(np.linspace(0.1, 0.9, 50)):
-            self.assertTrue(np.allclose(walk.get_K(param).ravel(), katz.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(walk.get_K(param).ravel(), katz.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
     def test_estrada(self):
         comm = logComm_H(self.graph)
         estrada = Estrada_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
-            self.assertTrue(np.allclose(comm.get_K(param).ravel(), estrada.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(comm.get_K(param).ravel(), estrada.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
     def test_heat(self):
         heat = logHeat_H(self.graph)
         heat_rubanov = Heat_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.7, 50)):
-            self.assertTrue(np.allclose(heat.get_K(param).ravel(), heat_rubanov.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(heat.get_K(param).ravel(), heat_rubanov.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
     def test_regularized_laplacian(self):
         forest = logFor_H(self.graph)
         reg_laplacian = RegularizedLaplacian_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.1, 0.9, 50)):
-            self.assertTrue(np.allclose(forest.get_K(param).ravel(), reg_laplacian.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(forest.get_K(param).ravel(), reg_laplacian.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
     def test_logPPR(self):
         logppr = logPPR_H(self.graph)
         ppr_rubanov = logPPR_R(self.graph)
         for param in scaler.Linear().scale_list(np.linspace(0.0, 1.0, 50)[1:-1]):
-            self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
     def test_logModifPPR(self):
         logppr = logModifPPR_H(self.graph)
         ppr_rubanov = logModifPPR_R(self.graph)
         for param in scaler.Linear().scale_list(np.linspace(0.0, 0.9, 50)[1:-1]):
-            self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
     def test_logHeatPPR(self):
         logppr = logHeatPR_H(self.graph)
         ppr_rubanov = logHeatPR_R(self.graph)
         for param in scaler.Fraction().scale_list(np.linspace(0.0, 0.7, 50)[1:-1]):
-            self.assertTrue(np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
-                            f'error in param={param:0.3f}')
+            self.assertTrue(
+                np.allclose(logppr.get_K(param).ravel(), ppr_rubanov.get_K(param).ravel(), atol=0.0001),
+                f"error in param={param:0.3f}",
+            )
 
 
 class TestCompetition(unittest.TestCase, ABC):
@@ -92,6 +122,7 @@ class TestCompetition(unittest.TestCase, ABC):
     def _calc_score(self, measure, params):
         results = dict()
         for param in tqdm(params, total=len(params), desc=measure.name):
+
             def whole_kmeans_run(A, y_true):
                 mg = measure(A)
                 try:
@@ -106,10 +137,13 @@ class TestCompetition(unittest.TestCase, ABC):
 
         results = dict([(a, b) for (a, b) in results.items() if ~np.isnan(b)])
         results_idx = np.argmin(list(results.values()))
-        best_param, best_error = list(results.keys())[results_idx], list(results.values())[results_idx],
+        best_param, best_error = (
+            list(results.keys())[results_idx],
+            list(results.values())[results_idx],
+        )
 
         # logging results for report
-        logging.info(f'{measure.name}; Best param: {best_param:0.4f}; Min error: {best_error:0.4f}')
+        logging.info(f"{measure.name}; Best param: {best_param:0.4f}; Min error: {best_error:0.4f}")
 
         return best_error
 
@@ -118,9 +152,11 @@ class TestCompetition(unittest.TestCase, ABC):
         diff = error_test - error_true
 
         # logging results for report
-        logging.info(f'{measure.name}; Min error: {error_test:0.4f}, true={error_true:0.4f}, diff={diff:0.4f}')
-        self.assertTrue(np.isclose(error_test, error_true, atol=self.atol),
-                        f'Test {error_test:0.4f} != True {error_true:0.4f}, diff={diff:0.4f}')
+        logging.info(f"{measure.name}; Min error: {error_test:0.4f}, true={error_true:0.4f}, diff={diff:0.4f}")
+        self.assertTrue(
+            np.isclose(error_test, error_true, atol=self.atol),
+            f"Test {error_test:0.4f} != True {error_true:0.4f}, diff={diff:0.4f}",
+        )
 
 
 @unittest.skip
@@ -181,8 +217,7 @@ class TestUnbalancedModel(TestCompetition):
     @classmethod
     def setUpClass(cls):
         sizes = np.array([50, 150])
-        probs = np.array([[0.1, 0.02],
-                          [0.02, 0.1]])
+        probs = np.array([[0.1, 0.02], [0.02, 0.1]])
         GS, _ = RubanovStochasticBlockModel(sizes, probs).generate_graphs(1000)  # 1000 graphs in paper
         cls.graphs = GS
 

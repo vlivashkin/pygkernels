@@ -6,12 +6,12 @@ from pygkernels.cluster.base import torch_func
 
 def _hKh(hk, ei, K):
     hk_ei = hk - ei
-    return torch.einsum('i,ij,j->', [hk_ei, K, hk_ei])
+    return torch.einsum("i,ij,j->", [hk_ei, K, hk_ei])
 
 
 def _inertia(h, e, K, labels):
     h_e = h.gather(0, labels[None]) - e
-    return torch.einsum('ki,ij,kj->', [h_e, K, h_e])
+    return torch.einsum("ki,ij,kj->", [h_e, K, h_e])
 
 
 def _modularity(A, labels):
@@ -45,7 +45,7 @@ def kmeanspp(K, n_clusters, device):
     h[0, first_centroid] = 1
     for c_idx in range(1, n_clusters):
         h_e = h.unsqueeze(1) - e.unsqueeze(0)  # [k, n, n]
-        min_distances, _ = torch.min(torch.einsum('kni,ij,knj->kn', [h_e, K, h_e]), dim=0)
+        min_distances, _ = torch.min(torch.einsum("kni,ij,knj->kn", [h_e, K, h_e]), dim=0)
         min_distances.pow_(2)
         if torch.sum(min_distances) > 0:
             p = (min_distances / min_distances.sum()).cpu().numpy()
@@ -65,7 +65,7 @@ def predict(K, h, max_iter: int, A, device):
     labels, success = torch.zeros((n,), dtype=torch.int64).to(device), True
     for _ in range(max_iter):
         h_e = h.unsqueeze(1) - e.unsqueeze(0)  # [k, n, n]
-        l = torch.einsum('kni,ij,knj->kn', [h_e, K, h_e]).argmin(dim=0)
+        l = torch.einsum("kni,ij,knj->kn", [h_e, K, h_e]).argmin(dim=0)
         if torch.all(labels == l):  # early stop
             break
         labels = l
@@ -90,7 +90,7 @@ def iterative_predict(K, h, max_iter: int, eps: float, A, device):
 
     # initialization
     h_e = h.unsqueeze(1) - e.unsqueeze(0)  # [k, n, n]
-    l = torch.einsum('kni,ij,knj->kn', [h_e, K, h_e]).argmin(dim=0)
+    l = torch.einsum("kni,ij,knj->kn", [h_e, K, h_e]).argmin(dim=0)
 
     U = torch.zeros((n, n_clusters), dtype=torch.float32).to(device)
     U[range(n), l] = 1
@@ -108,7 +108,7 @@ def iterative_predict(K, h, max_iter: int, eps: float, A, device):
         np.random.shuffle(node_order)
         for i in node_order:  # for each node
             h_ei = h - e[i][None]
-            ΔJ1 = nn / (nn + 1 + eps) * torch.einsum('ki,ij,kj->k', [h_ei, K, h_ei])
+            ΔJ1 = nn / (nn + 1 + eps) * torch.einsum("ki,ij,kj->k", [h_ei, K, h_ei])
             ΔJ1, k_star = ΔJ1.min(dim=0)
             ΔJ2 = nn[l[i]] / (nn[l[i]] - 1 + eps) * _hKh(h[l[i]], e[i], K)
             minΔJ = ΔJ1 - ΔJ2
@@ -117,8 +117,8 @@ def iterative_predict(K, h, max_iter: int, eps: float, A, device):
                     inertia = _inertia(h, e, K, labels)
                     modularity = _modularity(A, labels) if A is not None else None
                     return labels, inertia, modularity, False
-                h[l[i]] = 1. / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
-                h[k_star] = 1. / (nn[k_star] + 1 + eps) * (nn[k_star] * h[k_star] + e[i])
+                h[l[i]] = 1.0 / (nn[l[i]] - 1 + eps) * (nn[l[i]] * h[l[i]] - e[i])
+                h[k_star] = 1.0 / (nn[k_star] + 1 + eps) * (nn[k_star] * h[k_star] + e[i])
                 U[i, l[i]], U[i, k_star] = 0, 1
                 nn[l[i]], nn[k_star] = nn[l[i]] - 1, nn[k_star] + 1
                 l[i] = k_star

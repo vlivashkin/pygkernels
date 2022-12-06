@@ -7,7 +7,7 @@ from pygkernels.cluster.base import KernelEstimator
 
 
 class KWard(KernelEstimator):
-    name = 'KWard'
+    name = "KWard"
 
     def __init__(self, n_clusters, device=None, random_state=None):
         super().__init__(n_clusters, device=device, random_state=random_state)

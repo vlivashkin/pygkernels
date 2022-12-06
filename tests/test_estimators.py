@@ -8,8 +8,14 @@ import torch
 from tqdm import tqdm
 
 from pygkernels import score
-from pygkernels.cluster import KWard, SpectralClustering_rubanov, KMeans_sklearn, Ward_sklearn, \
-    KKMeans, KKMeans_iterative
+from pygkernels.cluster import (
+    KWard,
+    SpectralClustering_rubanov,
+    KMeans_sklearn,
+    Ward_sklearn,
+    KKMeans,
+    KKMeans_iterative,
+)
 from pygkernels.cluster import _kkmeans_pytorch
 from pygkernels.data import Datasets, LFRGenerator
 from pygkernels.measure import logComm_H
@@ -32,11 +38,11 @@ class TestEstimators(unittest.TestCase):
         ]
 
     def test_estimators_news_3cl(self):
-        (A, gt), info = Datasets()['football']
+        (A, gt), info = Datasets()["football"]
         K = logComm_H(A).get_K(0.5)
 
         for estimator in tqdm(self.estimators):
-            km = estimator(n_clusters=info['k'])
+            km = estimator(n_clusters=info["k"])
             km.predict(K, A=A)
 
     @staticmethod
@@ -53,9 +59,9 @@ class TestEstimators(unittest.TestCase):
     def test_modularity_datasets(self):
         (A, gt), _ = Datasets().polbooks
         G = nx.from_numpy_array(A)
-        nx.set_node_attributes(G, dict(enumerate(gt)), 'gt')
+        nx.set_node_attributes(G, dict(enumerate(gt)), "gt")
 
-        modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, 'gt'))
+        modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, "gt"))
 
         mod_ours_numpy1 = score.modularity(A, gt)
         mod_ours_numpy2 = score.modularity(A, gt)
@@ -70,8 +76,8 @@ class TestEstimators(unittest.TestCase):
         np.fill_diagonal(A, 0)
 
         G = nx.from_numpy_array(A)
-        nx.set_node_attributes(G, dict(enumerate(gt)), 'gt')
-        modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, 'gt'))
+        nx.set_node_attributes(G, dict(enumerate(gt)), "gt")
+        modularity_nx = self._calc_nx_modularity(G, nx.get_node_attributes(G, "gt"))
 
         mod_ours_numpy1 = score.modularity(A, gt)
         mod_ours_numpy2 = score.modularity2(A, gt)
