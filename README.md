@@ -42,6 +42,11 @@ Every measure is presented as dissimilarity (distance) and similarity (kernel/pr
 #### Graph datsets:
 https://github.com/vlivashkin/community-graphs
 
+## Install
+```bash
+pip install git+https://github.com/vlivashkin/pygkernels.git
+```
+
 
 ## Usage
 
