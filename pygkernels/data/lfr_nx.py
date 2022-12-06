@@ -2,7 +2,7 @@ from collections import Counter
 
 import numpy as np
 import powerlaw
-from networkx.algorithms.communities import LFR_benchmark_graph
+from networkx import LFR_benchmark_graph
 
 from pygkernels.data.graph_generator import GraphGenerator
 from pygkernels.data.utils import nx2np
