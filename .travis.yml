@@ -6,6 +6,4 @@ before_install:
   - pip install pytest pytest-cov codecov
 install:
   - pip install .
-script: pytest
-after_success:
-  - codecov
+script: pytest --cov-report term --cov=pygkernels --codecov
