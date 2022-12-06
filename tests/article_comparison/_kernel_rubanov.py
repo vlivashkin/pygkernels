@@ -12,6 +12,7 @@ from pygkernels.measure.kernel import Kernel
 # Avrachenkov: Kernels on Graphs as Proximity Measures
 # Implementation by Dmytro Rubanov
 
+
 class _KernelR(Kernel, ABC):
     name, _default_scaler = None, None
 
@@ -26,7 +27,7 @@ class _KernelR(Kernel, ABC):
 
 
 class Katz_R(_KernelR):
-    name, _default_scaler = 'Katz R', scaler.Rho
+    name, _default_scaler = "Katz R", scaler.Rho
 
     def __init__(self, A):
         super().__init__(A)
@@ -45,7 +46,7 @@ class Katz_R(_KernelR):
 
 
 class Estrada_R(_KernelR):
-    name, _default_scaler = 'Estrada R', scaler.Fraction
+    name, _default_scaler = "Estrada R", scaler.Fraction
 
     def get_K(self, t):
         with warnings.catch_warnings():
@@ -55,7 +56,7 @@ class Estrada_R(_KernelR):
 
 
 class Heat_R(_KernelR):  # this is logHeat, actually
-    name, _default_scaler = 'Heat R', scaler.Fraction
+    name, _default_scaler = "Heat R", scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -64,7 +65,7 @@ class Heat_R(_KernelR):  # this is logHeat, actually
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-            K = _KernelR.mat_exp(- t * self.L, n=50)
+            K = _KernelR.mat_exp(-t * self.L, n=50)
             if np.any(K < 0):
                 # logging.info(t, "K < 0")
                 return None
@@ -72,7 +73,7 @@ class Heat_R(_KernelR):  # this is logHeat, actually
 
 
 class NormalizedHeat_R(_KernelR):
-    name, _default_scaler = 'logNHeat R', scaler.Fraction
+    name, _default_scaler = "logNHeat R", scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -92,7 +93,7 @@ class NormalizedHeat_R(_KernelR):
 
 
 class RegularizedLaplacian_R(_KernelR):
-    name, _default_scaler = 'RegularizedLaplacian R', scaler.Fraction
+    name, _default_scaler = "RegularizedLaplacian R", scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -110,7 +111,7 @@ class RegularizedLaplacian_R(_KernelR):
 
 
 class logPPR_R(_KernelR):
-    name, _default_scaler = 'logPPR R', scaler.Linear
+    name, _default_scaler = "logPPR R", scaler.Linear
 
     def __init__(self, A):
         super().__init__(A)
@@ -128,7 +129,7 @@ class logPPR_R(_KernelR):
 
 
 class logModifPPR_R(_KernelR):
-    name, _default_scaler = 'logModifPPR R', scaler.Linear
+    name, _default_scaler = "logModifPPR R", scaler.Linear
 
     def __init__(self, A):
         super().__init__(A)
@@ -145,7 +146,7 @@ class logModifPPR_R(_KernelR):
 
 
 class logHeatPR_R(_KernelR):
-    name, _default_scaler = 'logHeatPR R', scaler.Fraction
+    name, _default_scaler = "logHeatPR R", scaler.Fraction
 
     def __init__(self, A):
         super().__init__(A)
@@ -155,7 +156,7 @@ class logHeatPR_R(_KernelR):
     def get_K(self, t):
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-            K = _KernelR.mat_exp(- t * (np.matlib.eye(self.A.shape[0]) - self.P))
+            K = _KernelR.mat_exp(-t * (np.matlib.eye(self.A.shape[0]) - self.P))
             if np.any(K < 0):
                 return None
             K[K == 0] = self.EPS

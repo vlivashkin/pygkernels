@@ -9,14 +9,14 @@ from pygkernels.cluster.base import torch_func
 
 def calc_cache_batch(Ck_n, Cl_n, Ck_h, Cl_h, K, device):
     """
-        dJ = (n_k * n_l)/(n_k + n_l) * (h_k - h_l)^T * K * (h_k - h_l)
+    dJ = (n_k * n_l)/(n_k + n_l) * (h_k - h_l)^T * K * (h_k - h_l)
     """
     Ck_n = torch.from_numpy(np.array(Ck_n)).to(device)
     Cl_n = torch.from_numpy(np.array(Cl_n)).to(device)
     Ck_h, Cl_h = torch.stack(Ck_h, dim=0), torch.stack(Cl_h, dim=0)
 
     hkhl = Ck_h - Cl_h
-    dJ = (Ck_n * Cl_n) * torch.einsum('ki,ij,kj->k', hkhl, K, hkhl) / (Ck_n + Cl_n)
+    dJ = (Ck_n * Cl_n) * torch.einsum("ki,ij,kj->k", hkhl, K, hkhl) / (Ck_n + Cl_n)
     dJ = dJ.cpu().numpy()
 
     return dJ

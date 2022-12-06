@@ -7,7 +7,7 @@ import numpy as np
 
 
 def configure_logging():
-    logging.basicConfig(stream=sys.stdout, format='%(levelname)s:%(message)s', level=logging.INFO)
+    logging.basicConfig(stream=sys.stdout, format="%(levelname)s:%(message)s", level=logging.INFO)
 
 
 def ddict2dict(d):
@@ -41,16 +41,16 @@ def load_or_calc_and_save(filename, ignore_if_exist=False):
     def my_decorator(func):
         def wrapped(n_graphs, n_params, n_jobs):
             if os.path.exists(filename):
-                print(f'{func.__name__}: cache file {filename} found! Skip calculations')
+                print(f"{func.__name__}: cache file {filename} found! Skip calculations")
                 if not ignore_if_exist:
-                    with open(filename, 'rb') as f:
+                    with open(filename, "rb") as f:
                         result = pickle.load(f)
                 else:
                     result = None
             else:
-                print(f'{func.__name__}: RECALC {filename}. n_graphs={n_graphs}, n_params={n_params}, n_jobs={n_jobs}')
+                print(f"{func.__name__}: RECALC {filename}. n_graphs={n_graphs}, n_params={n_params}, n_jobs={n_jobs}")
                 result = func(n_graphs=n_graphs, n_params=n_params, n_jobs=n_jobs)
-                with open(filename, 'wb') as f:
+                with open(filename, "wb") as f:
                     pickle.dump(result, f)
             return result
 

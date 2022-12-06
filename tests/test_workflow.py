@@ -23,12 +23,12 @@ class TestEstimators(unittest.TestCase):
     def test_all_estimators(self):
         K = Samples.diploma_matrix  # this is not kernel but who cares
 
-        y_pred_kmeans = KKMeans(n_clusters=2, device='cpu', init_measure='inertia').fit_predict(K)
+        y_pred_kmeans = KKMeans(n_clusters=2, device="cpu", init_measure="inertia").fit_predict(K)
         y_pred_ward = KWard(n_clusters=2).fit_predict(K)
         y_pred_spectral = SpectralClustering_rubanov(n_clusters=2).fit_predict(K)
-        logging.info('KMeans: {}'.format(y_pred_kmeans))
-        logging.info('Ward: {}'.format(y_pred_ward))
-        logging.info('Spectral Clustering: {}'.format(y_pred_spectral))
+        logging.info("KMeans: {}".format(y_pred_kmeans))
+        logging.info("Ward: {}".format(y_pred_ward))
+        logging.info("Spectral Clustering: {}".format(y_pred_spectral))
 
 
 class TestWorkflow(unittest.TestCase):
@@ -42,9 +42,9 @@ class TestWorkflow(unittest.TestCase):
             kernel = kernel_class(A)
             param = list(kernel.scaler.scale_list([flat_param]))[0]
             D = kernel.get_K(param)
-            y_pred = KWard(n_clusters=info['k']).predict(D)
-            assert (len(y_pred) == len(gt))
-            assert (not np.isnan(y_pred).any())
+            y_pred = KWard(n_clusters=info["k"]).predict(D)
+            assert len(y_pred) == len(gt)
+            assert not np.isnan(y_pred).any()
 
             score = adjusted_rand_score(gt, y_pred)
             logging.info("{}\t{}\t{}".format(kernel_class.name, flat_param, score))

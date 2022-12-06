@@ -13,30 +13,36 @@ class TestShortcuts(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
 
-        self.A = np.array([
-            [1, 1, 0, 0, 1, 0],
-            [1, 0, 1, 0, 1, 0],
-            [0, 1, 0, 1, 0, 0],
-            [0, 0, 1, 0, 1, 1],
-            [1, 1, 0, 1, 0, 0],
-            [0, 0, 0, 1, 0, 0]
-        ])
-        self.D = np.array([
-            [3, 0, 0, 0, 0, 0],
-            [0, 3, 0, 0, 0, 0],
-            [0, 0, 2, 0, 0, 0],
-            [0, 0, 0, 3, 0, 0],
-            [0, 0, 0, 0, 3, 0],
-            [0, 0, 0, 0, 0, 1]
-        ])
-        self.L = np.array([
-            [2, -1, 0, 0, -1, 0],
-            [-1, 3, -1, 0, -1, 0],
-            [0, -1, 2, -1, 0, 0],
-            [0, 0, -1, 3, -1, -1],
-            [-1, -1, 0, -1, 3, 0],
-            [0, 0, 0, -1, 0, 1]
-        ])
+        self.A = np.array(
+            [
+                [1, 1, 0, 0, 1, 0],
+                [1, 0, 1, 0, 1, 0],
+                [0, 1, 0, 1, 0, 0],
+                [0, 0, 1, 0, 1, 1],
+                [1, 1, 0, 1, 0, 0],
+                [0, 0, 0, 1, 0, 0],
+            ]
+        )
+        self.D = np.array(
+            [
+                [3, 0, 0, 0, 0, 0],
+                [0, 3, 0, 0, 0, 0],
+                [0, 0, 2, 0, 0, 0],
+                [0, 0, 0, 3, 0, 0],
+                [0, 0, 0, 0, 3, 0],
+                [0, 0, 0, 0, 0, 1],
+            ]
+        )
+        self.L = np.array(
+            [
+                [2, -1, 0, 0, -1, 0],
+                [-1, 3, -1, 0, -1, 0],
+                [0, -1, 2, -1, 0, 0],
+                [0, 0, -1, 3, -1, -1],
+                [-1, -1, 0, -1, 3, 0],
+                [0, 0, 0, -1, 0, 1],
+            ]
+        )
 
     def test_get_D(self):
         D = h.get_D(self.A)
@@ -56,8 +62,9 @@ class TestMeasureCommon(unittest.TestCase):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
                     for j in range(D.shape[1]):
-                        self.assertTrue(D[i][j] >= 0,
-                                        "{} < 0 at {}({}) {}/{}".format(D[i][j], distance.name, param, idx, n_params))
+                        self.assertTrue(
+                            D[i][j] >= 0, "{} < 0 at {}({}) {}/{}".format(D[i][j], distance.name, param, idx, n_params)
+                        )
 
     def test_chain_all_distances_symmetry_matrix(self):
         start, end, n_params = 0.1, 0.6, 30
@@ -67,8 +74,9 @@ class TestMeasureCommon(unittest.TestCase):
                 D = distance.get_D(param)
                 for i in range(D.shape[0]):
                     for j in range(i + 1, D.shape[1]):
-                        self.assertTrue(np.allclose(D[i][j], D[j][i]),
-                                        "{:0.3f} != {:0.3f} at {}, {}".format(D[i][j], D[j][i], i, j))
+                        self.assertTrue(
+                            np.allclose(D[i][j], D[j][i]), "{:0.3f} != {:0.3f} at {}, {}".format(D[i][j], D[j][i], i, j)
+                        )
 
     def test_chain_all_distances_main_diagonal_zero(self):
         start, end, n_params = 0.0001, 0.5, 30

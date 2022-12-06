@@ -51,8 +51,8 @@ class TestSPCT(unittest.TestCase):
 
     @unittest.skip
     def test_weighted_graph_SP(self):
-        with np.errstate(divide='ignore', invalid='ignore'):
-            A = np.divide(1., Samples.weighted, where=Samples.weighted != 0)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            A = np.divide(1.0, Samples.weighted, where=Samples.weighted != 0)
         true_SP = Samples.weighted_sp
         self.assertTrue(np.allclose(self.get_SP(A), true_SP))
 
@@ -104,29 +104,29 @@ class Figure2ComparisonTests(unittest.TestCase):
         (self.graph, self.y_true), _ = Datasets().karate
 
     def call_and_print(self, name, K):
-        y_pred = KKMeans(n_clusters=2, device='cpu', init_measure='inertia').fit_predict(K)
+        y_pred = KKMeans(n_clusters=2, device="cpu", init_measure="inertia").fit_predict(K)
         ari = adjusted_rand_score(self.y_true, y_pred)
-        print('{}\t{:0.3f}'.format(name, ari))
+        print("{}\t{:0.3f}".format(name, ari))
 
     def test_CT(self):
         K_CT = CT_H(self.graph).get_K(0)
-        self.call_and_print('CT\t', K_CT)
+        self.call_and_print("CT\t", K_CT)
         K_logFor = logFor_H(self.graph).get_K(500.0)
-        self.call_and_print('logFor\t500', K_logFor)
+        self.call_and_print("logFor\t500", K_logFor)
         K_RSP = RSP_K(self.graph).get_K(0.0001)
-        self.call_and_print('RSP\t0.0001', K_RSP)
+        self.call_and_print("RSP\t0.0001", K_RSP)
         K_FE = FE_K(self.graph).get_K(0.0001)
-        self.call_and_print('FE\t0.0001', K_FE)
+        self.call_and_print("FE\t0.0001", K_FE)
 
     def test_SP(self):
         K_SP = SP_K(self.graph).get_K(-1)
-        self.call_and_print('SP\t', K_SP)
+        self.call_and_print("SP\t", K_SP)
         K_logFor = logFor_H(self.graph).get_K(0.001)
-        self.call_and_print('logFor\t0.001', K_logFor)
+        self.call_and_print("logFor\t0.001", K_logFor)
         K_RSP = RSP_K(self.graph).get_K(19.0)
-        self.call_and_print('RSP\t19', K_RSP)
+        self.call_and_print("RSP\t19", K_RSP)
         K_FE = FE_K(self.graph).get_K(19.0)
-        self.call_and_print('FE\t19', K_FE)
+        self.call_and_print("FE\t19", K_FE)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import numpy as np
 
 class Scaler(ABC):
     def __init__(self, A: np.ndarray = None):
-        self.eps = 10 ** -10
+        self.eps = 10**-10
         self.A = A
 
     def scale_list(self, ts):

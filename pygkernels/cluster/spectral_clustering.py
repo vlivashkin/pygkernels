@@ -7,7 +7,7 @@ from pygkernels.cluster.base import KernelEstimator
 
 
 class SpectralClustering_rubanov(KernelEstimator):
-    name = 'SpectralClustering_rubanov'
+    name = "SpectralClustering_rubanov"
 
     def __init__(self, n_clusters, n_init=10, random_state=None):
         super().__init__(n_clusters)
@@ -16,7 +16,7 @@ class SpectralClustering_rubanov(KernelEstimator):
 
     def _max_ort(self, M):
         val, vec = np.linalg.eig(M)
-        ind = np.argpartition(val, -self.n_clusters)[-self.n_clusters:]
+        ind = np.argpartition(val, -self.n_clusters)[-self.n_clusters :]
         return vec[:, ind]
 
     def _sign_flip(self, X):

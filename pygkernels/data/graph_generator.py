@@ -14,7 +14,7 @@ class GraphGenerator:
         return cls.params_from_graph(np2nx(A, partition), name=name)
 
     @classmethod
-    def params_from_graph(cls, G, name=None) -> 'GraphGenerator':
+    def params_from_graph(cls, G, name=None) -> "GraphGenerator":
         raise NotImplementedError()
 
     def generate_graph(self, seed=None) -> (np.ndarray, np.ndarray):
@@ -30,16 +30,16 @@ class GraphGenerator:
         G = nx.from_numpy_matrix(A)
         while not nx.is_connected(G):
             components = list(nx.connected_components(G))
-            print(f'not connected! {len(components)} components')
+            print(f"not connected! {len(components)} components")
             G.add_edge(np.random.choice(list(components[0])), np.random.choice(list(components[1])))
         return A, partition
 
     def generate_graphs(self, n_graphs, is_connected=True, verbose=False, n_jobs=1):
-        logging.info(f'{self.__class__.__name__}: count={n_graphs}')
+        logging.info(f"{self.__class__.__name__}: count={n_graphs}")
 
         graphs_range = range(n_graphs)
         if verbose:
-            graphs_range = tqdm(graphs_range, desc=f'{self.__class__.__name__}')
+            graphs_range = tqdm(graphs_range, desc=f"{self.__class__.__name__}")
         generate_method = self.generate_connected_graph if is_connected else self.generate_graph
         graphs = Parallel(n_jobs=n_jobs)(delayed(generate_method)(idx) for idx in graphs_range)
         info = self.generate_info(n_graphs)

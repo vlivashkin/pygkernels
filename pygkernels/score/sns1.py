@@ -11,8 +11,8 @@ def fraction(numerator, denominator):
     if numerator == 0:
         return 0
     if numerator > 0:
-        return float('inf')
-    return -float('inf')
+        return float("inf")
+    return -float("inf")
 
 
 class Contingency(dict):
@@ -21,16 +21,9 @@ class Contingency(dict):
         self.B = Clustering.from_anything(B)
         self.n = len(self.A)
         self.meet = Clustering.meet(self.A, self.B)
-        self.sizesA = [
-            len(Ai) for Ai in self.A.partition()
-        ]
-        self.sizesB = [
-            len(Bj) for Bj in self.B.partition()
-        ]
-        super().__init__({
-            key: len(p)
-            for key, p in self.meet.items()
-        })
+        self.sizesA = [len(Ai) for Ai in self.A.partition()]
+        self.sizesB = [len(Bj) for Bj in self.B.partition()]
+        super().__init__({key: len(p) for key, p in self.meet.items()})
 
 
 class Score:
@@ -99,17 +92,11 @@ class Clustering(list):
         return list(self.clusters.values())
 
     def sizes(self):
-        return [
-            len(cluster) for cluster in self.clusters.values()
-        ]
+        return [len(cluster) for cluster in self.clusters.values()]
 
     @staticmethod
     def meet(A, B):
-        return {
-            (i, j): Ai.intersection(Bj)
-            for i, Ai in enumerate(A.partition())
-            for j, Bj in enumerate(B.partition())
-        }
+        return {(i, j): Ai.intersection(Bj) for i, Ai in enumerate(A.partition()) for j, Bj in enumerate(B.partition())}
 
     # Operator overload of A*B will return the meet of the clusterings.
     def __mul__(self, other):
@@ -117,10 +104,7 @@ class Clustering(list):
 
     @staticmethod
     def from_sizes(sizes):
-        return Clustering(sum([
-            [c] * size
-            for c, size in enumerate(sizes)
-        ], []))
+        return Clustering(sum([[c] * size for c, size in enumerate(sizes)], []))
 
     @staticmethod
     def from_partition(partition):
@@ -141,7 +125,7 @@ class Clustering(list):
         if isinstance(A, dict):
             return Clustering.from_partition(A.values())
         # See whether it is iterable.
-        if hasattr(A, '__iter__'):
+        if hasattr(A, "__iter__"):
             A = list(A)
             # If the first item is an integer, we assume it's a list
             # of clusterlabels so that we can call the constructor.
@@ -150,7 +134,7 @@ class Clustering(list):
             elif type(A[0]) in {set, list}:
                 # If the first item is a set or list, we consider it a partition.
                 return Clustering.from_partition(A)
-        print('Clustering.FromAnything was unable to cast {}'.format(A))
+        print("Clustering.FromAnything was unable to cast {}".format(A))
 
     @staticmethod
     def balanced_sizes(n, k):
@@ -182,7 +166,7 @@ class PairCounts(dict):
         self.N01 = N01
         self.N10 = N10
         self.N11 = N11
-        super().__init__({'N00': N00, 'N01': N01, 'N10': N10, 'N11': N11})
+        super().__init__({"N00": N00, "N01": N01, "N10": N10, "N11": N11})
         self.N = sum(self.values())
         self.mA = N11 + N10
         self.mB = N11 + N01
@@ -227,7 +211,7 @@ class PairCounts(dict):
                 N10=self.N10 + 1,
                 N01=self.N01,
                 N00=self.N00,
-            )
+            ),
         }
         # Remove invalid
         return {action: pc for action, pc in all_directions.items() if -1 not in pc.values()}
@@ -245,9 +229,7 @@ class PairCounts(dict):
         C = Clustering.from_anything(C)
         mA = len(G.edges)
         mB = C.intra_pairs()
-        N11 = sum([
-            1 for v, w in G.edges if C[v] == C[w]
-        ])
+        N11 = sum([1 for v, w in G.edges if C[v] == C[w]])
         N = int(len(C) * (len(C) - 1) / 2)
         return PairCounts(N11=N11, N10=mA - N11, N01=mB - N11, N00=N - mA - mB + N11)
 
@@ -262,17 +244,9 @@ class PairCounts(dict):
         if type(anything) == Contingency:
             sizes2intra = lambda sizes: int((0.5 * sizes * (sizes - 1)).sum())
             N11 = sizes2intra(np.array(list(anything.values())))
-            mA, mB = (
-                sizes2intra(np.array(sizes))
-                for sizes in [anything.sizesA, anything.sizesB]
-            )
+            mA, mB = (sizes2intra(np.array(sizes)) for sizes in [anything.sizesA, anything.sizesB])
             N = int(anything.n * (anything.n - 1) / 2)
-            return PairCounts(
-                N11=N11,
-                N10=mA - N11,
-                N01=mB - N11,
-                N00=N - mA - mB + N11
-            )
+            return PairCounts(N11=N11, N10=mA - N11, N01=mB - N11, N00=N - mA - mB + N11)
         if type(anything) == dict:
             return PairCounts(**anything)
         if type(anything) == tuple:
@@ -318,10 +292,9 @@ class PairCountingScore(Score):
 class SokalAndSneath1(PairCountingScore):
     @staticmethod
     def paircounting_score(N00, N01, N10, N11, **kwargs):
-        return (fraction(N11, N11 + N10)
-                + fraction(N11, N11 + N01)
-                + fraction(N00, N00 + N10)
-                + fraction(N00, N00 + N01)) / 4
+        return (
+            fraction(N11, N11 + N10) + fraction(N11, N11 + N01) + fraction(N00, N00 + N10) + fraction(N00, N00 + N01)
+        ) / 4
 
 
 def preddict2list(y):

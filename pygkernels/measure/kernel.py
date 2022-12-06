@@ -8,7 +8,7 @@ from . import shortcuts as h
 
 
 class Kernel(ABC):
-    EPS = 10 ** -10
+    EPS = 10**-10
     name, _default_scaler = None, None
     _parent_distance_class, _parent_kernel_class = None, None
 
@@ -37,7 +37,7 @@ class Kernel(ABC):
 
 
 class CT_H(Kernel):
-    name, _default_scaler = 'CT', scaler.Linear
+    name, _default_scaler = "CT", scaler.Linear
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -48,7 +48,7 @@ class CT_H(Kernel):
 
 
 class Katz_H(Kernel):
-    name, _default_scaler = 'Katz', scaler.Rho
+    name, _default_scaler = "Katz", scaler.Rho
 
     def get_K(self, t):
         """
@@ -59,7 +59,7 @@ class Katz_H(Kernel):
 
 
 class For_H(Kernel):
-    name, _default_scaler = 'For', scaler.Fraction
+    name, _default_scaler = "For", scaler.Fraction
 
     def get_K(self, t):
         """
@@ -70,7 +70,7 @@ class For_H(Kernel):
 
 
 class Comm_H(Kernel):
-    name, _default_scaler = 'Comm', scaler.Fraction
+    name, _default_scaler = "Comm", scaler.Fraction
 
     def get_K(self, t):
         """
@@ -80,7 +80,7 @@ class Comm_H(Kernel):
 
 
 class Heat_H(Kernel):
-    name, _default_scaler = 'Heat', scaler.Fraction
+    name, _default_scaler = "Heat", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -94,7 +94,7 @@ class Heat_H(Kernel):
 
 
 class NHeat_H(Kernel):
-    name, _default_scaler = 'NHeat', scaler.Fraction
+    name, _default_scaler = "NHeat", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -108,7 +108,7 @@ class NHeat_H(Kernel):
 
 
 class SCT_H(CT_H):
-    name, _default_scaler = 'SCT', scaler.Fraction
+    name, _default_scaler = "SCT", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -119,11 +119,11 @@ class SCT_H(CT_H):
         """
         H = 1/(1 + exp(-αL+/σ))
         """
-        return 1. / (1. + np.exp(-alpha * self.Kds))
+        return 1.0 / (1.0 + np.exp(-alpha * self.Kds))
 
 
 class CCT_H(Kernel):
-    name, _default_scaler = 'CCT', scaler.Fraction
+    name, _default_scaler = "CCT", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -151,7 +151,7 @@ class CCT_H(Kernel):
 
 
 class SCCT_H(CCT_H):
-    name, _default_scaler = 'SCCT', scaler.Fraction
+    name, _default_scaler = "SCCT", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -162,11 +162,11 @@ class SCCT_H(CCT_H):
         """
         H = 1/(1 + exp(-αL+/σ))
         """
-        return 1. / (1. + np.exp(-alpha * self.Kds))
+        return 1.0 / (1.0 + np.exp(-alpha * self.Kds))
 
 
 class PPR_H(Kernel):
-    name, _default_scaler = 'PPR', scaler.Linear
+    name, _default_scaler = "PPR", scaler.Linear
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -181,7 +181,7 @@ class PPR_H(Kernel):
 
 
 class ModifPPR_H(Kernel):
-    name, _default_scaler = 'ModifPPR', scaler.Linear
+    name, _default_scaler = "ModifPPR", scaler.Linear
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -195,7 +195,7 @@ class ModifPPR_H(Kernel):
 
 
 class HeatPR_H(Kernel):
-    name, _default_scaler = 'HeatPR', scaler.Fraction
+    name, _default_scaler = "HeatPR", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)
@@ -210,7 +210,7 @@ class HeatPR_H(Kernel):
 
 
 class DF_H(Kernel):
-    name, _default_scaler = 'DF', scaler.Fraction
+    name, _default_scaler = "DF", scaler.Fraction
 
     def __init__(self, A: np.ndarray, n_iter=30):
         super().__init__(A)
@@ -235,7 +235,7 @@ class DF_H(Kernel):
 
 
 class Abs_H(Kernel):
-    name, _default_scaler = 'Abs', scaler.Fraction
+    name, _default_scaler = "Abs", scaler.Fraction
 
     def __init__(self, A: np.ndarray):
         super().__init__(A)

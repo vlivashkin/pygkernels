@@ -101,12 +101,12 @@ More usage approaches are in a separate repo https://github.com/vlivashkin/pygke
 ## Citation
 
 ```
-@inproceedings{ivashkin2016logarithmic,
-  title={Do logarithmic proximity measures outperform plain ones in graph clustering?},
+@inproceedings{ivashkin2021dissecting,
+  title={Dissecting graph measure performance for node clustering in LFR parameter space},
   author={Ivashkin, Vladimir and Chebotarev, Pavel},
-  booktitle={International Conference on Network Analysis},
-  pages={87--105},
-  year={2016},
+  booktitle={International Conference on Complex Networks and Their Applications},
+  pages={328--341},
+  year={2021},
   organization={Springer}
 }
 ```

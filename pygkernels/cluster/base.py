@@ -17,10 +17,10 @@ class KernelEstimator(BaseEstimator, ClusterMixin, ABC):
         self.random_state = random_state
         if device is None:
             if torch.cuda.is_available():
-                self.device = 'cuda:0'
+                self.device = "cuda:0"
             else:
-                self.device = 'cpu'
-            print(f'Auto chosen device: {self.device}')
+                self.device = "cpu"
+            print(f"Auto chosen device: {self.device}")
         else:
             self.device = device
 
@@ -38,28 +38,38 @@ class KernelEstimator(BaseEstimator, ClusterMixin, ABC):
 
 
 class REstimatorWrapper(KernelEstimator, ABC):
-    RSCRIPT_ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), 'r')
+    RSCRIPT_ROOT_PATH = pj(os.path.dirname(os.path.abspath(__file__)), "r")
 
     def _predict(self, K, script_name):
         temp_name = f"{uuid.uuid4()}.csv"
         np.savetxt(temp_name, K, delimiter=",")
         try:
             subprocess.check_output(
-                ["Rscript", "--vanilla", pj(REstimatorWrapper.RSCRIPT_ROOT_PATH, script_name),
-                 temp_name, str(self.n_clusters)], timeout=60)
-            result = list(pd.read_csv(temp_name + '_result.csv')['x'])
+                [
+                    "Rscript",
+                    "--vanilla",
+                    pj(REstimatorWrapper.RSCRIPT_ROOT_PATH, script_name),
+                    temp_name,
+                    str(self.n_clusters),
+                ],
+                timeout=60,
+            )
+            result = list(pd.read_csv(temp_name + "_result.csv")["x"])
         finally:
             os.remove(temp_name)
-            os.remove(temp_name + '_result.csv')
+            os.remove(temp_name + "_result.csv")
         return result
 
 
 def torch_func(func):
     def wrapper(*args, **kwargs):
         with torch.no_grad():
-            args = [torch.from_numpy(x).float().to(kwargs['device'])
-                    if type(x) in [np.ndarray, np.memmap] and x.dtype in [np.float32, np.float64] else x
-                    for x in args]
+            args = [
+                torch.from_numpy(x).float().to(kwargs["device"])
+                if type(x) in [np.ndarray, np.memmap] and x.dtype in [np.float32, np.float64]
+                else x
+                for x in args
+            ]
             results = func(*args, **kwargs)
             if type(results) == tuple:
                 results = tuple(x.cpu().numpy() if type(x) == torch.Tensor else x for x in results)
