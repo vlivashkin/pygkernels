@@ -5,17 +5,17 @@ from typing import List
 import networkx as nx
 import numpy as np
 
+CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 class Datasets:
     """
     Example datasets.
-    The class uses https://github.com/vlivashkin/community-graphs, mounted as submodule to ./community-graphs
+    The class uses https://github.com/vlivashkin/community-graphs, mounted as submodule to /submodules/community-graphs
     """
 
     def __init__(self, datasets_root=None):
         if datasets_root is None:
-            folder_of_this_src_file = os.path.dirname(os.path.abspath(__file__))
-            self.datasets_root = f"{folder_of_this_src_file}/community-graphs/gml_connected_subgraphs"
+            self.datasets_root = f"{CURRENT_FOLDER}/../../submodules/community-graphs/gml_connected_subgraphs"
         else:
             self.datasets_root = datasets_root
 

@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+joblib = ">=1.2.0"
+matplotlib = ">=3.6.2"
+networkx = "*"
+numpy = "*"
+pandas = "*"
+scikit-learn = ">=1.1.3"
+scipy = ">=1.9.3"
+tqdm = "*"
+torch = ">=1.12.0"
+powerlaw = ">=1.5"
+
+[dev-packages]
+jupyter = "*"
+black = "*"
+requests = "*"
+beautifulsoup4 = "*"
+
+[requires]
+python_version = "3.11"
