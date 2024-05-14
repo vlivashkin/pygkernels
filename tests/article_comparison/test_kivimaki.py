@@ -11,7 +11,7 @@ from sklearn.metrics import normalized_mutual_info_score
 import numpy as np
 from pygkernels import util
 from pygkernels.cluster import KKMeans
-from pygkernels.data import Samples, Datasets
+from pygkernels.data import Samples, ClusteringDatasets
 from pygkernels.measure import SPCT_D, logFor_D, RSP_D, FE_D, RSP_K, FE_K, logFor_H, SPCT_K, SCT_H
 
 
@@ -83,7 +83,7 @@ class TestTable2(unittest.TestCase):
             "news_5cl2": (0.640, 0.646, 0.587, 0.596, 0.604),
             "news_5cl3": (0.612, 0.616, 0.573, 0.478, 0.573),
         }
-        self.datasets = Datasets()
+        self.datasets = ClusteringDatasets()
 
     def _newsgroup_results(self, measure_class, best_param, idx):
         results = []

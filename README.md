@@ -84,10 +84,11 @@ best_param = params[np.argmax(ari)]
 ```
 
 #### Generate LFR graphs like datasets:
-```python
-from pygkernels.data import Datasets, LFRGenerator
 
-(A, partition), info = Datasets()['news_2cl1_0.1']
+```python
+from pygkernels.data import ClusteringDatasets, LFRGenerator
+
+(A, partition), info = ClusteringDatasets()['news_2cl1_0.1']
 gen = LFRGenerator.params_from_adj_matrix(A, partition, info['k'])
 print(gen.generate_info())
 A, partition = gen.generate_graph()

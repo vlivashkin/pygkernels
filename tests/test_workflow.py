@@ -7,7 +7,7 @@ from sklearn.metrics import adjusted_rand_score
 from pygkernels import util
 from pygkernels.cluster import KKMeans, SpectralClustering_rubanov
 from pygkernels.cluster.kward import KWard
-from pygkernels.data import Samples, Datasets
+from pygkernels.data import Samples, ClusteringDatasets
 from pygkernels.measure import kernels
 
 
@@ -36,7 +36,7 @@ class TestWorkflow(unittest.TestCase):
         super().__init__(*args, **kwargs)
 
     def test_ward_clustering(self):
-        (A, gt), info = Datasets().polbooks
+        (A, gt), info = ClusteringDatasets().polbooks
         flat_param = 0.5
         for kernel_class in kernels:
             kernel = kernel_class(A)

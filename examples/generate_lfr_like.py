@@ -1,6 +1,6 @@
 from networkx.algorithms.community import LFR_benchmark_graph
 
-from pygkernels.data import Datasets, LFRGenerator
+from pygkernels.data import ClusteringDatasets, LFRGenerator
 from pygkernels.data.utils import nx2np
 
 
@@ -31,7 +31,7 @@ def generate_by_fixed_params():
 
 def generate_like():
     print("generate_like")
-    (A, partition), info = Datasets()["news_2cl1_0.1"]
+    (A, partition), info = ClusteringDatasets()["news_2cl1_0.1"]
     gen = LFRGenerator.params_from_adj_matrix(A, partition)
     print(gen.generate_info())
     A, partition = gen.generate_graph()

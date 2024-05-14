@@ -6,7 +6,7 @@ from sklearn.metrics import adjusted_rand_score
 import pygkernels.measure.shortcuts as h
 from pygkernels import util
 from pygkernels.cluster import KKMeans
-from pygkernels.data import Samples, Datasets
+from pygkernels.data import Samples, ClusteringDatasets
 from pygkernels.measure import SPCT_D, SP_D, CT_H, logFor_H, RSP_K, FE_K, SP_K
 
 
@@ -101,7 +101,7 @@ class Figure2ComparisonTests(unittest.TestCase):
         super().__init__(*args, **kwargs)
         util.configure_logging()
 
-        (self.graph, self.y_true), _ = Datasets().karate
+        (self.graph, self.y_true), _ = ClusteringDatasets().karate
 
     def call_and_print(self, name, K):
         y_pred = KKMeans(n_clusters=2, device="cpu", init_measure="inertia").fit_predict(K)

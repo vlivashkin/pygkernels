@@ -17,7 +17,7 @@ from pygkernels.cluster import (
     KKMeans_iterative,
 )
 from pygkernels.cluster import _kkmeans_pytorch
-from pygkernels.data import Datasets, LFRGenerator
+from pygkernels.data import ClusteringDatasets, LFRGenerator
 from pygkernels.measure import logComm_H
 
 
@@ -38,7 +38,7 @@ class TestEstimators(unittest.TestCase):
         ]
 
     def test_estimators_news_3cl(self):
-        (A, gt), info = Datasets()["football"]
+        (A, gt), info = ClusteringDatasets()["football"]
         K = logComm_H(A).get_K(0.5)
 
         for estimator in tqdm(self.estimators):
@@ -57,7 +57,7 @@ class TestEstimators(unittest.TestCase):
         return nx.community.modularity(G, communities)
 
     def test_modularity_datasets(self):
-        (A, gt), _ = Datasets().polbooks
+        (A, gt), _ = ClusteringDatasets().polbooks
         G = nx.from_numpy_array(A)
         nx.set_node_attributes(G, dict(enumerate(gt)), "gt")
 

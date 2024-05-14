@@ -11,7 +11,7 @@ from sklearn.metrics import adjusted_rand_score
 
 from pygkernels import util
 from pygkernels.cluster import KKMeans
-from pygkernels.data import Datasets
+from pygkernels.data import ClusteringDatasets
 from pygkernels.measure import SCT_H
 from pygkernels.score import rand_index
 
@@ -33,7 +33,7 @@ class Table1Tests(unittest.TestCase):
             "news_5cl2": (0.748, 0.77),
             "news_5cl3": (0.764, 0.75),
         }
-        self.datasets = Datasets()
+        self.datasets = ClusteringDatasets()
 
     def _newsgroup_results(self, name, scorer_func, result_idx, atol=0.1):
         results = []

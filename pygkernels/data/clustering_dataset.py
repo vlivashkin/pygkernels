@@ -1,28 +1,17 @@
-import json
 import os
 from typing import List
 
 import networkx as nx
 import numpy as np
 
+from pygkernels.data._dataset import Datasets
+
 CURRENT_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-class Datasets:
-    """
-    Example datasets.
-    The class uses https://github.com/vlivashkin/community-graphs, mounted as submodule to /submodules/community-graphs
-    """
 
+class ClusteringDatasets(Datasets):
     def __init__(self, datasets_root=None):
-        if datasets_root is None:
-            self.datasets_root = f"{CURRENT_FOLDER}/../../submodules/community-graphs/gml_connected_subgraphs"
-        else:
-            self.datasets_root = datasets_root
-
-        with open(f"{self.datasets_root}/stat.json", "r") as f:
-            self._meta = json.load(f)
-
-        self._paths = {
+        paths = {
             "cora_AI": "cora_subset/Artificial_Intelligence.gml",
             "cora_AI_ML": "cora_subset/Artificial_Intelligence__Machine_Learning.gml",
             "cora_DS_AT": "cora_subset/Data_Structures__Algorithms_and_Theory.gml",
@@ -62,20 +51,19 @@ class Datasets:
             "sp_school_day_1": "sp_school/sp_school_day_1.gml",
             "sp_school_day_2": "sp_school/sp_school_day_2.gml",
         }
-
-        self._loaded_datasets = {}
+        super().__init__(paths, datasets_root=datasets_root)
 
     @staticmethod
-    def simplify_partition(partition: List):
+    def _simplify_partition(partition: List):
         class_mapping = dict([(y, x) for x, y in enumerate(set(partition))])
         return np.array([class_mapping[x] for x in partition], dtype=np.uint8)
 
-    def _read_gml(self, name, rel_path):
+    def _read_gml(self, rel_path):
         fpath = f"{self.datasets_root}/{rel_path}"
         G = nx.read_gml(fpath)
         nodes_order, partition = zip(*nx.get_node_attributes(G, "gt").items())
         A = np.array(nx.adjacency_matrix(G, nodelist=nodes_order).todense())
-        partition = self.simplify_partition(partition)
+        partition = self._simplify_partition(partition)
 
         meta = self._meta[os.path.splitext(os.path.basename(rel_path))[0]]
         n, k = meta["n_nodes"], meta["n_classes"]
@@ -96,12 +84,3 @@ class Datasets:
             "P": P,
         }
         return (A, partition), info
-
-    def __getitem__(self, name):
-        if name not in self._loaded_datasets:
-            print(f"Dataset {name} not in cache; reload")
-            self._loaded_datasets[name] = self._read_gml(name, self._paths[name])
-        return self._loaded_datasets[name]
-
-    def __getattr__(self, name):
-        return self[name]
